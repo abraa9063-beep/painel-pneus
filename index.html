@@ -684,7 +684,7 @@ header .small {
 
   <script>
     /* ===== 1) COLE AQUI SEU LINK DO APPS SCRIPT ( /exec ) ===== */
-    const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbw_KsRDLmybSs0Qqp-zkT4TJzJxPvBk6QKEP67qVI5p-IrdN0bK1GZOO2HY65WBdEtvhQ/exec";
+    const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwVgzTSpsua4U8VqCBCLjsKAekpKqYR9MosYkkGv_0WXtd-RRfJWct5G1jb5g8TI_sf9g/exec";
     /* ========================================================= */
 
     // dados de marca -> modelos -> tamanho
@@ -1113,37 +1113,53 @@ header .small {
       });
     }
 
-    function removeMovement(localId) {
-      const mov = movements.find(m => m.localId === localId);
-      if (!mov) return;
-      if (!confirm("Remover esta baixa e devolver ao estoque?")) return;
+   function removeMovement(localId) {
+  const mov = movements.find(m => m.localId === localId);
+  if (!mov) return;
 
-      const item = items.find(i => i.id === mov.itemId);
-      if (item) {
-        item.qty += mov.qty;
-      }
+  if (!confirm("Remover esta baixa e devolver ao estoque?")) return;
 
-      movements = movements.filter(m => m.localId !== localId);
-renderMovements();
-applyFilters();
-saveAll();
+  // devolve a quantidade ao item original
+  const item = items.find(i => i.id === mov.itemId);
+  if (item) {
+    item.qty += mov.qty;
+  }
 
-// envia atualização pro Google Sheets (salvar_item)
-const item = items.find(i => i.localId === localId);
-if (item) {
+  // remove do histórico
+  movements = movements.filter(m => m.localId !== localId);
+  renderMovements();
+  applyFilters();
+  saveAll();
+
+  // envia atualização para a planilha (estoque atualizado)
+  if (item) {
+    sendToSheet({
+      tipo: "salvar_item",
+      data: new Date().toLocaleString("pt-BR"),
+      placa: "",
+      numero: item.id || "",
+      quantidade: item.qty || "",
+      marca: item.marca || "",
+      modelo: item.modelo || ""
+    });
+  }
+
+  // envia informação da saída removida
   sendToSheet({
-    tipo: "salvar_item",
-    data: new Date().toLocaleString("pt-BR"),
-    placa: "",
-    numero: item.id || "",
-    quantidade: item.qty || "",
-    marca: item.marca || "",
-    modelo: item.modelo || ""
+    tipo: "extornar_saida",
+    id: mov.itemId,
+    nome: mov.itemName,
+    qtd: mov.qty,
+    preco: mov.price,
+    placa: mov.plate,
+    observacao: "remoção de baixa",
+    marca: mov.marca,
+    modelo: mov.modelo,
+    tamanho: mov.tamanho,
+    status: "removido"
   });
-
 }
 
-   
     }
 
     // ===== Recapagem =====
@@ -1486,6 +1502,7 @@ setInterval(loadFromSheet, 3000);
   </script>
 </body>
 </html>
+
 
 
 
