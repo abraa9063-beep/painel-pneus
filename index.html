@@ -10,8 +10,10 @@
       --panel: #111827;
       --panel-light: #1f2937;
       --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.1);
       --text: #e2e8f0;
       --muted: #94a3b8;
+      --danger: #f43f5e;
       --radius: 14px;
     }
     * {
@@ -20,30 +22,66 @@
     }
     body {
       margin: 0;
-      background: radial-gradient(circle at center, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.65) 60%, #020617 100%),
-        url("logo-canarinhos.png") no-repeat center center;
-      background-size: 900px auto;
+      background: radial-gradient(circle at top, rgba(31, 41, 55, 0.95), #020617);
       color: var(--text);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      position: relative;
+      overflow-x: hidden;
+    }
+    /* fundo com logo redondo */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.65) 60%, #020617 100%),
+        url("logo-canarinhos2.png") no-repeat center center;
+      background-size: 900px auto;
+      opacity: 0.12;
+      pointer-events: none;
+      z-index: -1;
     }
     header {
-      padding: 16px 24px 0;
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 16px;
+      background: rgba(2, 6, 23, 0.78);
+      backdrop-filter: blur(16px);
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .logo-icon {
-      width: 40px;
       height: 40px;
+      width: 40px;
+      border-radius: 10px;
       object-fit: contain;
+      background: transparent;
     }
     header h1 {
+      font-size: 1.1rem;
       margin: 0;
-      font-size: 1.05rem;
     }
     .small {
-      font-size: .7rem;
+      font-size: 0.7rem;
       color: var(--muted);
+    }
+    .header-center {
+      margin-left: auto;
+      font-size: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      background: rgba(15,23,42,.4);
+      padding: 4px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,.15);
     }
     .tag {
       background: rgba(56, 189, 248, 0.12);
@@ -53,73 +91,86 @@
       font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.06em;
-      margin-left: auto;
-      margin-right: 24px;
-    }
-    .header-center {
-      width: 100%;
-      border-top: 1px solid rgba(148, 163, 184, 0.12);
-      margin-top: 10px;
-      padding: 6px 24px 10px;
-      font-size: .75rem;
-      letter-spacing: .04em;
+      margin-left: 12px;
     }
     main {
+      padding: 20px 24px 40px;
       max-width: 1250px;
+      width: 100%;
       margin: 0 auto;
-      padding: 12px 24px 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
     .tabs {
       display: flex;
       gap: 8px;
-      margin-bottom: 12px;
+      margin-top: 8px;
+      flex-wrap: wrap;
     }
     .tab-btn {
       background: rgba(15, 23, 42, 0.2);
-      border: none;
-      color: var(--text);
-      padding: 7px 16px;
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 6px 14px;
       border-radius: 999px;
+      font-size: 0.72rem;
       cursor: pointer;
-      font-size: .78rem;
     }
     .tab-btn.active {
       background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-color: rgba(56, 189, 248, 0.3);
+      color: var(--text);
     }
     .toolbar {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
       flex-wrap: wrap;
+      align-items: center;
     }
-    .input {
+    .input, select {
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(148, 163, 184, 0.2);
       border-radius: 999px;
       padding: 8px 14px 8px 32px;
       color: var(--text);
+      font-size: 0.85rem;
+      outline: none;
     }
     .input-wrapper { position: relative; }
     .input-icon {
       position: absolute;
       left: 10px;
       top: 7px;
-      font-size: .8rem;
+      font-size: 0.85rem;
       color: var(--muted);
     }
-    select.input {
-      padding-left: 12px;
-    }
     .btn {
-      background: #0ea5e9;
-      border: none;
+      background: linear-gradient(120deg, #38bdf8, #0ea5e9);
       color: #020617;
+      border: none;
       border-radius: 999px;
       padding: 8px 16px;
       font-weight: 600;
-      font-size: .78rem;
+      font-size: 0.78rem;
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-xs {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      color: var(--text);
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: #ffe4e6;
     }
     .card {
       background: rgba(2, 6, 23, 0.55);
@@ -132,102 +183,65 @@
       border-collapse: collapse;
       min-width: 600px;
     }
-    thead {
-      background: rgba(15, 23, 42, 0.42);
-    }
+    thead { background: rgba(15, 23, 42, 0.42); }
     th, td {
-      padding: 9px 12px;
-      font-size: .78rem;
       text-align: left;
+      padding: 10px 14px;
+      font-size: 0.8rem;
+    }
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
     }
     tbody tr {
-      border-bottom: 1px solid rgba(148, 163, 184, 0.05);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+      transition: background 0.1s ease-out;
     }
-    tbody tr:hover {
-      background: rgba(15, 23, 42, 0.25);
-    }
+    tbody tr:hover { background: rgba(15, 23, 42, 0.3); }
     .list-wrapper { overflow-x: auto; }
-    .badge {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      border-radius: 999px;
-      padding: 2px 10px;
-      font-size: .7rem;
+    .hidden { display: none; }
+    .inline-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 12px 14px 0;
     }
-    .actions { display: flex; gap: 6px; }
-    .btn-xs {
-      background: rgba(15, 23, 42, 0.4);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      color: var(--text);
-      padding: 3px 9px;
-      border-radius: 999px;
-      font-size: .7rem;
-      cursor: pointer;
-    }
-    .btn-danger {
-      background: rgba(244, 63, 94, 0.12);
-      border: 1px solid rgba(244, 63, 94, 0.3);
-      color: #ffe4e6;
-    }
-    .hidden { display:none; }
-
-    /* modalzinho */
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(2, 6, 23, 0.5);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 50;
-    }
-    .modal {
-      background: #0f172a;
-      border: 1px solid rgba(148,163,184,0.22);
-      border-radius: 15px;
-      padding: 16px;
-      width: 360px;
-      max-height: 90vh;
-      overflow-y: auto;
+    .inline-form .field {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 3px;
+      min-width: 140px;
+      flex: 1;
     }
-    .modal input, .modal select {
-      background: rgba(15,23,42,.3);
-      border: 1px solid rgba(148,163,184,.15);
-      border-radius: 8px;
-      padding: 5px 7px;
-      color: var(--text);
-    }
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-      margin-top: 8px;
-    }
-    /* bloco google */
-    #sheetBlock table td {
-      font-size: .7rem;
+    .inline-form label {
+      font-size: .68rem;
+      color: var(--muted);
     }
     @media (max-width: 720px) {
       header { flex-direction: column; align-items: flex-start; }
-      .tag { margin-left: 0; }
-      .toolbar { flex-direction: column; }
-      .input, select.input { width: 100%; }
+      .header-center { margin-top: 6px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .input, select { width: 100%; }
+      body::before { background-size: 620px auto; }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo-canarinhos2.png" class="logo-icon" alt="Transportes Canarinho">
-    <div>
-      <h1>Transportes Canarinho</h1>
-      <div class="small">Buscando entregar o melhor com qualidade.</div>
+    <div class="header-left">
+      <!-- logo quadrada -->
+      <img src="logo-canarinhos.png" alt="Transportes Canarinho" class="logo-icon" />
+      <div>
+        <h1>Transportes Canarinho</h1>
+        <div class="small">Buscando entregar o melhor com qualidade.</div>
+      </div>
     </div>
+    <div class="header-center">ESTOQUE DE PNEUS</div>
     <span class="tag" id="saveStatus">autosave ativo</span>
   </header>
-  <div class="header-center">ESTOQUE DE PNEUS</div>
 
   <main>
     <div class="tabs">
@@ -242,29 +256,32 @@
       <div class="toolbar">
         <div class="input-wrapper">
           <span class="input-icon">🔍</span>
-          <input id="searchInput" class="input" placeholder="Buscar por FOGO ou nome..." />
+          <input id="searchInput" class="input" type="text" placeholder="Buscar por FOGO ou nome..." />
         </div>
-        <select id="categoryFilter" class="input" style="width:auto;">
-          <option value="">Todas as categorias</option>
-        </select>
+        <div class="input-wrapper">
+          <span class="input-icon">🗂</span>
+          <select id="categoryFilter" class="input" style="padding-left:30px;">
+            <option value="">Todas as categorias</option>
+          </select>
+        </div>
         <button id="addItemBtn" class="btn">+ Novo pneu</button>
       </div>
 
-      <div class="card">
+      <div class="card" style="margin-top:10px;">
         <div class="list-wrapper">
           <table>
             <thead>
               <tr>
-                <th>FOGO</th>
-                <th>Nome</th>
+                <th data-sort="id">FOGO</th>
+                <th data-sort="name">Nome</th>
                 <th>Foto</th>
-                <th>Categoria</th>
-                <th>Marca</th>
-                <th>Modelo</th>
-                <th>Tamanho</th>
-                <th>Qtd.</th>
-                <th>Reposição</th>
-                <th>Ações</th>
+                <th data-sort="category">Categoria</th>
+                <th data-sort="marca">Marca</th>
+                <th data-sort="modelo">Modelo</th>
+                <th data-sort="tamanho">Tamanho</th>
+                <th data-sort="qty">Qtd.</th>
+                <th data-sort="reorderPoint">Reposição</th>
+                <th style="width: 210px;">Ações</th>
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -286,7 +303,7 @@
                 <th>Placa</th>
                 <th>Marca</th>
                 <th>Modelo</th>
-                <th>Tam.</th>
+                <th>Tamanho</th>
                 <th>Preço</th>
                 <th>Obs</th>
                 <th>Ações</th>
@@ -301,6 +318,39 @@
     <!-- RECAPAGEM -->
     <div id="tab-recapagem" class="hidden">
       <div class="card">
+        <div class="inline-form">
+          <div class="field">
+            <label for="recapFogo">FOGO</label>
+            <select id="recapFogo"></select>
+          </div>
+          <div class="field">
+            <label for="recapQtd">Qtd.</label>
+            <input type="number" id="recapQtd" min="1" value="1" />
+          </div>
+          <div class="field">
+            <label for="recapMarca">Marca</label>
+            <select id="recapMarca"></select>
+          </div>
+          <div class="field">
+            <label for="recapModelo">Modelo</label>
+            <select id="recapModelo"></select>
+          </div>
+          <div class="field">
+            <label for="recapTamanho">Tamanho</label>
+            <input type="text" id="recapTamanho" placeholder="295/80" />
+          </div>
+          <div class="field">
+            <label for="recapBorracha">Tipo de borracha</label>
+            <input type="text" id="recapBorracha" placeholder="ex: Premium" />
+          </div>
+          <div class="field">
+            <label for="recapRecapadora">Recapadora</label>
+            <input type="text" id="recapRecapadora" placeholder="Nome da recapadora" />
+          </div>
+          <div class="field" style="align-self:flex-end;min-width:120px;">
+            <button id="recapSubmit" class="btn">▶ Enviar</button>
+          </div>
+        </div>
         <div class="list-wrapper">
           <table>
             <thead>
@@ -327,6 +377,35 @@
     <!-- DESCARTE -->
     <div id="tab-descarte" class="hidden">
       <div class="card">
+        <div class="inline-form">
+          <div class="field">
+            <label for="descFogo">FOGO</label>
+            <select id="descFogo"></select>
+          </div>
+          <div class="field">
+            <label for="descQtd">Qtd.</label>
+            <input type="number" id="descQtd" value="1" min="1" />
+          </div>
+          <div class="field">
+            <label for="descMarca">Marca</label>
+            <select id="descMarca"></select>
+          </div>
+          <div class="field">
+            <label for="descModelo">Modelo</label>
+            <select id="descModelo"></select>
+          </div>
+          <div class="field">
+            <label for="descTamanho">Tamanho</label>
+            <input type="text" id="descTamanho" placeholder="295/80" />
+          </div>
+          <div class="field">
+            <label for="descMotivo">Motivo</label>
+            <input type="text" id="descMotivo" placeholder="Ex: carcaça danificada" />
+          </div>
+          <div class="field" style="align-self:flex-end;min-width:120px;">
+            <button id="descSubmit" class="btn">🗑 Descartar</button>
+          </div>
+        </div>
         <div class="list-wrapper">
           <table>
             <thead>
@@ -335,7 +414,7 @@
                 <th>FOGO</th>
                 <th>Marca</th>
                 <th>Modelo</th>
-                <th>Tam.</th>
+                <th>Tamanho</th>
                 <th>Motivo</th>
                 <th>Obs</th>
               </tr>
@@ -347,7 +426,7 @@
     </div>
 
     <!-- BLOCO GOOGLE SHEETS -->
-    <div id="sheetBlock" class="card" style="margin-top:18px;">
+    <div class="card" id="sheetBlock">
       <div style="padding:10px 14px 0;">
         <strong>Registros do Google Sheets</strong>
         <div class="small" id="sheetStatus">Carregando dados...</div>
@@ -364,34 +443,70 @@
               <th>Modelo</th>
             </tr>
           </thead>
-          <tbody id="sheetBody">
+          <tbody id="sheetTableBody">
             <tr><td colspan="6">Carregando...</td></tr>
           </tbody>
         </table>
       </div>
     </div>
+
   </main>
 
-  <!-- MODAIS (só um básico) -->
-  <div class="modal-backdrop" id="editModal">
+  <!-- MODAIS (iguais ao que já tínhamos) -->
+  <div class="modal-backdrop hidden" id="adjustModal">
+    <div class="modal">
+      <h2>Ajustar estoque</h2>
+      <div class="small" id="adjustItemLabel"></div>
+      <label for="adjustType">Tipo de ajuste</label>
+      <select id="adjustType">
+        <option value="in">Entrada (+)</option>
+        <option value="out">Saída (-)</option>
+      </select>
+      <label for="adjustAmount">Quantidade</label>
+      <input id="adjustAmount" type="number" min="1" value="1" />
+      <div id="extraOutBlock" style="display:none;">
+        <label for="adjustPlate">Placa</label>
+        <input id="adjustPlate" type="text" />
+        <label for="adjustMarca">Marca</label>
+        <select id="adjustMarca"></select>
+        <label for="adjustModelo">Modelo</label>
+        <select id="adjustModelo"></select>
+        <label for="adjustTamanho">Tamanho</label>
+        <input id="adjustTamanho" type="text" />
+        <label for="adjustObs">Observação</label>
+        <input id="adjustObs" type="text" />
+        <label for="adjustPrice">Preço</label>
+        <input id="adjustPrice" type="number" min="0" step="0.01" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeAdjustModal()">Cancelar</button>
+        <button class="btn" onclick="confirmAdjust()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop hidden" id="editModal">
     <div class="modal">
       <h2 id="editTitle">Novo pneu</h2>
-      <label>FOGO</label>
-      <input id="editId" />
-      <label>Nome</label>
-      <input id="editName" />
-      <label>Categoria</label>
-      <input id="editCategory" value="Pneu" />
-      <label>Marca</label>
-      <input id="editMarca" value="Michelin" />
-      <label>Modelo</label>
-      <input id="editModelo" value="X Multi Z" />
-      <label>Tamanho</label>
-      <input id="editTamanho" value="295/80" />
-      <label>Quantidade</label>
-      <input id="editQty" type="number" value="0" />
-      <label>Reposição</label>
-      <input id="editReorder" type="number" value="0" />
+      <label for="editId">FOGO</label>
+      <input id="editId" type="text" />
+      <label for="editName">Nome</label>
+      <input id="editName" type="text" />
+      <label for="editCategory">Categoria</label>
+      <input id="editCategory" type="text" value="Pneu" />
+      <label for="editMarca">Marca</label>
+      <select id="editMarca"></select>
+      <label for="editModelo">Modelo</label>
+      <select id="editModelo"></select>
+      <label for="editTamanho">Tamanho</label>
+      <input id="editTamanho" type="text" value="295/80" />
+      <label for="editQty">Quantidade</label>
+      <input id="editQty" type="number" min="0" />
+      <label for="editReorder">Ponto de reposição</label>
+      <input id="editReorder" type="number" min="0" />
+      <label for="editPhoto">Foto do pneu</label>
+      <input id="editPhoto" type="file" accept="image/*" />
+      <img id="photoPreview" style="width:120px;height:120px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,0.2);display:none;" />
       <div class="modal-actions">
         <button class="btn-xs" onclick="closeEditModal()">Cancelar</button>
         <button class="btn" onclick="saveItem()">Salvar</button>
@@ -399,326 +514,648 @@
     </div>
   </div>
 
-  <script>
-    /* ====== 1) SEU ENDPOINT DO APPS SCRIPT ====== */
-    const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwVgzTSpsua4U8VqCBCLjsKAekpKqYR9MosYkkGv_0WXtd-RRfJWct5G1jb5g8TI_sf9g/exec";
+  <div class="modal-backdrop hidden" id="photoModal">
+    <div class="modal">
+      <h2>Foto do pneu</h2>
+      <img id="photoModalImg" src="" alt="Foto do pneu" style="max-width:480px;max-height:480px;border-radius:12px;" />
+      <div class="modal-actions">
+        <button class="btn" onclick="closePhotoModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
 
-    /* ====== 2) DADOS LOCAIS ====== */
+  <script>
+    /* ===== 1) COLE AQUI SEU LINK DO APPS SCRIPT ( /exec ) ===== */
+    const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwVgzTSpsua4U8VqCBCLjsKAekpKqYR9MosYkkGv_0WXtd-RRfJWct5G1jb5g8TI_sf9g/exec";
+    /* ========================================================= */
+
+    // se quiser forçar sem google pra testar:
+    const FORCE_NO_SHEETS = false;
+
+    // dados de marca -> modelos
+    const TIRE_DATA = {
+      "Michelin": [
+        { model: "X Multi Z", size: "295/80" },
+        { model: "X Multi D", size: "295/80" },
+        { model: "X Multi T", size: "295/80" }
+      ],
+      "Pirelli": [
+        { model: "FG-01 MISTO", size: "295/80" },
+        { model: "FR-85", size: "295/80" }
+      ],
+      "Goodyear": [
+        { model: "Kmax D", size: "295/80" },
+        { model: "Kmax S", size: "295/80" }
+      ],
+      "Speedmax": [],
+      "Firestone": [],
+      "Kumho": [],
+      "Continental": []
+    };
+
     const STORAGE_KEY_ITEMS = "tc_pneus_items_v1";
     const STORAGE_KEY_MOVES = "tc_pneus_moves_v1";
     const STORAGE_KEY_RECAP = "tc_pneus_recap_v1";
     const STORAGE_KEY_DESC = "tc_pneus_desc_v1";
 
     let items = loadLocal(STORAGE_KEY_ITEMS, [
-      { id: "F-001", name: "Pneu 295/80", category: "Pneu", qty: 9, reorderPoint: 3, marca: "Michelin", modelo: "X Multi Z", tamanho: "295/80", photo: "" },
-      { id: "F-002", name: "Pneu 295/80", category: "Pneu", qty: 4, reorderPoint: 2, marca: "Pirelli", modelo: "FG-01 MISTO", tamanho: "295/80", photo: "" },
-      { id: "21414", name: "dwadwadwad", category: "Pneu", qty: 10, reorderPoint: 0, marca: "Michelin", modelo: "X Multi Z", tamanho: "295/80", photo: "" }
+      { id: "F-001", name: "Pneu 295/80", category: "Pneu", qty: 9, reorderPoint: 3, photo: "", marca: "Michelin", modelo: "X Multi Z", tamanho: "295/80" },
+      { id: "F-002", name: "Pneu 295/80", category: "Pneu", qty: 4, reorderPoint: 2, photo: "", marca: "Pirelli", modelo: "FG-01 MISTO", tamanho: "295/80" }
     ]);
     let movements = loadLocal(STORAGE_KEY_MOVES, []);
     let recapagens = loadLocal(STORAGE_KEY_RECAP, []);
     let descartes = loadLocal(STORAGE_KEY_DESC, []);
 
+    let filtered = [...items];
+    let currentSort = { key: "name", dir: "asc" };
+    let adjustTarget = null;
+    let editTarget = null;
+    let tempPhotoData = null;
+
+    const tableBody = document.getElementById("tableBody");
+    const itemsCount = null; // não estamos mostrando esse agora
+    const searchInput = document.getElementById("searchInput");
+    const categoryFilter = document.getElementById("categoryFilter");
+    const saveStatus = document.getElementById("saveStatus");
+    const movementsBody = document.getElementById("movementsBody");
+    const recapTableBody = document.getElementById("recapTableBody");
+    const descTableBody = document.getElementById("descTableBody");
+    const sheetStatus = document.getElementById("sheetStatus");
+    const sheetTableBody = document.getElementById("sheetTableBody");
+
     function loadLocal(key, fallback) {
       const raw = localStorage.getItem(key);
-      if (!raw) return fallback;
-      try { return JSON.parse(raw); } catch(e) { return fallback; }
+      if (raw) {
+        try { return JSON.parse(raw); } catch(e) {}
+      }
+      return fallback;
     }
     function saveAll() {
       localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
       localStorage.setItem(STORAGE_KEY_MOVES, JSON.stringify(movements));
       localStorage.setItem(STORAGE_KEY_RECAP, JSON.stringify(recapagens));
       localStorage.setItem(STORAGE_KEY_DESC, JSON.stringify(descartes));
-      const ss = document.getElementById("saveStatus");
-      if (ss) {
-        ss.textContent = "salvo ✔";
-        setTimeout(()=> ss.textContent = "autosave ativo", 1400);
+      if (saveStatus) {
+        saveStatus.textContent = "salvo ✔";
+        setTimeout(() => saveStatus.textContent = "autosave ativo", 1500);
       }
+      fillFogoSelects();
     }
 
-    /* ====== 3) RENDER ESTOQUE ====== */
-    const tableBody = document.getElementById("tableBody");
-    const searchInput = document.getElementById("searchInput");
-    const categoryFilter = document.getElementById("categoryFilter");
+    function sendToSheet(payload) {
+      if (!SHEETS_ENDPOINT || FORCE_NO_SHEETS) return;
+      const url = SHEETS_ENDPOINT + "?data=" + encodeURIComponent(JSON.stringify(payload));
+      fetch(url, { mode: "no-cors" }).catch(() => {});
+    }
 
-    function renderItems() {
-      const term = (searchInput.value || "").toLowerCase();
+    function applyFilters() {
+      const term = (searchInput?.value || "").toLowerCase();
       const cat = categoryFilter.value;
-      tableBody.innerHTML = "";
-      items
-        .filter(it => {
-          const okT = it.id.toLowerCase().includes(term) || it.name.toLowerCase().includes(term);
-          const okC = cat ? it.category === cat : true;
-          return okT && okC;
-        })
-        .forEach(it => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${it.id}</td>
-            <td>${it.name}</td>
-            <td>${it.photo ? "<img src='"+it.photo+"' style='width:44px;border-radius:7px;'>" : "sem foto"}</td>
-            <td><span class="badge">${it.category||"-"}</span></td>
-            <td>${it.marca||"-"}</td>
-            <td>${it.modelo||"-"}</td>
-            <td>${it.tamanho||"-"}</td>
-            <td>${it.qty}</td>
-            <td>${it.reorderPoint}</td>
-            <td>
-              <div class="actions">
-                <button class="btn-xs" onclick="openEditModal('${it.id}')">Editar</button>
-                <button class="btn-xs btn-danger" onclick="deleteItem('${it.id}')">Excluir</button>
-              </div>
-            </td>
-          `;
-          tableBody.appendChild(tr);
-        });
+      filtered = items.filter(i => {
+        const matchText = i.name.toLowerCase().includes(term) || i.id.toLowerCase().includes(term);
+        const matchCat = cat ? i.category === cat : true;
+        return matchText && matchCat;
+      });
+      applySort();
     }
-    renderItems();
+    function applySort() {
+      const { key, dir } = currentSort;
+      filtered.sort((a, b) => {
+        if ((a[key] || "") < (b[key] || "")) return dir === "asc" ? -1 : 1;
+        if ((a[key] || "") > (b[key] || "")) return dir === "asc" ? 1 : -1;
+        return 0;
+      });
+      renderTable();
+    }
+    function renderTable() {
+      tableBody.innerHTML = "";
+      filtered.forEach(item => {
+        const needsReorder = item.qty <= item.reorderPoint;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td>${item.photo ? `<img src="${item.photo}" style="width:52px;height:52px;border-radius:10px;object-fit:cover;border:1px solid rgba(148,163,184,0.2);" onclick="openPhotoModal('${item.id}')" />` : `<span class="small" style="color:var(--muted);">sem foto</span>`}</td>
+          <td><span class="badge">${item.category || "-"}</span></td>
+          <td>${item.marca || "-"}</td>
+          <td>${item.modelo || "-"}</td>
+          <td>${item.tamanho || "-"}</td>
+          <td><span class="badge ${needsReorder ? "qty-low" : ""}">${item.qty}</span></td>
+          <td>${item.reorderPoint}</td>
+          <td>
+            <div class="actions" style="display:flex;gap:6px;">
+              <button class="btn-xs" onclick="openAdjustModal('${item.id}')">Ajustar</button>
+              <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
+              <button class="btn-xs btn-danger" onclick="deleteItem('${item.id}')">Excluir</button>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(tr);
+      });
+      renderCategoryFilter();
+    }
+    function renderCategoryFilter() {
+      const cats = Array.from(new Set(items.map(i => i.category))).sort();
+      const currentValue = categoryFilter.value;
+      categoryFilter.innerHTML = '<option value="">Todas as categorias</option>';
+      cats.forEach(c => {
+        if (!c) return;
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        categoryFilter.appendChild(opt);
+      });
+      if (currentValue) categoryFilter.value = currentValue;
+    }
 
-    searchInput.addEventListener("input", renderItems);
-    categoryFilter.addEventListener("change", renderItems);
+    if (searchInput) searchInput.addEventListener("input", applyFilters);
+    if (categoryFilter) categoryFilter.addEventListener("change", applyFilters);
 
-    /* ====== 4) MODAL EDIT ====== */
-    const editModal = document.getElementById("editModal");
-    document.getElementById("addItemBtn").addEventListener("click", () => openEditModal(null));
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.querySelectorAll("main > div[id^='tab-']").forEach(div => div.classList.add("hidden"));
+        document.getElementById("tab-" + tab).classList.remove("hidden");
+      });
+    });
+
+    function openAdjustModal(id) {
+      adjustTarget = items.find(i => i.id === id);
+      document.getElementById("adjustItemLabel").textContent = adjustTarget.id + " – " + adjustTarget.name;
+      document.getElementById("adjustAmount").value = 1;
+      document.getElementById("adjustType").value = "in";
+      document.getElementById("extraOutBlock").style.display = "none";
+      document.getElementById("adjustTamanho").value = adjustTarget.tamanho || "295/80";
+      fillMarcaSelect("adjustMarca");
+      fillModelSelect("adjustMarca", "adjustModelo");
+      document.getElementById("adjustModal").classList.remove("hidden");
+      document.getElementById("adjustModal").style.display = "flex";
+    }
+    function closeAdjustModal() {
+      document.getElementById("adjustModal").style.display = "none";
+      document.getElementById("adjustModal").classList.add("hidden");
+      adjustTarget = null;
+    }
+    document.getElementById("adjustType").addEventListener("change", e => {
+      document.getElementById("extraOutBlock").style.display = e.target.value === "out" ? "block" : "none";
+    });
+
+    function confirmAdjust() {
+      const amount = parseInt(document.getElementById("adjustAmount").value, 10) || 0;
+      const type   = document.getElementById("adjustType").value;
+      const plate  = document.getElementById("adjustPlate").value.trim().toUpperCase();
+      const marca  = document.getElementById("adjustMarca").value;
+      const modelo = document.getElementById("adjustModelo").value;
+      const tamanho= document.getElementById("adjustTamanho").value || "295/80";
+      const obs    = document.getElementById("adjustObs").value.trim();
+      const price  = parseFloat(document.getElementById("adjustPrice").value || "0");
+
+      if (!adjustTarget || amount <= 0) { closeAdjustModal(); return; }
+
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("pt-BR") + " " + now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+
+      if (type === "in") {
+        adjustTarget.qty += amount;
+        sendToSheet({
+          tipo: "entrada",
+          data: dateStr,
+          placa: "",
+          numero: adjustTarget.id,
+          quantidade: amount,
+          marca: marca,
+          modelo: modelo
+        });
+      } else {
+        adjustTarget.qty = Math.max(0, adjustTarget.qty - amount);
+        const mov = {
+          localId: "mov_"+Date.now(),
+          date: dateStr,
+          itemId: adjustTarget.id,
+          itemName: adjustTarget.name,
+          qty: amount,
+          plate: plate,
+          marca: marca,
+          modelo: modelo,
+          tamanho: tamanho,
+          price: isNaN(price)?0:price,
+          obs: obs
+        };
+        movements.unshift(mov);
+        renderMovements();
+        sendToSheet({
+          tipo: "saida",
+          data: dateStr,
+          placa: plate,
+          numero: adjustTarget.id,
+          quantidade: amount,
+          marca: marca,
+          modelo: modelo
+        });
+      }
+      closeAdjustModal();
+      applyFilters();
+      saveAll();
+    }
+
+    const addItemBtn = document.getElementById("addItemBtn");
+    if (addItemBtn) addItemBtn.addEventListener("click", () => openEditModal(null));
 
     function openEditModal(id) {
-      editModal.style.display = "flex";
-      const title = document.getElementById("editTitle");
+      fillMarcaSelect("editMarca");
+      fillModelSelect("editMarca", "editModelo");
+      const photoPreview = document.getElementById("photoPreview");
+      tempPhotoData = null;
       if (id) {
-        const it = items.find(i => i.id === id);
-        title.textContent = "Editar pneu";
-        document.getElementById("editId").value = it.id;
-        document.getElementById("editName").value = it.name;
-        document.getElementById("editCategory").value = it.category;
-        document.getElementById("editMarca").value = it.marca || "";
-        document.getElementById("editModelo").value = it.modelo || "";
-        document.getElementById("editTamanho").value = it.tamanho || "";
-        document.getElementById("editQty").value = it.qty;
-        document.getElementById("editReorder").value = it.reorderPoint;
+        editTarget = items.find(i => i.id === id);
+        document.getElementById("editTitle").textContent = "Editar pneu";
+        document.getElementById("editId").value = editTarget.id;
+        document.getElementById("editName").value = editTarget.name;
+        document.getElementById("editCategory").value = editTarget.category;
+        document.getElementById("editMarca").value = editTarget.marca || "";
+        fillModelSelect("editMarca", "editModelo", editTarget.modelo);
+        document.getElementById("editTamanho").value = editTarget.tamanho || "295/80";
+        document.getElementById("editQty").value = editTarget.qty;
+        document.getElementById("editReorder").value = editTarget.reorderPoint;
+        if (editTarget.photo) {
+          photoPreview.src = editTarget.photo;
+          photoPreview.style.display = "block";
+        } else {
+          photoPreview.style.display = "none";
+        }
       } else {
-        title.textContent = "Novo pneu";
+        editTarget = null;
+        document.getElementById("editTitle").textContent = "Novo pneu";
         document.getElementById("editId").value = "";
         document.getElementById("editName").value = "";
         document.getElementById("editCategory").value = "Pneu";
         document.getElementById("editMarca").value = "Michelin";
-        document.getElementById("editModelo").value = "X Multi Z";
+        fillModelSelect("editMarca", "editModelo");
         document.getElementById("editTamanho").value = "295/80";
         document.getElementById("editQty").value = 0;
         document.getElementById("editReorder").value = 0;
+        photoPreview.style.display = "none";
       }
+      document.getElementById("editPhoto").value = "";
+      document.getElementById("editModal").classList.remove("hidden");
+      document.getElementById("editModal").style.display = "flex";
     }
-    function closeEditModal() {
-      editModal.style.display = "none";
+    document.getElementById("editPhoto").addEventListener("change", function(e){
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        tempPhotoData = ev.target.result;
+        const photoPreview = document.getElementById("photoPreview");
+        photoPreview.src = tempPhotoData;
+        photoPreview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+    function closeEditModal(){
+      document.getElementById("editModal").style.display = "none";
+      document.getElementById("editModal").classList.add("hidden");
+      editTarget = null;
+      tempPhotoData = null;
     }
     function saveItem() {
       const id = document.getElementById("editId").value.trim();
-      if (!id) { alert("FOGO obrigatório"); return; }
       const name = document.getElementById("editName").value.trim() || "Pneu";
-      const cat  = document.getElementById("editCategory").value.trim() || "Pneu";
-      const marca= document.getElementById("editMarca").value.trim();
-      const modelo= document.getElementById("editModelo").value.trim();
-      const tam  = document.getElementById("editTamanho").value.trim();
-      const qty  = parseInt(document.getElementById("editQty").value, 10) || 0;
-      const rep  = parseInt(document.getElementById("editReorder").value, 10) || 0;
-
-      const existing = items.find(i => i.id === id);
-      if (existing) {
-        existing.name = name;
-        existing.category = cat;
-        existing.marca = marca;
-        existing.modelo = modelo;
-        existing.tamanho = tam;
-        existing.qty = qty;
-        existing.reorderPoint = rep;
+      const category = document.getElementById("editCategory").value.trim() || "Pneu";
+      const marca = document.getElementById("editMarca").value;
+      const modelo = document.getElementById("editModelo").value;
+      const tamanho = document.getElementById("editTamanho").value || "295/80";
+      const qty = parseInt(document.getElementById("editQty").value, 10) || 0;
+      const reorderPoint = parseInt(document.getElementById("editReorder").value, 10) || 0;
+      if (!id) {
+        alert("FOGO é obrigatório.");
+        return;
+      }
+      if (editTarget) {
+        editTarget.id = id;
+        editTarget.name = name;
+        editTarget.category = category;
+        editTarget.marca = marca;
+        editTarget.modelo = modelo;
+        editTarget.tamanho = tamanho;
+        editTarget.qty = qty;
+        editTarget.reorderPoint = reorderPoint;
+        if (tempPhotoData) editTarget.photo = tempPhotoData;
       } else {
-        items.push({ id, name, category: cat, marca, modelo, tamanho: tam, qty, reorderPoint: rep, photo: "" });
+        items.push({ id, name, category, qty, reorderPoint, photo: tempPhotoData || "", marca, modelo, tamanho });
       }
       closeEditModal();
-      renderItems();
+      applyFilters();
       saveAll();
-
-      // opcional: mandar pro sheets
-      sendToSheet({
-        tipo: "salvar_item",
-        data: new Date().toLocaleString("pt-BR"),
-        placa: "",
-        numero: id,
-        quantidade: qty,
-        marca: marca,
-        modelo: modelo
-      });
     }
     function deleteItem(id) {
-      if (!confirm("Excluir este pneu?")) return;
+      if (!confirm("Tem certeza que deseja excluir este pneu?")) return;
       items = items.filter(i => i.id !== id);
-      renderItems();
+      applyFilters();
       saveAll();
     }
 
-    /* ====== 5) SAÍDAS (render simples) ====== */
-    const movementsBody = document.getElementById("movementsBody");
-    function renderMovements() {
+    function openPhotoModal(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item || !item.photo) return;
+      document.getElementById("photoModalImg").src = item.photo;
+      document.getElementById("photoModal").style.display = "flex";
+      document.getElementById("photoModal").classList.remove("hidden");
+    }
+    function closePhotoModal() {
+      document.getElementById("photoModal").style.display = "none";
+      document.getElementById("photoModal").classList.add("hidden");
+    }
+
+    function renderMovements(){
       movementsBody.innerHTML = "";
       movements.forEach(m => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${m.date}</td>
-          <td>${m.itemId} – ${m.itemName||""}</td>
+          <td>${m.itemId} – ${m.itemName || ""}</td>
           <td>${m.qty}</td>
-          <td>${m.plate||"-"}</td>
-          <td>${m.marca||"-"}</td>
-          <td>${m.modelo||"-"}</td>
-          <td>${m.tamanho||"-"}</td>
-          <td>${m.price ? "R$ "+m.price.toFixed(2):"-"}</td>
-          <td>${m.obs||"-"}</td>
+          <td>${m.plate || "-"}</td>
+          <td>${m.marca || "-"}</td>
+          <td>${m.modelo || "-"}</td>
+          <td>${m.tamanho || "-"}</td>
+          <td>${m.price ? "R$ " + m.price.toFixed(2) : "-"}</td>
+          <td>${m.obs || "-"}</td>
           <td><button class="btn-xs btn-danger" onclick="removeMovement('${m.localId}')">Remover</button></td>
         `;
         movementsBody.appendChild(tr);
       });
     }
-
-    // AQUI está a função corrigida 👇
     function removeMovement(localId) {
       const mov = movements.find(m => m.localId === localId);
       if (!mov) return;
-
       if (!confirm("Remover esta baixa e devolver ao estoque?")) return;
 
-      // devolve ao item
       const item = items.find(i => i.id === mov.itemId);
       if (item) {
         item.qty += mov.qty;
       }
 
-      // remove da lista
       movements = movements.filter(m => m.localId !== localId);
       renderMovements();
-      renderItems();
+      applyFilters();
       saveAll();
 
-      // manda item atualizado
-      if (item) {
-        sendToSheet({
-          tipo: "salvar_item",
-          data: new Date().toLocaleString("pt-BR"),
-          placa: "",
-          numero: item.id,
-          quantidade: item.qty,
-          marca: item.marca || "",
-          modelo: item.modelo || ""
-        });
-      }
-
-      // manda info de que extornou
       sendToSheet({
         tipo: "extornar_saida",
-        id: mov.itemId,
-        nome: mov.itemName,
-        qtd: mov.qty,
-        preco: mov.price,
+        data: mov.date,
         placa: mov.plate,
-        observacao: "remoção de baixa",
+        numero: mov.itemId,
+        quantidade: mov.qty,
         marca: mov.marca,
-        modelo: mov.modelo,
-        tamanho: mov.tamanho,
-        status: "removido"
+        modelo: mov.modelo
       });
     }
 
-    /* ====== 6) DESCARTE / RECAPAGEM (só mostrar o que tem) ====== */
-    const descTableBody = document.getElementById("descTableBody");
-    function renderDescartes() {
-      descTableBody.innerHTML = "";
-      descartes.forEach(d => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${d.date}</td>
-          <td>${d.fogo}</td>
-          <td>${d.marca||"-"}</td>
-          <td>${d.modelo||"-"}</td>
-          <td>${d.tamanho||"-"}</td>
-          <td>${d.motivo||"-"}</td>
-          <td>${d.obs||"-"}</td>
-        `;
-        descTableBody.appendChild(tr);
+    document.getElementById("recapSubmit").addEventListener("click", () => {
+      const fogo = document.getElementById("recapFogo").value;
+      const qtd  = parseInt(document.getElementById("recapQtd").value, 10)||0;
+      const marca= document.getElementById("recapMarca").value;
+      const modelo=document.getElementById("recapModelo").value;
+      const tamanho=document.getElementById("recapTamanho").value||"295/80";
+      const borracha=document.getElementById("recapBorracha").value;
+      const recapadora=document.getElementById("recapRecapadora").value;
+      const obs=document.getElementById("recapObs").value;
+      if (!fogo || qtd<=0) { alert("Selecione o FOGO e quantidade."); return; }
+      const item = items.find(i => i.id === fogo);
+      if (!item) { alert("FOGO não encontrado."); return; }
+      item.qty = Math.max(0, item.qty - qtd);
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("pt-BR")+" "+now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+      const rec = {
+        recId: "rec_"+Date.now(),
+        date: dateStr,
+        fogo,
+        marca,
+        modelo,
+        tamanho,
+        borracha,
+        recapadora,
+        obs,
+        qty: qtd,
+        status:"pendente"
+      };
+      recapagens.unshift(rec);
+      renderRecapagens();
+      applyFilters();
+      saveAll();
+
+      sendToSheet({
+        tipo: "recapagem",
+        data: dateStr,
+        placa: "",
+        numero: fogo,
+        quantidade: qtd,
+        marca: marca,
+        modelo: modelo
       });
-    }
-    const recapTableBody = document.getElementById("recapTableBody");
-    function renderRecapagens() {
+    });
+    function renderRecapagens(){
       recapTableBody.innerHTML = "";
       recapagens.forEach(r => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${r.date}</td>
           <td>${r.fogo}</td>
-          <td>${r.marca||"-"}</td>
-          <td>${r.modelo||"-"}</td>
-          <td>${r.tamanho||"-"}</td>
-          <td>${r.borracha||"-"}</td>
-          <td>${r.recapadora||"-"}</td>
+          <td>${r.marca || "-"}</td>
+          <td>${r.modelo || "-"}</td>
+          <td>${r.tamanho || "-"}</td>
+          <td>${r.borracha || "-"}</td>
+          <td>${r.recapadora || "-"}</td>
           <td>${r.qty}</td>
-          <td>${r.status||"pendente"}</td>
-          <td>${r.obs||"-"}</td>
-          <td></td>
+          <td>${r.status}</td>
+          <td>${r.obs || "-"}</td>
+          <td>${r.status==="pendente" ? `<button class="btn-xs" onclick="returnRecap('${r.recId}')">Voltar</button>` : ""}</td>
         `;
         recapTableBody.appendChild(tr);
       });
     }
+    function returnRecap(recId){
+      const rec = recapagens.find(r => r.recId === recId);
+      if (!rec) return;
+      const item = items.find(i => i.id === rec.fogo);
+      if (item) item.qty += rec.qty;
+      rec.status = "retornado";
+      renderRecapagens();
+      applyFilters();
+      saveAll();
+      sendToSheet({
+        tipo: "retorno_recapagem",
+        data: rec.date,
+        placa: "",
+        numero: rec.fogo,
+        quantidade: rec.qty,
+        marca: rec.marca,
+        modelo: rec.modelo
+      });
+    }
 
-    /* ====== 7) TABS ====== */
-    document.querySelectorAll(".tab-btn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        const tab = btn.dataset.tab;
-        document.querySelectorAll("main > div[id^='tab-']").forEach(div => div.classList.add("hidden"));
-        document.getElementById("tab-"+tab).classList.remove("hidden");
+    document.getElementById("descSubmit").addEventListener("click", () => {
+      const fogo = document.getElementById("descFogo").value;
+      const qtd = parseInt(document.getElementById("descQtd").value,10)||0;
+      const marca = document.getElementById("descMarca").value;
+      const modelo = document.getElementById("descModelo").value;
+      const tamanho = document.getElementById("descTamanho").value||"295/80";
+      const motivo = document.getElementById("descMotivo").value;
+      const obs = document.getElementById("descObs").value;
+      if (!fogo || qtd<=0){ alert("Selecione o FOGO e quantidade."); return; }
+      const item = items.find(i => i.id === fogo);
+      if (!item){ alert("FOGO não encontrado."); return; }
+      item.qty = Math.max(0, item.qty - qtd);
+      const now = new Date();
+      const dateStr = now.toLocaleDateString("pt-BR")+" "+now.toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+      const desc = {
+        descId: "desc_"+Date.now(),
+        date: dateStr,
+        fogo,
+        marca,
+        modelo,
+        tamanho,
+        motivo,
+        obs,
+        qty: qtd
+      };
+      descartes.unshift(desc);
+      renderDescartes();
+      applyFilters();
+      saveAll();
+
+      sendToSheet({
+        tipo: "descarte",
+        data: dateStr,
+        placa: "",
+        numero: fogo,
+        quantidade: qtd,
+        marca: marca,
+        modelo: modelo
       });
     });
-
-    /* ====== 8) ENVIAR PRO SHEETS ====== */
-    function sendToSheet(payload) {
-      if (!SHEETS_ENDPOINT) return;
-      const url = SHEETS_ENDPOINT + "?data=" + encodeURIComponent(JSON.stringify(payload));
-      // não vamos travar o site se falhar
-      fetch(url,{method:"GET"}).catch(()=>{});
+    function renderDescartes(){
+      descTableBody.innerHTML = "";
+      descartes.forEach(d => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${d.date}</td>
+          <td>${d.fogo}</td>
+          <td>${d.marca || "-"}</td>
+          <td>${d.modelo || "-"}</td>
+          <td>${d.tamanho || "-"}</td>
+          <td>${d.motivo || "-"}</td>
+          <td>${d.obs || "-"}</td>
+        `;
+        descTableBody.appendChild(tr);
+      });
     }
 
-    /* ====== 9) BUSCAR DA PLANILHA (MOSTRAR EMBAIXO) ====== */
-    async function fetchSheetData() {
-      const status = document.getElementById("sheetStatus");
-      const body = document.getElementById("sheetBody");
-      try {
-        const resp = await fetch(SHEETS_ENDPOINT);
-        const data = await resp.json(); // se vier [], beleza
-        status.textContent = "Carregado " + data.length + " linha(s).";
-        body.innerHTML = "";
-        if (!data.length) {
-          body.innerHTML = `<tr><td colspan="6">Sem registros ainda.</td></tr>`;
-          return;
-        }
-        data.forEach(row => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row.data||""}</td>
-            <td>${row.placa||""}</td>
-            <td>${row.numero||""}</td>
-            <td>${row.quantidade||""}</td>
-            <td>${row.marca||""}</td>
-            <td>${row.modelo||""}</td>
-          `;
-          body.appendChild(tr);
+    function fillMarcaSelect(id){
+      const sel = document.getElementById(id);
+      if (!sel) return;
+      sel.innerHTML = "";
+      Object.keys(TIRE_DATA).forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m;
+        sel.appendChild(opt);
+      });
+    }
+    function fillModelSelect(marcaSelectId, modelSelectId, preselect=null){
+      const ms = document.getElementById(marcaSelectId);
+      const mod = document.getElementById(modelSelectId);
+      if (!ms || !mod) return;
+      const marca = ms.value;
+      const list = TIRE_DATA[marca] || [];
+      mod.innerHTML = "";
+      if (list.length === 0){
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "—";
+        mod.appendChild(opt);
+      } else {
+        list.forEach(obj => {
+          const opt = document.createElement("option");
+          opt.value = obj.model;
+          opt.textContent = obj.model;
+          mod.appendChild(opt);
         });
-      } catch (e) {
-        status.textContent = "Erro ao conectar na planilha.";
-        body.innerHTML = `<tr><td colspan="6">Não foi possível carregar.</td></tr>`;
       }
+      if (preselect) mod.value = preselect;
+    }
+    document.addEventListener("change", e => {
+      if (e.target.id === "editMarca") fillModelSelect("editMarca", "editModelo");
+      if (e.target.id === "adjustMarca") fillModelSelect("adjustMarca", "adjustModelo");
+      if (e.target.id === "recapMarca") fillModelSelect("recapMarca", "recapModelo");
+      if (e.target.id === "descMarca") fillModelSelect("descMarca", "descModelo");
+    });
+
+    function fillFogoSelects(){
+      const recapFogo = document.getElementById("recapFogo");
+      const descFogo = document.getElementById("descFogo");
+      [recapFogo, descFogo].forEach(sel => {
+        if (!sel) return;
+        sel.innerHTML = "";
+        items.forEach(it => {
+          const opt = document.createElement("option");
+          opt.value = it.id;
+          opt.textContent = it.id + " – " + it.name;
+          sel.appendChild(opt);
+        });
+      });
     }
 
-    // inicializa tudo
+    // carrega da planilha (GET)
+    function fetchSheetData(){
+      if (FORCE_NO_SHEETS || !SHEETS_ENDPOINT) {
+        sheetStatus.textContent = "Google Sheets desligado (teste).";
+        sheetTableBody.innerHTML = "<tr><td colspan='6'>–</td></tr>";
+        return;
+      }
+      fetch(SHEETS_ENDPOINT)
+        .then(r => r.json())
+        .then(data => {
+          sheetStatus.textContent = "Dados carregados da planilha.";
+          sheetTableBody.innerHTML = "";
+          if (!data || !Array.isArray(data) || data.length === 0){
+            sheetTableBody.innerHTML = "<tr><td colspan='6'>Sem registros.</td></tr>";
+            return;
+          }
+          data.forEach(row => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${row.data || ""}</td>
+              <td>${row.placa || ""}</td>
+              <td>${row.numero || ""}</td>
+              <td>${row.quantidade || ""}</td>
+              <td>${row.marca || ""}</td>
+              <td>${row.modelo || ""}</td>
+            `;
+            sheetTableBody.appendChild(tr);
+          });
+        })
+        .catch(() => {
+          sheetStatus.textContent = "Erro ao conectar na planilha.";
+          sheetTableBody.innerHTML = "<tr><td colspan='6'>Erro...</td></tr>";
+        });
+    }
+
+    // inicializa
+    applyFilters();
     renderMovements();
-    renderDescartes();
     renderRecapagens();
+    renderDescartes();
+    fillMarcaSelect("recapMarca");
+    fillModelSelect("recapMarca", "recapModelo");
+    fillMarcaSelect("descMarca");
+    fillModelSelect("descMarca", "descModelo");
+    fillFogoSelects();
+
+    // último: tenta buscar da planilha
     fetchSheetData();
   </script>
 </body>
