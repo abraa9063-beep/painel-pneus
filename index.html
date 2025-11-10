@@ -45,43 +45,54 @@
       z-index: -1;
     }
     header {
-      padding: 16px 24px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      background: rgba(2, 6, 23, 0.78);
-      backdrop-filter: blur(16px);
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .logo-icon {
-      height: 40px;
-      width: 40px;
-      border-radius: 10px;
-      object-fit: contain;
-      background: transparent;
-    }
-    header h1 {
-      font-size: 1.1rem;
-      margin: 0;
-    }
-    .small {
-      font-size: 0.7rem;
-      color: var(--muted);
-    }
-    .header-center {
-      margin-left: auto;
-      font-size: .8rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      background: rgba(15,23,42,.4);
-      padding: 4px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.15);
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(2, 6, 23, 0.78);
+  backdrop-filter: blur(16px);
+  position: relative; /* importante pra centralizar o título */
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  height: 40px;
+  width: 40px;
+  border-radius: 10px;
+  object-fit: contain;
+  background: transparent;
+}
+
+header h1 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.small {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+/* CENTRALIZA o "ESTOQUE DE PNEUS" perfeitamente */
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  background: rgba(15, 23, 42, 0.4);
+  padding: 4px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.15);
+}
+
     }
     .tag {
       background: rgba(56, 189, 248, 0.12);
@@ -227,6 +238,39 @@
       .input, select { width: 100%; }
       body::before { background-size: 620px auto; }
     }
+
+    /* ======== MODAIS ======== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.6);
+  display: none;            /* começa escondido */
+  align-items: center;
+  justify-content: center;
+  z-index: 99;
+}
+
+.modal {
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 16px;
+  padding: 18px;
+  min-width: 280px;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: #e2e8f0;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
   </style>
 </head>
 <body>
@@ -1160,3 +1204,4 @@
   </script>
 </body>
 </html>
+
