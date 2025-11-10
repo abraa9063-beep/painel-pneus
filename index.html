@@ -43,6 +43,8 @@
   pointer-events: none;
 }
 
+}
+
       z-index: -1;
     }
     header {
@@ -77,14 +79,15 @@
       border-radius: 999px;
       border: 1px solid rgba(148,163,184,.15);
     }
-    .logo-icon {
-      height: 38px;
-      width: 38px;
-      border-radius: 999px;
-      object-fit: cover;
-      object-position: left center;
-      background: #020617;
-    }
+   .logo-icon {
+  height: 40px;
+  width: 40px;
+  border-radius: 6px;         /* deixa com leve canto arredondado */
+  object-fit: contain;        /* mostra a logo inteira, sem cortar */
+  background-color: #0f172a;  /* fundo escuro pra realçar */
+  margin-right: 8px;
+}
+
     .tag {
       background: rgba(56, 189, 248, 0.12);
       border: 1px solid rgba(56, 189, 248, 0.4);
@@ -1451,6 +1454,7 @@ setInterval(loadFromSheet, 3000);
   </script>
 </body>
 </html>
+
 
 
 
