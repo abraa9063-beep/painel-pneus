@@ -52,7 +52,6 @@
   gap: 16px;
   background: rgba(2, 6, 23, 0.78);
   backdrop-filter: blur(16px);
-  position: relative; /* importante pra centralizar o título */
 }
 
 .header-left {
@@ -62,35 +61,35 @@
 }
 
 .logo-icon {
-  height: 40px;
-  width: 40px;
-  border-radius: 10px;
+  height: 38px;
+  width: 38px;
+  border-radius: 999px;
   object-fit: contain;
   background: transparent;
 }
 
 header h1 {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   margin: 0;
 }
 
 .small {
-  font-size: 0.7rem;
-  color: var(--muted);
+  font-size: .7rem;
+  color: #94a3b8;
 }
 
-/* CENTRALIZA o "ESTOQUE DE PNEUS" perfeitamente */
+/* ESSE é o que centraliza */
 .header-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.8rem;
+  margin-left: auto;
+  font-size: .8rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: rgba(15, 23, 42, 0.4);
+  letter-spacing: .06em;
+  background: rgba(15,23,42,.4);
   padding: 4px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(148,163,184,.15);
+}
+
 }
 
     }
@@ -239,7 +238,7 @@ header h1 {
       body::before { background-size: 620px auto; }
     }
 
-    /* ======== MODAIS ======== */
+  /* ===== MODAL GENÉRICO ===== */
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -250,25 +249,53 @@ header h1 {
   z-index: 99;
 }
 
+.modal-backdrop.show {
+  display: flex;
+}
+
 .modal {
   background: #0f172a;
   border: 1px solid rgba(148, 163, 184, 0.2);
   border-radius: 16px;
   padding: 18px;
   min-width: 280px;
-  max-width: 420px;
+  max-width: 900px;
+  width: 95%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.modal h2 {
   width: 100%;
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.modal .field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 4px;
+  flex: 1 1 150px;
+}
+
+.modal input,
+.modal select {
+  background: rgba(15, 23, 42, 0.3);
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 8px;
+  padding: 6px 8px;
   color: #e2e8f0;
 }
 
 .modal-actions {
+  width: 100%;
   display: flex;
   justify-content: flex-end;
   gap: 8px;
   margin-top: 6px;
+}
+
 }
 
   </style>
@@ -488,7 +515,7 @@ header h1 {
             </tr>
           </thead>
           <tbody id="sheetTableBody">
-            <tr><td colspan="6">Carregando...</td></tr>
+            <tr><td colspan="6">Carregando...</td></tr>A
           </tbody>
         </table>
       </div>
@@ -496,82 +523,82 @@ header h1 {
 
   </main>
 
-  <!-- MODAIS (iguais ao que já tínhamos) -->
-  <div class="modal-backdrop hidden" id="adjustModal">
-    <div class="modal">
-      <h2>Ajustar estoque</h2>
-      <div class="small" id="adjustItemLabel"></div>
-      <label for="adjustType">Tipo de ajuste</label>
-      <select id="adjustType">
-        <option value="in">Entrada (+)</option>
-        <option value="out">Saída (-)</option>
-      </select>
-      <label for="adjustAmount">Quantidade</label>
-      <input id="adjustAmount" type="number" min="1" value="1" />
-      <div id="extraOutBlock" style="display:none;">
-        <label for="adjustPlate">Placa</label>
-        <input id="adjustPlate" type="text" />
-        <label for="adjustMarca">Marca</label>
-        <select id="adjustMarca"></select>
-        <label for="adjustModelo">Modelo</label>
-        <select id="adjustModelo"></select>
-        <label for="adjustTamanho">Tamanho</label>
-        <input id="adjustTamanho" type="text" />
-        <label for="adjustObs">Observação</label>
-        <input id="adjustObs" type="text" />
-        <label for="adjustPrice">Preço</label>
-        <input id="adjustPrice" type="number" min="0" step="0.01" />
-      </div>
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closeAdjustModal()">Cancelar</button>
-        <button class="btn" onclick="confirmAdjust()">Confirmar</button>
-      </div>
-    </div>
-  </div>
+ <!-- MODAL: Novo pneu -->
+<div class="modal-backdrop" id="newTireModal">
+  <div class="modal">
+    <h2>Novo pneu</h2>
 
-  <div class="modal-backdrop hidden" id="editModal">
-    <div class="modal">
-      <h2 id="editTitle">Novo pneu</h2>
+    <div class="field">
       <label for="editId">FOGO</label>
       <input id="editId" type="text" />
+    </div>
+
+    <div class="field">
       <label for="editName">Nome</label>
-      <input id="editName" type="text" />
+      <input id="editName" type="text" placeholder="Ex: Pneu 295/80" />
+    </div>
+
+    <div class="field">
       <label for="editCategory">Categoria</label>
       <input id="editCategory" type="text" value="Pneu" />
+    </div>
+
+    <div class="field">
       <label for="editMarca">Marca</label>
       <select id="editMarca"></select>
+    </div>
+
+    <div class="field">
       <label for="editModelo">Modelo</label>
       <select id="editModelo"></select>
+    </div>
+
+    <div class="field">
       <label for="editTamanho">Tamanho</label>
       <input id="editTamanho" type="text" value="295/80" />
+    </div>
+
+    <div class="field">
       <label for="editQty">Quantidade</label>
-      <input id="editQty" type="number" min="0" />
+      <input id="editQty" type="number" min="0" value="0" />
+    </div>
+
+    <div class="field">
       <label for="editReorder">Ponto de reposição</label>
-      <input id="editReorder" type="number" min="0" />
+      <input id="editReorder" type="number" min="0" value="0" />
+    </div>
+
+    <div class="field" style="flex:1 1 100%;">
       <label for="editPhoto">Foto do pneu</label>
       <input id="editPhoto" type="file" accept="image/*" />
-      <img id="photoPreview" style="width:120px;height:120px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,0.2);display:none;" />
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closeEditModal()">Cancelar</button>
-        <button class="btn" onclick="saveItem()">Salvar</button>
-      </div>
+      <img id="photoPreview" style="width:90px;height:90px;object-fit:cover;border-radius:12px;border:1px solid rgba(148,163,184,0.2);display:none;" />
     </div>
-  </div>
 
-  <div class="modal-backdrop hidden" id="photoModal">
-    <div class="modal">
-      <h2>Foto do pneu</h2>
-      <img id="photoModalImg" src="" alt="Foto do pneu" style="max-width:480px;max-height:480px;border-radius:12px;" />
-      <div class="modal-actions">
-        <button class="btn" onclick="closePhotoModal()">Fechar</button>
-      </div>
+    <div class="modal-actions">
+      <button class="btn-xs" type="button" onclick="closeNewTireModal()">Cancelar</button>
+      <button class="btn" type="button" onclick="saveItem()">Salvar</button>
     </div>
   </div>
+</div>
+
 
   <script>
     /* ===== 1) COLE AQUI SEU LINK DO APPS SCRIPT ( /exec ) ===== */
     const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbwVgzTSpsua4U8VqCBCLjsKAekpKqYR9MosYkkGv_0WXtd-RRfJWct5G1jb5g8TI_sf9g/exec";
     /* ========================================================= */
+    // pega o modal de "novo pneu"
+const newTireModal = document.getElementById("newTireModal");
+
+// quando clicar no botão + Novo pneu, mostra o modal
+document.getElementById("addItemBtn").addEventListener("click", () => {
+  newTireModal.classList.add("show");    // mesma classe que usamos no CSS
+});
+
+// função pra fechar (usada no botão "Cancelar")
+function closeNewTireModal() {
+  newTireModal.classList.remove("show");
+}
+
 
     // se quiser forçar sem google pra testar:
     const FORCE_NO_SHEETS = false;
@@ -1204,4 +1231,5 @@ header h1 {
   </script>
 </body>
 </html>
+
 
