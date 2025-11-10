@@ -369,6 +369,39 @@
         </div>
       </div>
     </div>
+    </div>
+  </div>
+</div>
+
+<!-- DADOS VINDOS DA PLANILHA GOOGLE -->
+<div class="card" style="margin-top:10px;">
+  <div class="section-title" style="padding:10px 14px 0;">
+    <div>
+      <strong>Registros do Google Sheets</strong>
+      <div class="small" id="sheetStatus">Carregando dados...</div>
+    </div>
+  </div>
+  <div class="list-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Placa</th>
+          <th>Nº do pneu</th>
+          <th>Quantidade</th>
+          <th>Marca</th>
+          <th>Modelo</th>
+        </tr>
+      </thead>
+      <tbody id="sheetBody">
+        <tr><td colspan="6">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SAÍDAS -->
+<div id="tab-saidas" class="hidden">
 
     <!-- SAÍDAS -->
     <div id="tab-saidas" class="hidden">
@@ -1356,7 +1389,65 @@
     fillMarcaSelect("descMarca");
     fillModelSelect("descMarca", "descModelo");
     fillFogoSelects();
+// inicializa tudo
+applyFilters();
+renderMovements();
+renderRecapagens();
+renderDescartes();
+
+// preenche selects globais
+fillMarcaSelect("recapMarca");
+fillModelSelect("recapMarca", "recapModelo");
+fillMarcaSelect("descMarca");
+fillModelSelect("descMarca", "descModelo");
+fillFogoSelects();
+
+
+// ====== LEITURA EM TEMPO QUASE REAL DO GOOGLE SHEETS ======
+async function loadFromSheet() {
+  if (!SHEETS_ENDPOINT) return;
+  const statusEl = document.getElementById("sheetStatus");
+  const tbody = document.getElementById("sheetBody");
+  try {
+    const res = await fetch(SHEETS_ENDPOINT);
+    const dados = await res.json();
+
+    tbody.innerHTML = "";
+
+    if (!Array.isArray(dados) || dados.length === 0) {
+      statusEl.textContent = "Planilha vazia.";
+      tbody.innerHTML = "<tr><td colspan='6'>Sem registros na planilha.</td></tr>";
+      return;
+    }
+
+    statusEl.textContent = "Atualizado da planilha.";
+    dados.forEach(row => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${row.data || ""}</td>
+        <td>${row.placa || ""}</td>
+        <td>${row.numero || ""}</td>
+        <td>${row.quantidade || ""}</td>
+        <td>${row.marca || ""}</td>
+        <td>${row.modelo || ""}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+  } catch (err) {
+    console.log("Erro ao ler planilha:", err);
+    if (statusEl) statusEl.textContent = "Erro ao conectar na planilha.";
+  }
+}
+
+// carrega ao abrir e depois a cada 3 segundos
+loadFromSheet();
+setInterval(loadFromSheet, 3000);
+</script>
+</body>
+</html>
 
   </script>
 </body>
 </html>
+
