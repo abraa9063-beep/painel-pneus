@@ -684,7 +684,7 @@ header .small {
 
   <script>
     /* ===== 1) COLE AQUI SEU LINK DO APPS SCRIPT ( /exec ) ===== */
-    const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbyHOe2t5jJCc__asGIOCoQgbFYtW1DS6Z3vzfPZWfcuwvyLwq7Act1gjrNZO090s7g5/exec";
+    const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbw_KsRDLmybSs0Qqp-zkT4TJzJxPvBk6QKEP67qVI5p-IrdN0bK1GZOO2HY65WBdEtvhQ/exec";
     /* ========================================================= */
 
     // dados de marca -> modelos -> tamanho
@@ -1124,23 +1124,26 @@ header .small {
       }
 
       movements = movements.filter(m => m.localId !== localId);
-      renderMovements();
-      applyFilters();
-      saveAll();
+renderMovements();
+applyFilters();
+saveAll();
 
-      sendToSheet({
-        tipo: "extornar_saida",
-        id: mov.itemId,
-        nome: mov.itemName,
-        qtd: mov.qty,
-        preco: mov.price,
-        placa: mov.plate,
-        observacao: "remoção de baixa",
-        marca: mov.marca,
-        modelo: mov.modelo,
-        tamanho: mov.tamanho,
-        status: "removido"
-      });
+// envia atualização pro Google Sheets (salvar_item)
+const item = items.find(i => i.localId === localId);
+if (item) {
+  sendToSheet({
+    tipo: "salvar_item",
+    data: new Date().toLocaleString("pt-BR"),
+    placa: "",
+    numero: item.id || "",
+    quantidade: item.qty || "",
+    marca: item.marca || "",
+    modelo: item.modelo || ""
+  });
+
+}
+
+   
     }
 
     // ===== Recapagem =====
@@ -1483,6 +1486,7 @@ setInterval(loadFromSheet, 3000);
   </script>
 </body>
 </html>
+
 
 
 
