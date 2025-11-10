@@ -47,37 +47,64 @@
 
       z-index: -1;
     }
-    header {
-      padding: 16px 24px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-      background: rgba(2, 6, 23, 0.78);
-      backdrop-filter: blur(16px);
-    }
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    header h1 {
-      font-size: 1.05rem;
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      white-space: nowrap;
-    }
-    .header-center {
-      font-size: .8rem;
-      text-transform: uppercase;
-      letter-spacing: .06em;
-      background: rgba(15,23,42,.4);
-      padding: 4px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(148,163,184,.15);
+   /* Cabeçalho elegante */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #0b1522, #111a2c);
+  padding: 10px 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+/* Logo e texto alinhados */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo-icon {
+  height: 38px; /* ajusta conforme o tamanho real da imagem */
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.15));
+  transition: transform 0.2s ease;
+}
+
+.logo-icon:hover {
+  transform: scale(1.05);
+}
+
+/* Texto do cabeçalho */
+header h1 {
+  color: #fff;
+  font-size: 17px;
+  margin: 0;
+  font-weight: 600;
+}
+
+header .small {
+  color: #9ca3af;
+  font-size: 12px;
+}
+
+/* Parte central (ESTOQUE DE PNEUS) */
+.header-center {
+  color: #cbd5e1;
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+/* Status */
+.tag#saveStatus {
+  background-color: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+
     }
    .logo-icon {
   height: 40px;
@@ -309,7 +336,7 @@
   </style>
 </head>
 <body>
-  <header>
+ <header>
   <div class="header-left">
     <img src="logo-canarinhos2.png" alt="Transportes Canarinho" class="logo-icon" />
     <div>
@@ -318,7 +345,9 @@
     </div>
   </div>
   <div class="header-center">ESTOQUE DE PNEUS</div>
+  <span class="tag" id="saveStatus">autosave ativo</span>
 </header>
+
 
 
   <main>
@@ -1454,6 +1483,7 @@ setInterval(loadFromSheet, 3000);
   </script>
 </body>
 </html>
+
 
 
 
