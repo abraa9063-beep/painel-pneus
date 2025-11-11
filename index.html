@@ -2,590 +2,763 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Estoque de Pneus - Base</title>
+  <title>Transportes Canarinho - Estoque</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
       --bg: #0f172a;
       --panel: #111827;
       --panel-light: #1f2937;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.1);
       --text: #e2e8f0;
       --muted: #94a3b8;
-      --accent: #38bdf8;
       --danger: #f43f5e;
-      --r: 14px;
+      --warn: #f97316;
+      --radius: 14px;
     }
-    * { box-sizing: border-box; font-family: "Segoe UI", system-ui, sans-serif; }
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+    }
     body {
       margin: 0;
-      background: #020617;
+      background: radial-gradient(circle at top, rgba(31, 41, 55, 0.95), #020617);
       color: var(--text);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-size: 15px;
+      position: relative;
+      overflow-x: hidden;
     }
+    /* LOGO DE FUNDO GRANDE (tema principal) */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at center, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.65) 60%, #020617 100%),
+        url("Logo Nova_page-0001 (1).png") no-repeat center center;
+      background-size: 900px auto; /* deixa grandão */
+      opacity: 0.12;               /* bem elegante */
+      pointer-events: none;
+      z-index: -1;
+    }
+
     header {
-      background: #020617;
-      border-bottom: 1px solid rgba(148,163,184,.15);
-      padding: 14px 20px;
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: rgba(2, 6, 23, 0.78);
+      backdrop-filter: blur(16px);
+    }
+    header h1 {
+      font-size: 1.2rem;
+      margin: 0;
       display: flex;
       align-items: center;
       gap: 10px;
+      white-space: nowrap;
     }
+    /* pega a parte colorida do logo (a que você mostrou) */
     .logo-icon {
-      width: 38px;
       height: 38px;
-      object-fit: contain;
-    }
-    .header-txt h1 {
-      margin: 0;
-      font-size: 1rem;
-    }
-    .header-txt small {
-      color: var(--muted);
-      font-size: .7rem;
-    }
-    .header-title {
-      margin-left: auto;
-      font-size: .75rem;
-      text-transform: uppercase;
-      border: 1px solid rgba(148,163,184,.2);
+      width: 38px;
       border-radius: 999px;
-      padding: 3px 10px;
+      object-fit: cover;
+      object-position: left center; /* foca na parte colorida à esquerda */
+      background: #020617;
+    }
+    .tag {
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 3px 12px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
     }
     main {
-      max-width: 1100px;
+      padding: 20px 24px 40px;
+      max-width: 1200px;
+      width: 100%;
       margin: 0 auto;
-      padding: 18px 16px 50px;
-    }
-    .tabs {
       display: flex;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-    .tab-btn {
-      background: rgba(15,23,42,.2);
-      border: 1px solid transparent;
-      color: var(--muted);
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: .7rem;
-      cursor: pointer;
-    }
-    .tab-btn.active {
-      background: rgba(56,189,248,.1);
-      border-color: rgba(56,189,248,.3);
-      color: var(--text);
+      flex-direction: column;
+      gap: 18px;
     }
     .toolbar {
       display: flex;
       gap: 10px;
-      margin-bottom: 10px;
       flex-wrap: wrap;
+      align-items: center;
     }
-    .input {
-      background: rgba(15,23,42,.5);
-      border: 1px solid rgba(148,163,184,.2);
+    .input, select {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
       border-radius: 999px;
-      padding: 7px 12px;
+      padding: 8px 14px 8px 32px;
       color: var(--text);
+      font-size: 0.85rem;
+      position: relative;
       outline: none;
     }
-    .btn {
-      background: #0ea5e9;
-      border: none;
-      color: #020617;
-      border-radius: 999px;
-      padding: 7px 14px;
-      font-size: .75rem;
-      font-weight: 600;
-      cursor: pointer;
+    .input-wrapper { position: relative; }
+    .input-icon {
+      position: absolute;
+      left: 10px;
+      top: 7px;
+      font-size: 0.85rem;
+      color: var(--muted);
     }
+    .btn {
+      background: linear-gradient(120deg, #38bdf8, #0ea5e9);
+      color: #020617;
+      border: none;
+      border-radius: 999px;
+      padding: 8px 16px;
+      font-weight: 600;
+      font-size: 0.78rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.08s ease-out;
+    }
+    .btn:active { transform: translateY(1px); }
     .card {
-      background: rgba(2,6,23,.5);
-      border: 1px solid rgba(148,163,184,.05);
-      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.06);
+      border-radius: var(--radius);
       overflow: hidden;
     }
     table {
       width: 100%;
       border-collapse: collapse;
+      min-width: 600px;
     }
-    thead { background: rgba(15,23,42,.3); }
+    thead { background: rgba(15, 23, 42, 0.42); }
     th, td {
       text-align: left;
-      padding: 9px 12px;
-      font-size: .75rem;
+      padding: 10px 14px;
+      font-size: 0.8rem;
     }
-    tbody tr { border-bottom: 1px solid rgba(148,163,184,.04); }
-    tbody tr:hover { background: rgba(15,23,42,.25); }
-    .btn-xs {
-      background: rgba(15,23,42,.4);
-      border: 1px solid rgba(148,163,184,.1);
+    th {
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+      transition: background 0.1s ease-out;
+    }
+    tbody tr:hover { background: rgba(15, 23, 42, 0.3); }
+    .badge {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.15);
       border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .qty-low {
+      background: rgba(244, 63, 94, 0.12);
+      color: #ffe4e6;
+      border-color: rgba(244, 63, 94, 0.4);
+    }
+    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
+    .btn-xs {
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(148, 163, 184, 0.12);
       color: var(--text);
-      font-size: .65rem;
-      padding: 3px 8px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.7rem;
       cursor: pointer;
     }
     .btn-danger {
-      background: rgba(244,63,94,.1);
-      border-color: rgba(244,63,94,.4);
+      background: rgba(244, 63, 94, 0.1);
+      border: 1px solid rgba(244, 63, 94, 0.3);
       color: #ffe4e6;
     }
-    .hidden { display: none; }
+    .list-wrapper { overflow-x: auto; }
+    .section-title {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .small { font-size: 0.7rem; color: var(--muted); }
 
-    /* modal */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(2,6,23,.6);
+      background: rgba(2, 6, 23, 0.6);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      z-index: 99;
     }
-    .modal-backdrop.show { display: flex; }
     .modal {
       background: #0f172a;
-      border: 1px solid rgba(148,163,184,.2);
+      border: 1px solid rgba(148, 163, 184, 0.2);
       border-radius: 16px;
-      padding: 16px;
-      width: min(100% - 40px, 700px);
+      padding: 18px;
+      min-width: 280px;
+      max-width: 380px;
+      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-    .modal h2 { margin: 0; }
-    .modal .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px;
-    }
-    .modal label {
-      font-size: .65rem;
-      color: var(--muted);
-    }
+    .modal h2 { font-size: 1rem; margin: 0; }
+    .modal label { font-size: 0.72rem; color: var(--muted); margin-bottom: 3px; }
     .modal input, .modal select {
       width: 100%;
-      background: rgba(15,23,42,.3);
-      border: 1px solid rgba(148,163,184,.2);
-      border-radius: 9px;
-      padding: 5px 7px;
+      border-radius: 8px;
+      background: rgba(15, 23, 42, 0.3);
+      padding: 6px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
       color: var(--text);
-      font-size: .72rem;
     }
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
+
+    .tabs { display: flex; gap: 8px; margin-top: 8px; }
+    .tab-btn {
+      background: rgba(15, 23, 42, 0.2);
+      border: 1px solid transparent;
+      color: var(--muted);
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: rgba(56, 189, 248, 0.3);
+      color: var(--text);
+    }
+    .hidden { display: none; }
+
+    .img-thumb {
+      width: 38px;
+      height: 38px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: rgba(148, 163, 184, 0.05);
+      cursor: pointer;
+    }
+
+    #photoModal .modal {
+      max-width: 520px;
+      align-items: center;
+    }
+    #photoModal img {
+      max-width: 480px;
+      max-height: 480px;
+      border-radius: 12px;
+    }
+
+    @media (max-width: 720px) {
+      header { flex-direction: column; align-items: flex-start; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .input, select { width: 100%; }
+      body::before { background-size: 620px auto; }
     }
   </style>
 </head>
 <body>
   <header>
-    <img src="logo-canarinhos2.png" class="logo-icon" alt="logo" />
-    <div class="header-txt">
-      <h1>Transportes Canarinho</h1>
-      <small>Buscando entregar o melhor com qualidade.</small>
+    <div>
+      <h1>
+        <img src="Logo Nova_page-0001 (1).png" alt="Transportes Canarinho" class="logo-icon" />
+        Transportes Canarinho
+      </h1>
+      <div class="small">Buscando entregar o melhor com qualidade.</div>
     </div>
-    <div class="header-title">ESTOQUE DE PNEUS</div>
+    <span class="tag" id="saveStatus">autosave ativo</span>
   </header>
-
   <main>
     <div class="tabs">
       <button class="tab-btn active" data-tab="estoque">Estoque</button>
       <button class="tab-btn" data-tab="saidas">Saídas</button>
-      <button class="tab-btn" data-tab="recapagem">Recapagem</button>
-      <button class="tab-btn" data-tab="descarte">Descarte</button>
     </div>
 
     <!-- ESTOQUE -->
     <div id="tab-estoque">
       <div class="toolbar">
-        <input id="searchInput" class="input" placeholder="Buscar por FOGO ou nome" />
-        <select id="categoryFilter" class="input">
-          <option value="">Todas as categorias</option>
-        </select>
-        <button class="btn" id="newItemBtn">+ Novo pneu</button>
+        <div class="input-wrapper">
+          <span class="input-icon">🔍</span>
+          <input id="searchInput" class="input" type="text" placeholder="Buscar por nome ou ID..." />
+        </div>
+        <div class="input-wrapper">
+          <span class="input-icon">🗂</span>
+          <select id="categoryFilter" class="input" style="padding-left:30px;">
+            <option value="">Todas as categorias</option>
+          </select>
+        </div>
+        <button id="addItemBtn" class="btn">+ Novo item</button>
       </div>
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th>FOGO</th>
-              <th>Nome</th>
-              <th>Categoria</th>
-              <th>Marca</th>
-              <th>Modelo</th>
-              <th>Tam.</th>
-              <th>Qtd</th>
-              <th>Reposição</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="itemsBody"></tbody>
-        </table>
+
+      <div class="card" style="margin-top:10px;">
+        <div class="section-title" style="padding: 10px 14px 0;">
+          <div>
+            <strong>Itens de estoque</strong>
+            <div class="small" id="itemsCount"></div>
+          </div>
+        </div>
+        <div class="list-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th data-sort="id">ID</th>
+                <th data-sort="name">Nome</th>
+                <th>Foto</th>
+                <th data-sort="category">Categoria</th>
+                <th data-sort="qty">Qtd. em estoque</th>
+                <th data-sort="reorderPoint">Ponto de reposição</th>
+                <th style="width: 180px;">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- SAÍDAS -->
     <div id="tab-saidas" class="hidden">
-      <div class="card">
-        <table>
-          <thead>
-            <tr>
-              <th>Data</th>
-              <th>Item</th>
-              <th>Qtd</th>
-              <th>Placa</th>
-              <th>Obs</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody id="movesBody"></tbody>
-        </table>
+      <div class="toolbar" style="margin-bottom:6px;">
+        <div class="input-wrapper">
+          <span class="input-icon">🚛</span>
+          <input id="filterPlaca" class="input" type="text" placeholder="Filtrar por placa (ex: ABC1D23)" />
+        </div>
+        <div class="input-wrapper">
+          <span class="input-icon">🔧</span>
+          <input id="filterPeca" class="input" type="text" placeholder="Filtrar por peça / nome" />
+        </div>
       </div>
-    </div>
-
-    <!-- RECAPAGEM -->
-    <div id="tab-recapagem" class="hidden">
-      <p style="color: var(--muted);">(base) aqui só mostramos a lista depois</p>
       <div class="card">
-        <table>
-          <thead><tr><th>Data</th><th>FOGO</th><th>Qtd</th><th>Status</th></tr></thead>
-          <tbody id="recapBody"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- DESCARTE -->
-    <div id="tab-descarte" class="hidden">
-      <p style="color: var(--muted);">(base) aqui só mostramos a lista depois</p>
-      <div class="card">
-        <table>
-          <thead><tr><th>Data</th><th>FOGO</th><th>Qtd</th><th>Motivo</th></tr></thead>
-          <tbody id="descBody"></tbody>
-        </table>
+        <div class="section-title" style="padding: 10px 14px 0;">
+          <div>
+            <strong>Saídas de estoque</strong>
+            <div class="small">Filtre por placa ou por peça para ver o que saiu.</div>
+          </div>
+        </div>
+        <div class="list-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>ID / Nome</th>
+                <th>Qtd.</th>
+                <th>Placa</th>
+                <th>Preço informado</th>
+                <th>Observação</th>
+              </tr>
+            </thead>
+            <tbody id="movementsBody"></tbody>
+          </table>
+        </div>
       </div>
     </div>
   </main>
 
-  <!-- MODAL ITEM -->
-  <div class="modal-backdrop" id="itemModal">
+  <!-- Modal Ajuste -->
+  <div class="modal-backdrop" id="adjustModal">
     <div class="modal">
-      <h2 id="itemModalTitle">Novo pneu</h2>
-      <div class="grid">
-        <div>
-          <label for="mId">FOGO</label>
-          <input id="mId" type="text">
-        </div>
-        <div>
-          <label for="mName">Nome</label>
-          <input id="mName" type="text">
-        </div>
-        <div>
-          <label for="mCategory">Categoria</label>
-          <input id="mCategory" type="text" value="Pneu">
-        </div>
-        <div>
-          <label for="mMarca">Marca</label>
-          <select id="mMarca"></select>
-        </div>
-        <div>
-          <label for="mModelo">Modelo</label>
-          <select id="mModelo"></select>
-        </div>
-        <div>
-          <label for="mTamanho">Tamanho</label>
-          <input id="mTamanho" type="text" value="295/80">
-        </div>
-        <div>
-          <label for="mQty">Quantidade</label>
-          <input id="mQty" type="number" value="0" min="0">
-        </div>
-        <div>
-          <label for="mReorder">Reposição</label>
-          <input id="mReorder" type="number" value="0" min="0">
-        </div>
+      <h2>Ajustar estoque</h2>
+      <div class="small" id="adjustItemLabel"></div>
+      <label for="adjustType">Tipo de ajuste</label>
+      <select id="adjustType">
+        <option value="in">Entrada (+)</option>
+        <option value="out">Saída (-)</option>
+      </select>
+      <label for="adjustAmount">Quantidade</label>
+      <input id="adjustAmount" type="number" min="1" value="1" />
+      <div id="priceBlock" style="display:none;">
+        <label for="adjustPlate">Placa (ex: ABC1D23)</label>
+        <input id="adjustPlate" type="text" />
+        <label for="adjustPrice">Preço / custo dessa saída (opcional)</label>
+        <input id="adjustPrice" type="number" min="0" step="0.01" />
+        <label for="adjustObs">Observação (opcional)</label>
+        <input id="adjustObs" type="text" placeholder="Ex: saída para manutenção" />
       </div>
       <div class="modal-actions">
-        <button class="btn-xs" onclick="closeItemModal()">Cancelar</button>
+        <button class="btn-xs" onclick="closeAdjustModal()">Cancelar</button>
+        <button class="btn" onclick="confirmAdjust()">Confirmar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar/Adicionar -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <h2 id="editTitle">Novo item</h2>
+      <label for="editId">ID</label>
+      <input id="editId" type="text" />
+      <label for="editName">Nome</label>
+      <input id="editName" type="text" />
+      <label for="editCategory">Categoria</label>
+      <input id="editCategory" type="text" list="categoriesList" />
+      <datalist id="categoriesList"></datalist>
+      <label for="editQty">Quantidade</label>
+      <input id="editQty" type="number" min="0" />
+      <label for="editReorder">Ponto de reposição</label>
+      <input id="editReorder" type="number" min="0" />
+      <label for="editPhoto">Foto do item (opcional)</label>
+      <input id="editPhoto" type="file" accept="image/*" />
+      <img id="photoPreview" alt="Prévia" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid rgba(148,163,184,0.2);display:none;" />
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeEditModal()">Cancelar</button>
         <button class="btn" onclick="saveItem()">Salvar</button>
       </div>
     </div>
   </div>
 
+  <!-- Modal Foto -->
+  <div class="modal-backdrop" id="photoModal">
+    <div class="modal">
+      <h2>Foto do item</h2>
+      <img id="photoModalImg" src="" alt="Foto do item" />
+      <div class="modal-actions">
+        <button class="btn" onclick="closePhotoModal()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    /* ====== DADOS FIXOS DE MARCA/MODELO ====== */
-    const TIRE_DATA = {
-      "Michelin": [
-        { model: "X Multi Z", size: "295/80" },
-        { model: "X Multi D", size: "295/80" }
-      ],
-      "Pirelli": [
-        { model: "FG-01 MISTO", size: "295/80" }
-      ],
-      "Goodyear": [
-        { model: "Kmax D", size: "295/80" }
-      ]
-    };
+    const STORAGE_KEY_ITEMS = "tc_estoque_items_v1";
+    const STORAGE_KEY_MOVES = "tc_estoque_moves_v1";
 
-    /* ====== ESTADO ====== */
-    const LS_ITEMS = "pneus_base_items";
-    const LS_MOVES  = "pneus_base_moves";
+    let items = loadItems();
+    let movements = loadMovements();
 
-    let items = loadLS(LS_ITEMS, [
-      { id: "F-001", name: "Pneu 295/80", category: "Pneu", marca: "Michelin", modelo: "X Multi Z", tamanho: "295/80", qty: 9, reorderPoint: 3 },
-      { id: "F-002", name: "Pneu 295/80", category: "Pneu", marca: "Pirelli",  modelo: "FG-01 MISTO", tamanho: "295/80", qty: 4, reorderPoint: 2 }
-    ]);
-    let moves = loadLS(LS_MOVES, []);
+    let currentSort = { key: "name", dir: "asc" };
+    let filtered = [...items];
+    let adjustTarget = null;
     let editTarget = null;
+    let tempPhotoData = null;
 
-    function loadLS(key, fallback){
-      const raw = localStorage.getItem(key);
-      if(!raw) return fallback;
-      try { return JSON.parse(raw); } catch(e){ return fallback; }
-    }
-    function saveLS(){
-      localStorage.setItem(LS_ITEMS, JSON.stringify(items));
-      localStorage.setItem(LS_MOVES, JSON.stringify(moves));
-    }
+    const tableBody = document.getElementById("tableBody");
+    const itemsCount = document.getElementById("itemsCount");
+    const searchInput = document.getElementById("searchInput");
+    const categoryFilter = document.getElementById("categoryFilter");
+    const saveStatus = document.getElementById("saveStatus");
+    const filterPlacaInput = document.getElementById("filterPlaca");
+    const filterPecaInput = document.getElementById("filterPeca");
 
-    /* ====== RENDER ====== */
-    function renderItems(){
-      const tbody = document.getElementById("itemsBody");
-      const term = document.getElementById("searchInput").value.toLowerCase();
-      const cat = document.getElementById("categoryFilter").value;
-      tbody.innerHTML = "";
-      items
-        .filter(it => {
-          let ok = true;
-          if(term){
-            ok = (it.id && it.id.toLowerCase().includes(term)) ||
-                 (it.name && it.name.toLowerCase().includes(term));
-          }
-          if(ok && cat){
-            ok = (it.category || "") === cat;
-          }
-          return ok;
-        })
-        .forEach(it => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${it.id}</td>
-            <td>${it.name || ""}</td>
-            <td>${it.category || ""}</td>
-            <td>${it.marca || ""}</td>
-            <td>${it.modelo || ""}</td>
-            <td>${it.tamanho || ""}</td>
-            <td>${it.qty ?? 0}</td>
-            <td>${it.reorderPoint ?? 0}</td>
-            <td>
-              <button class="btn-xs" onclick="openItemModal('${it.id}')">Editar</button>
-              <button class="btn-xs" onclick="openAdjust('${it.id}')">Ajustar</button>
-              <button class="btn-xs btn-danger" onclick="deleteItem('${it.id}')">Excluir</button>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
+    function loadItems() {
+      const raw = localStorage.getItem(STORAGE_KEY_ITEMS);
+      if (raw) {
+        try { return JSON.parse(raw); } catch(e) {}
+      }
+      return [
+        { id: "P-001", name: "Filtro de óleo", category: "Peças", qty: 8, reorderPoint: 5, photo: "" },
+        { id: "P-002", name: "Pneu 295/80", category: "Pneus", qty: 3, reorderPoint: 4, photo: "" },
+        { id: "P-003", name: "Óleo 15W40", category: "Insumos", qty: 15, reorderPoint: 6, photo: "" },
+        { id: "P-004", name: "Pastilha de freio", category: "Peças", qty: 2, reorderPoint: 3, photo: "" },
+        { id: "P-005", name: "Limpador", category: "Acessórios", qty: 11, reorderPoint: 5, photo: "" },
+      ];
+    }
+    function loadMovements() {
+      const raw = localStorage.getItem(STORAGE_KEY_MOVES);
+      if (raw) {
+        try { return JSON.parse(raw); } catch(e) {}
+      }
+      return [];
+    }
+    function saveAll() {
+      localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
+      localStorage.setItem(STORAGE_KEY_MOVES, JSON.stringify(movements));
+      if (saveStatus) {
+        saveStatus.textContent = "salvo ✔";
+        setTimeout(() => saveStatus.textContent = "autosave ativo", 1500);
+      }
     }
 
-    function renderMoves(){
-      const tbody = document.getElementById("movesBody");
-      tbody.innerHTML = "";
-      moves.forEach(m => {
+    function renderTable() {
+      tableBody.innerHTML = "";
+      filtered.forEach((item) => {
+        const needsReorder = item.qty <= item.reorderPoint;
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${m.date}</td>
-          <td>${m.itemId}</td>
-          <td>${m.qty}</td>
-          <td>${m.plate || ""}</td>
-          <td>${m.notes || ""}</td>
-          <td><button class="btn-xs btn-danger" onclick="removeMove('${m.id}')">Voltar</button></td>
+          <td>${item.id}</td>
+          <td>${item.name}</td>
+          <td>${item.photo ? `<img src="${item.photo}" class="img-thumb" onclick="openPhotoModal('${item.id}')" />` : `<span class="small" style="color:var(--muted);">sem foto</span>`}</td>
+          <td><span class="badge">${item.category}</span></td>
+          <td><span class="badge ${needsReorder ? "qty-low" : ""}">${item.qty} ${needsReorder ? "⚠" : ""}</span></td>
+          <td>${item.reorderPoint}</td>
+          <td>
+            <div class="actions">
+              <button class="btn-xs" onclick="openAdjustModal('${item.id}')">Ajustar</button>
+              <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
+              <button class="btn-xs btn-danger" onclick="deleteItem('${item.id}')">Excluir</button>
+            </div>
+          </td>
         `;
-        tbody.appendChild(tr);
+        tableBody.appendChild(tr);
       });
+      itemsCount.textContent = filtered.length + " item(ns) exibidos";
+      renderCategoryFilter();
     }
 
-    /* ====== MODAL ITEM ====== */
-    function openItemModal(id){
-      const modal = document.getElementById("itemModal");
-      fillMarcaSelect(document.getElementById("mMarca"));
-      // padrão: primeira marca
-      const firstMarca = document.getElementById("mMarca").value;
-      fillModeloSelect(document.getElementById("mModelo"), firstMarca);
-
-      if(id){
-        editTarget = items.find(i => i.id === id);
-        document.getElementById("itemModalTitle").textContent = "Editar pneu";
-        document.getElementById("mId").value = editTarget.id;
-        document.getElementById("mName").value = editTarget.name || "";
-        document.getElementById("mCategory").value = editTarget.category || "Pneu";
-        document.getElementById("mMarca").value = editTarget.marca || firstMarca;
-        fillModeloSelect(document.getElementById("mModelo"), document.getElementById("mMarca").value);
-        document.getElementById("mModelo").value = editTarget.modelo || "";
-        document.getElementById("mTamanho").value = editTarget.tamanho || "295/80";
-        document.getElementById("mQty").value = editTarget.qty ?? 0;
-        document.getElementById("mReorder").value = editTarget.reorderPoint ?? 0;
-      } else {
-        editTarget = null;
-        document.getElementById("itemModalTitle").textContent = "Novo pneu";
-        document.getElementById("mId").value = "";
-        document.getElementById("mName").value = "";
-        document.getElementById("mCategory").value = "Pneu";
-        document.getElementById("mMarca").value = firstMarca;
-        fillModeloSelect(document.getElementById("mModelo"), firstMarca);
-        document.getElementById("mTamanho").value = "295/80";
-        document.getElementById("mQty").value = 0;
-        document.getElementById("mReorder").value = 0;
-      }
-      modal.classList.add("show");
-    }
-    function closeItemModal(){
-      document.getElementById("itemModal").classList.remove("show");
-    }
-    function saveItem(){
-      const id = document.getElementById("mId").value.trim();
-      if(!id){ alert("Informe o FOGO"); return; }
-      const obj = {
-        id,
-        name: document.getElementById("mName").value.trim(),
-        category: document.getElementById("mCategory").value.trim() || "Pneu",
-        marca: document.getElementById("mMarca").value,
-        modelo: document.getElementById("mModelo").value,
-        tamanho: document.getElementById("mTamanho").value.trim() || "295/80",
-        qty: parseInt(document.getElementById("mQty").value || "0",10),
-        reorderPoint: parseInt(document.getElementById("mReorder").value || "0",10)
-      };
-      if(editTarget){
-        Object.assign(editTarget, obj);
-      } else {
-        items.push(obj);
-        refreshCategoryFilter();
-      }
-      saveLS();
-      renderItems();
-      closeItemModal();
-    }
-
-    /* ====== AJUSTE RÁPIDO ====== */
-    function openAdjust(id){
-      const it = items.find(i => i.id === id);
-      if(!it) return;
-      const qtd = parseInt(prompt("Quantidade (use número negativo para saída):", "1") || "0", 10);
-      if(!qtd) return;
-      it.qty = (it.qty || 0) + qtd;
-      if(qtd < 0){
-        moves.push({
-          id: "mov_" + Date.now(),
-          date: new Date().toLocaleString("pt-BR"),
-          itemId: it.id,
-          qty: Math.abs(qtd)
-        });
-      }
-      saveLS();
-      renderItems();
-      renderMoves();
-    }
-    function removeMove(mid){
-      const m = moves.find(m => m.id === mid);
-      if(!m) return;
-      const it = items.find(i => i.id === m.itemId);
-      if(it) it.qty = (it.qty || 0) + (m.qty || 0);
-      moves = moves.filter(m => m.id !== mid);
-      saveLS();
-      renderItems();
-      renderMoves();
-    }
-
-    /* ====== DELETE ====== */
-    function deleteItem(id){
-      if(!confirm("Excluir este pneu?")) return;
-      items = items.filter(i => i.id !== id);
-      saveLS();
-      refreshCategoryFilter();
-      renderItems();
-    }
-
-    /* ====== SELECTS DE MARCA/MODELO ====== */
-    function fillMarcaSelect(sel){
-      sel.innerHTML = "";
-      Object.keys(TIRE_DATA).forEach(m => {
-        const op = document.createElement("option");
-        op.value = m;
-        op.textContent = m;
-        sel.appendChild(op);
-      });
-    }
-    function fillModeloSelect(sel, marca){
-      sel.innerHTML = "";
-      const arr = TIRE_DATA[marca] || [];
-      if(arr.length === 0){
-        const op = document.createElement("option");
-        op.value = "";
-        op.textContent = "Modelo livre";
-        sel.appendChild(op);
-      } else {
-        arr.forEach(obj => {
-          const op = document.createElement("option");
-          op.value = obj.model;
-          op.textContent = obj.model;
-          sel.appendChild(op);
-        });
-      }
-    }
-
-    /* ====== CATEGORIAS ====== */
-    function refreshCategoryFilter(){
-      const sel = document.getElementById("categoryFilter");
-      const current = sel.value;
-      const cats = [...new Set(items.map(i => i.category).filter(Boolean))];
-      sel.innerHTML = `<option value="">Todas as categorias</option>`;
+    function renderCategoryFilter() {
+      const cats = Array.from(new Set(items.map(i => i.category))).sort();
+      const currentValue = categoryFilter.value;
+      categoryFilter.innerHTML = '<option value="">Todas as categorias</option>';
       cats.forEach(c => {
-        const op = document.createElement("option");
-        op.value = c;
-        op.textContent = c;
-        sel.appendChild(op);
+        const opt = document.createElement("option");
+        opt.value = c;
+        opt.textContent = c;
+        categoryFilter.appendChild(opt);
       });
-      if(cats.includes(current)) sel.value = current;
+      if (currentValue) categoryFilter.value = currentValue;
+      const datalist = document.getElementById("categoriesList");
+      datalist.innerHTML = "";
+      cats.forEach(c => {
+        const opt = document.createElement("option");
+        opt.value = c;
+        datalist.appendChild(opt);
+      });
     }
 
-    /* ====== TABS ====== */
-    document.addEventListener("DOMContentLoaded", () => {
-      // tabs
-      document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.addEventListener("click", () => {
-          document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
-          btn.classList.add("active");
-          const tab = btn.dataset.tab;
-          document.querySelectorAll("main > div[id^='tab-']").forEach(div => {
-            div.classList.toggle("hidden", div.id !== "tab-" + tab);
-          });
-        });
+    function applyFilters() {
+      const term = (searchInput?.value || "").toLowerCase();
+      const cat = categoryFilter.value;
+      filtered = items.filter(i => {
+        const matchText = i.name.toLowerCase().includes(term) || i.id.toLowerCase().includes(term);
+        const matchCat = cat ? i.category === cat : true;
+        return matchText && matchCat;
       });
+      applySort();
+    }
 
-      document.getElementById("newItemBtn").addEventListener("click", () => openItemModal(null));
-      document.getElementById("searchInput").addEventListener("input", renderItems);
-      document.getElementById("categoryFilter").addEventListener("change", renderItems);
+    function applySort() {
+      const { key, dir } = currentSort;
+      filtered.sort((a, b) => {
+        if (a[key] < b[key]) return dir === "asc" ? -1 : 1;
+        if (a[key] > b[key]) return dir === "asc" ? 1 : -1;
+        return 0;
+      });
+      renderTable();
+    }
 
-      refreshCategoryFilter();
-      renderItems();
-      renderMoves();
+    if (searchInput) searchInput.addEventListener("input", applyFilters);
+    if (categoryFilter) categoryFilter.addEventListener("change", applyFilters);
 
-      // quando troca marca no modal
-      document.addEventListener("change", (e) => {
-        if(e.target.id === "mMarca"){
-          fillModeloSelect(document.getElementById("mModelo"), e.target.value);
+    document.querySelectorAll("th[data-sort]").forEach(th => {
+      th.addEventListener("click", () => {
+        const key = th.dataset.sort;
+        if (currentSort.key === key) {
+          currentSort.dir = currentSort.dir === "asc" ? "desc" : "asc";
+        } else {
+          currentSort.key = key;
+          currentSort.dir = "asc";
         }
+        applySort();
       });
     });
 
-    // expõe funções
-    window.openItemModal = openItemModal;
-    window.closeItemModal = closeItemModal;
-    window.saveItem = saveItem;
-    window.openAdjust = openAdjust;
-    window.deleteItem = deleteItem;
-    window.removeMove = removeMove;
+    function openAdjustModal(id) {
+      adjustTarget = items.find(i => i.id === id);
+      document.getElementById("adjustItemLabel").textContent = adjustTarget.id + " – " + adjustTarget.name;
+      document.getElementById("adjustAmount").value = 1;
+      document.getElementById("adjustType").value = "in";
+      document.getElementById("priceBlock").style.display = "none";
+      document.getElementById("adjustPrice").value = "";
+      document.getElementById("adjustObs").value = "";
+      document.getElementById("adjustPlate").value = "";
+      document.getElementById("adjustModal").style.display = "flex";
+    }
+    function closeAdjustModal() {
+      document.getElementById("adjustModal").style.display = "none";
+      adjustTarget = null;
+    }
+    document.getElementById("adjustType").addEventListener("change", (e) => {
+      document.getElementById("priceBlock").style.display = e.target.value === "out" ? "block" : "none";
+    });
+
+    function confirmAdjust() {
+      const amount = parseInt(document.getElementById("adjustAmount").value, 10) || 0;
+      const type = document.getElementById("adjustType").value;
+      const price = parseFloat(document.getElementById("adjustPrice").value || "0");
+      const obs = document.getElementById("adjustObs").value.trim();
+      const plate = document.getElementById("adjustPlate").value.trim().toUpperCase();
+      if (!adjustTarget || amount <= 0) { closeAdjustModal(); return; }
+
+      if (type === "in") {
+        adjustTarget.qty += amount;
+      } else {
+        adjustTarget.qty = Math.max(0, adjustTarget.qty - amount);
+        const now = new Date();
+        const dateStr = now.toLocaleDateString("pt-BR") + " " + now.toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"});
+        movements.unshift({
+          date: dateStr,
+          itemId: adjustTarget.id,
+          itemName: adjustTarget.name,
+          qty: amount,
+          price: isNaN(price) ? 0 : price,
+          obs: obs,
+          plate: plate
+        });
+        renderMovements();
+      }
+      closeAdjustModal();
+      applyFilters();
+      saveAll();
+    }
+
+    const addItemBtn = document.getElementById("addItemBtn");
+    if (addItemBtn) addItemBtn.addEventListener("click", () => openEditModal(null));
+
+    function openEditModal(id) {
+      const photoPreview = document.getElementById("photoPreview");
+      tempPhotoData = null;
+      if (id) {
+        editTarget = items.find(i => i.id === id);
+        document.getElementById("editTitle").textContent = "Editar item";
+        document.getElementById("editId").value = editTarget.id;
+        document.getElementById("editName").value = editTarget.name;
+        document.getElementById("editCategory").value = editTarget.category;
+        document.getElementById("editQty").value = editTarget.qty;
+        document.getElementById("editReorder").value = editTarget.reorderPoint;
+        if (editTarget.photo) {
+          photoPreview.src = editTarget.photo;
+          photoPreview.style.display = "block";
+        } else {
+          photoPreview.style.display = "none";
+        }
+      } else {
+        editTarget = null;
+        document.getElementById("editTitle").textContent = "Novo item";
+        document.getElementById("editId").value = "";
+        document.getElementById("editName").value = "";
+        document.getElementById("editCategory").value = "";
+        document.getElementById("editQty").value = 0;
+        document.getElementById("editReorder").value = 0;
+        photoPreview.style.display = "none";
+      }
+      document.getElementById("editPhoto").value = "";
+      document.getElementById("editModal").style.display = "flex";
+    }
+
+    document.getElementById("editPhoto").addEventListener("change", function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        tempPhotoData = ev.target.result;
+        const photoPreview = document.getElementById("photoPreview");
+        photoPreview.src = tempPhotoData;
+        photoPreview.style.display = "block";
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function closeEditModal() {
+      document.getElementById("editModal").style.display = "none";
+      editTarget = null;
+      tempPhotoData = null;
+    }
+
+    function saveItem() {
+      const id = document.getElementById("editId").value.trim();
+      const name = document.getElementById("editName").value.trim();
+      const category = document.getElementById("editCategory").value.trim() || "Sem categoria";
+      const qty = parseInt(document.getElementById("editQty").value, 10) || 0;
+      const reorderPoint = parseInt(document.getElementById("editReorder").value, 10) || 0;
+
+      if (!id || !name) {
+        alert("ID e nome são obrigatórios.");
+        return;
+      }
+
+      if (editTarget) {
+        editTarget.id = id;
+        editTarget.name = name;
+        editTarget.category = category;
+        editTarget.qty = qty;
+        editTarget.reorderPoint = reorderPoint;
+        if (tempPhotoData) editTarget.photo = tempPhotoData;
+      } else {
+        items.push({ id, name, category, qty, reorderPoint, photo: tempPhotoData || "" });
+      }
+      closeEditModal();
+      applyFilters();
+      saveAll();
+    }
+
+    function deleteItem(id) {
+      if (confirm("Tem certeza que deseja excluir este item?")) {
+        items = items.filter(i => i.id !== id);
+        applyFilters();
+        saveAll();
+      }
+    }
+
+    function openPhotoModal(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item || !item.photo) return;
+      document.getElementById("photoModalImg").src = item.photo;
+      document.getElementById("photoModal").style.display = "flex";
+    }
+    function closePhotoModal() {
+      document.getElementById("photoModal").style.display = "none";
+    }
+
+    function renderMovements() {
+      const body = document.getElementById("movementsBody");
+      body.innerHTML = "";
+
+      const placaTerm = (filterPlacaInput?.value || "").trim().toUpperCase();
+      const pecaTerm = (filterPecaInput?.value || "").trim().toLowerCase();
+
+      movements
+        .filter(m => {
+          const placaOk = placaTerm ? (m.plate || "").toUpperCase().includes(placaTerm) : true;
+          const pecaOk = pecaTerm ? (m.itemName || "").toLowerCase().includes(pecaTerm) || (m.itemId || "").toLowerCase().includes(pecaTerm) : true;
+          return placaOk && pecaOk;
+        })
+        .forEach(m => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${m.date}</td>
+            <td>${m.itemId} – ${m.itemName}</td>
+            <td>${m.qty}</td>
+            <td>${m.plate || "-"}</td>
+            <td>${m.price ? "R$ " + m.price.toFixed(2) : "-"}</td>
+            <td>${m.obs || "-"}</td>
+          `;
+          body.appendChild(tr);
+        });
+    }
+
+    if (filterPlacaInput) filterPlacaInput.addEventListener("input", renderMovements);
+    if (filterPecaInput) filterPecaInput.addEventListener("input", renderMovements);
+
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        const tab = btn.dataset.tab;
+        document.getElementById("tab-estoque").classList.add("hidden");
+        document.getElementById("tab-saidas").classList.add("hidden");
+        document.getElementById("tab-" + tab).classList.remove("hidden");
+      });
+    });
+
+    applyFilters();
+    renderMovements();
   </script>
 </body>
 </html>
