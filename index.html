@@ -119,6 +119,10 @@
       background: rgba(16, 185, 129, 0.2);
       color: #d1fae5;
     }
+    .sulco-disabled {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--muted);
+    }
     .qty-low {
       background: rgba(244, 63, 94, 0.2);
       color: #ffe4e6;
@@ -139,6 +143,10 @@
     .btn-success {
       background: rgba(16, 185, 129, 0.2);
       color: #d1fae5;
+    }
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.2);
+      color: #ffe4e6;
     }
     .modal-backdrop {
       position: fixed;
@@ -206,10 +214,6 @@
     .alert-banner.critical {
       background: rgba(244, 63, 94, 0.2);
       border-color: rgba(244, 63, 94, 0.4);
-    }
-    .sulco-disabled {
-      background: rgba(148, 163, 184, 0.1);
-      color: var(--muted);
     }
   </style>
 </head>
@@ -327,26 +331,14 @@
         </div>
 
         <div>
-          <label>Veículo/Placa (se aplicável)</label>
-          <input type="text" id="baixaPlaca" class="input" placeholder="ABC1D23" style="width: 100%;">
-        </div>
-
-        <div>
           <label>Observação</label>
           <textarea id="baixaObs" class="input" placeholder="Detalhes da baixa..." style="width: 100%; height: 60px;"></textarea>
-        </div>
-
-        <div>
-          <label>
-            <input type="checkbox" id="baixaTotal">
-            Baixa total do estoque deste pneu
-          </label>
         </div>
       </div>
 
       <div class="modal-actions">
         <button class="btn-xs" onclick="closeBaixaModal()">Cancelar</button>
-        <button onclick="confirmBaixa()" style="background: var(--danger);">Confirmar Baixa</button>
+        <button class="btn-danger" onclick="confirmBaixa()">Confirmar Baixa</button>
       </div>
     </div>
   </div>
@@ -434,7 +426,7 @@
           </div>
           <div>
             <label>Status *</label>
-            <select id="editStatus" class="input" onchange="toggleSulcoField()">
+            <select id="editStatus" class="input">
               <option value="Novo">Novo</option>
               <option value="Recapado">Recapado</option>
               <option value="Usado">Usado</option>
@@ -442,8 +434,8 @@
           </div>
         </div>
 
-        <div id="sulcoField">
-          <label>Sulco (mm) *</label>
+        <div>
+          <label>Sulco (mm) * para Novos/Recapados</label>
           <input type="number" id="editSulco" class="input" step="0.1" min="0" max="20" placeholder="8.5">
         </div>
 
@@ -467,7 +459,7 @@
   </div>
 
   <script>
-    // Dados iniciais
+    // Dados iniciais - usando o código base que funcionava
     let items = JSON.parse(localStorage.getItem('tc_pneus')) || [
       { 
         fogo: "001", 
@@ -567,7 +559,7 @@
             <td>
               <div class="actions">
                 <button class="btn-xs btn-success" onclick="openPneuSaidaModal('${item.fogo}')">Saída</button>
-                <button class="btn-xs" onclick="openBaixaModal('${item.fogo}')" style="background: rgba(244, 63, 94, 0.1); color: #ffe4e6;">Baixa</button>
+                <button class="btn-xs btn-danger" onclick="openBaixaModal('${item.fogo}')">Baixa</button>
                 <button class="btn-xs" onclick="openEditModal('${item.fogo}')">Editar</button>
               </div>
             </td>
@@ -677,9 +669,7 @@
       
       // Limpar campos
       document.getElementById('baixaMotivo').value = '';
-      document.getElementById('baixaPlaca').value = '';
       document.getElementById('baixaObs').value = '';
-      document.getElementById('baixaTotal').checked = false;
 
       document.getElementById('baixaModal').style.display = 'flex';
     }
@@ -691,18 +681,14 @@
 
     function confirmBaixa() {
       const motivo = document.getElementById('baixaMotivo').value;
-      const placa = document.getElementById('baixaPlaca').value.trim();
       const obs = document.getElementById('baixaObs').value.trim();
-      const baixaTotal = document.getElementById('baixaTotal').checked;
 
       if (!motivo) {
         alert('Motivo da baixa é obrigatório!');
         return;
       }
 
-      const qtyBaixa = baixaTotal ? currentItem.qty : 1;
-
-      if (currentItem.qty < qtyBaixa) {
+      if (currentItem.qty <= 0) {
         alert('Estoque insuficiente para baixa!');
         return;
       }
@@ -714,14 +700,13 @@
         tipo: 'BAIXA',
         fogo: currentItem.fogo,
         medida: currentItem.medida,
-        qty: qtyBaixa,
-        placa: placa,
+        qty: 1,
         motivo: motivo,
         observacao: obs
       });
 
       // Atualizar estoque
-      currentItem.qty -= qtyBaixa;
+      currentItem.qty -= 1;
 
       // Salvar e atualizar
       saveData();
@@ -829,22 +814,7 @@
         document.getElementById('editReorder').value = '2';
       }
 
-      toggleSulcoField();
       document.getElementById('editModal').style.display = 'flex';
-    }
-
-    function toggleSulcoField() {
-      const status = document.getElementById('editStatus').value;
-      const sulcoField = document.getElementById('sulcoField');
-      const sulcoInput = document.getElementById('editSulco');
-      
-      if (status === 'Usado') {
-        sulcoField.style.display = 'none';
-        sulcoInput.required = false;
-      } else {
-        sulcoField.style.display = 'block';
-        sulcoInput.required = true;
-      }
     }
 
     function closeEditModal() {
