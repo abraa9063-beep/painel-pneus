@@ -285,15 +285,15 @@
   </header>
   
   <main>
-	 <div class="tabs">
-	  <button class="tab-btn active" data-tab="container">Container</button>
-	  <button class="tab-btn" data-tab="fogo">Controle por Fogo</button>
-	  <button class="tab-btn" data-tab="recapagem">Recapagem</button>
-	  <button class="tab-btn" data-tab="descarte">Descarte</button>
-	  <button class="tab-btn" data-tab="venda">Vendas</button>
-	  <button class="tab-btn" data-tab="saidas">Saídas</button>
-	  <button class="tab-btn" data-tab="alertas">Alertas</button>
-	</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="container">Container</button>
+      <button class="tab-btn" data-tab="fogo">Controle por Fogo</button>
+      <button class="tab-btn" data-tab="recapagem">Recapagem</button>
+      <button class="tab-btn" data-tab="descarte">Descarte</button>
+      <button class="tab-btn" data-tab="venda">Vendas</button>
+      <button class="tab-btn" data-tab="saidas">Saídas</button>
+      <button class="tab-btn" data-tab="alertas">Alertas</button>
+    </div>
 
     <!-- ALERTAS -->
     <div id="tab-alertas" class="hidden">
@@ -411,470 +411,90 @@
         </div>
       </div>
     </div>
-	
-	<!-- CONTROLE POR FOGO -->
-	<div id="tab-fogo" class="hidden">
-	  <div class="toolbar">
-		<input type="text" id="searchFogo" class="input" placeholder="Buscar por fogo, marca, modelo..." style="flex:1;">
-		<button id="addFogoBtn">+ Novo Pneu Individual</button>
-	  </div>
 
-	  <div class="card">
-		<div style="padding: 15px;">
-		  <h3>Controle Individual por Fogo</h3>
-		  <div id="fogoCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
-		</div>
-		<div style="overflow-x: auto;">
-		  <table>
-			<thead>
-			  <tr>
-				<th>Fogo</th>
-				<th>Marca</th>
-				<th>Modelo</th>
-				<th>Medida</th>
-				<th>Valor (R$)</th>
-				<th>Status</th>
-				<th>Ações</th>
-			  </tr>
-			</thead>
-			<tbody id="fogoBody"></tbody>
-		  </table>
-		</div>
-	  </div>
-	</div>
-
-	<!-- RECAPAGEM -->
-	<div id="tab-recapagem" class="hidden">
-	  <div class="toolbar">
-		<input type="text" id="searchRecapagem" class="input" placeholder="Buscar por fogo, recapadora..." style="flex:1;">
-		<button id="addRecapagemBtn">+ Nova Recapagem</button>
-	  </div>
-
-	  <div class="card">
-		<div style="padding: 15px;">
-		  <h3>Controle de Recapagem</h3>
-		</div>
-		<div style="overflow-x: auto;">
-		  <table>
-			<thead>
-			  <tr>
-				<th>Data</th>
-				<th>Fogo</th>
-				<th>Marca/Modelo</th>
-				<th>Medida</th>
-				<th>Borracha</th>
-				<th>Recapadora</th>
-				<th>Observação</th>
-				<th>Ações</th>
-			  </tr>
-			</thead>
-			<tbody id="recapagemBody"></tbody>
-		  </table>
-		</div>
-	  </div>
-	</div>
-
-	<!-- DESCARTE -->
-	<div id="tab-descarte" class="hidden">
-	  <div class="toolbar">
-		<input type="text" id="searchDescarte" class="input" placeholder="Buscar por fogo, motivo..." style="flex:1;">
-		<button id="addDescarteBtn">+ Novo Descarte</button>
-	  </div>
-
-	  <div class="card">
-		<div style="padding: 15px;">
-		  <h3>Controle de Descarte</h3>
-		</div>
-		<div style="overflow-x: auto;">
-		  <table>
-			<thead>
-			  <tr>
-				<th>Data</th>
-				<th>Fogo</th>
-				<th>Marca/Modelo</th>
-				<th>Medida</th>
-				<th>Motivo</th>
-				<th>Ações</th>
-			  </tr>
-			</thead>
-			<tbody id="descarteBody"></tbody>
-		  </table>
-		</div>
-	  </div>
-	</div>
-
-	<!-- VENDAS -->
-	<div id="tab-venda" class="hidden">
-	  <div class="toolbar">
-		<input type="text" id="searchVenda" class="input" placeholder="Buscar por fogo, comprador..." style="flex:1;">
-		<button id="addVendaBtn">+ Nova Venda</button>
-	  </div>
-
-	  <div class="card">
-		<div style="padding: 15px;">
-		  <h3>Controle de Vendas</h3>
-		</div>
-		<div style="overflow-x: auto;">
-		  <table>
-			<thead>
-			  <tr>
-				<th>Data</th>
-				<th>Fogo</th>
-				<th>Marca/Modelo</th>
-				<th>Medida</th>
-				<th>Tipo</th>
-				<th>Comprador</th>
-				<th>CPF/CNPJ</th>
-				<th>Valor (R$)</th>
-				<th>Ações</th>
-			  </tr>
-			</thead>
-			<tbody id="vendaBody"></tbody>
-		  </table>
-		</div>
-	  </div>
-	</div>
-
-    <!-- SAÍDAS -->
-    <div id="tab-saidas" class="hidden">
-      <div class="toolbar">
-        <input type="text" id="filterPlaca" class="input" placeholder="Filtrar por placa..." style="flex:1;">
-        <input type="text" id="filterPeca" class="input" placeholder="Filtrar por medida...">
-      </div>
-      
-      <div class="card">
-        <div style="padding: 15px;">
-          <h3>Histórico de Saídas</h3>
-        </div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Data</th>
-                <th>Pneu</th>
-                <th>Medida</th>
-                <th>Qtd</th>
-                <th>Veículo</th>
-                <th>Posição</th>
-                <th>Motorista</th>
-              </tr>
-            </thead>
-            <tbody id="movementsBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Modal Saída de Pneu -->
-  <div class="modal-backdrop" id="pneuSaidaModal">
-    <div class="modal">
-      <h2>Saída de Pneu</h2>
-      <div id="pneuSaidaLabel" style="color: var(--muted); margin-bottom: 15px;"></div>
-      
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <div>
-          <label>Veículo/Placa *</label>
-          <input type="text" id="saidaPlaca" class="input" placeholder="ABC1D23" style="width: 100%;">
-        </div>
+    <!-- Modal Editar Pneu -->
+    <div class="modal-backdrop" id="editModal">
+      <div class="modal">
+        <h2 id="editTitle">Novo Pneu</h2>
         
-        <div>
-          <label>Posição no veículo *</label>
-          <select id="saidaPosicao" class="input" style="width: 100%;">
-            <option value="">Selecionar posição</option>
-            <option value="Dianteira Esquerda">Dianteira Esquerda</option>
-            <option value="Dianteira Direita">Dianteira Direita</option>
-            <option value="Traseira Externa Esq">Traseira Externa Esq</option>
-            <option value="Traseira Externa Dir">Traseira Externa Dir</option>
-            <option value="Step">Step (Soco)</option>
-          </select>
-        </div>
-
-        <div class="field-row">
-          <div>
-            <label>Motorista</label>
-            <input type="text" id="saidaMotorista" class="input">
-          </div>
-          <div>
-            <label>KM do Veículo</label>
-            <input type="number" id="saidaKm" class="input">
-          </div>
-        </div>
-
-        <div>
-          <label>Observação</label>
-          <textarea id="saidaObs" class="input" placeholder="Motivo da troca..." style="width: 100%; height: 60px;"></textarea>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closePneuSaidaModal()">Cancelar</button>
-        <button onclick="confirmPneuSaida()">Confirmar Saída</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Editar Pneu (ATUALIZADO) -->
-  <div class="modal-backdrop" id="editModal">
-    <div class="modal">
-      <h2 id="editTitle">Novo Pneu</h2>
-      
-      <div style="display: flex; flex-direction: column; gap: 10px;">
-        <!-- Upload de Imagem -->
-        <div class="full-width">
-          <label>Imagem do Pneu</label>
-          <div class="image-upload-container" onclick="document.getElementById('imageInput').click()">
-            <div id="imageUploadText">Clique para adicionar imagem</div>
-            <div class="image-preview" id="imagePreview">
-              <img id="previewImage" src="" alt="Preview">
+        <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div class="field-row">
+            <div>
+              <label>Código/Fogo *</label>
+              <input type="text" id="editId" class="input" placeholder="Código único do pneu">
+            </div>
+            <div>
+              <label>Medida *</label>
+              <input type="text" id="editMedida" class="input" placeholder="295/80 R22.5">
             </div>
           </div>
-          <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewImage(event)">
-        </div>
 
-        <div class="field-row">
-          <div>
-            <label>Código/Fogo *</label>
-            <input type="text" id="editId" class="input" placeholder="Código único do pneu">
+          <div class="field-row">
+            <div>
+              <label>Marca *</label>
+              <input type="text" id="editMarca" class="input" placeholder="Michelin">
+            </div>
+            <div>
+              <label>Modelo *</label>
+              <input type="text" id="editModelo" class="input" placeholder="X Line Energy">
+            </div>
           </div>
-          <div>
-            <label>Medida *</label>
-            <input type="text" id="editMedida" class="input" placeholder="295/80 R22.5">
-          </div>
-        </div>
 
-        <div class="field-row">
-          <div>
-            <label>Marca *</label>
-            <input type="text" id="editMarca" class="input" placeholder="Michelin">
+          <div class="field-row">
+            <div>
+              <label>DOT</label>
+              <input type="text" id="editDot" class="input" placeholder="4321">
+            </div>
+            <div>
+              <label>Sulco (mm)</label>
+              <input type="number" id="editSulco" class="input" step="0.1" min="0" max="20" value="0">
+            </div>
           </div>
-          <div>
-            <label>Modelo *</label>
-            <input type="text" id="editModelo" class="input" placeholder="X Line Energy">
-          </div>
-        </div>
 
-        <div class="field-row">
-          <div>
-            <label>DOT</label>
-            <input type="text" id="editDot" class="input" placeholder="4321">
+          <div class="field-row">
+            <div>
+              <label>Status</label>
+              <select id="editStatus" class="input">
+                <option value="Novo">Novo</option>
+                <option value="Usado">Usado</option>
+                <option value="Reformado">Reformado</option>
+              </select>
+            </div>
+            <div>
+              <label>Quantidade em Estoque *</label>
+              <input type="number" id="editQty" class="input" min="0" value="0">
+            </div>
           </div>
-          <div>
-            <label>Sulco (mm)</label>
-            <input type="number" id="editSulco" class="input" step="0.1" min="0" max="20" value="0">
-          </div>
-        </div>
 
-        <div class="field-row">
-          <div>
-            <label>Status</label>
-            <select id="editStatus" class="input">
-              <option value="Novo">Novo</option>
-              <option value="Usado">Usado</option>
-              <option value="Reformado">Reformado</option>
-            </select>
+          <div class="field-row">
+            <div>
+              <label>Container</label>
+              <select id="editContainer" class="input">
+                <option value="container1">Container 1</option>
+                <option value="container2">Container 2</option>
+                <option value="container3">Container 3</option>
+              </select>
+            </div>
+            <div>
+              <label>Preço (R$)</label>
+              <input type="number" id="editPreco" class="input" step="0.01" min="0" placeholder="0.00">
+            </div>
           </div>
-          <div>
-            <label>Quantidade em Estoque *</label>
-            <input type="number" id="editQty" class="input" min="0" value="0">
-          </div>
-        </div>
 
-        <div class="field-row">
-          <div>
-            <label>Ponto de Reposição</label>
-            <input type="number" id="editReorderPoint" class="input" min="0" value="5">
-            <small style="color: var(--muted);">Alerta quando estoque ficar abaixo deste valor</small>
-          </div>
-          <div>
-            <label>Preço (R$)</label>
-            <input type="number" id="editPreco" class="input" step="0.01" min="0" placeholder="0.00">
+          <div class="full-width">
+            <label>Observações</label>
+            <textarea id="editObservacoes" class="input" placeholder="Observações adicionais..." style="width: 100%; height: 60px;"></textarea>
           </div>
         </div>
 
-        <div class="full-width">
-          <label>Observações</label>
-          <textarea id="editObservacoes" class="input" placeholder="Observações adicionais..." style="width: 100%; height: 60px;"></textarea>
+        <div class="modal-actions">
+          <button class="btn-xs" onclick="closeEditModal()">Cancelar</button>
+          <button onclick="saveItem()">Salvar Pneu</button>
         </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closeEditModal()">Cancelar</button>
-        <button onclick="saveItem()">Salvar Pneu</button>
       </div>
     </div>
-  </div>
-	  
-	  <!-- Modal Fogo Individual -->
-	<div class="modal-backdrop" id="fogoModal">
-	  <div class="modal">
-		<h2 id="fogoTitle">Novo Pneu Individual</h2>
-		<div style="display: flex; flex-direction: column; gap: 10px;">
-		  <div class="field-row">
-			<div>
-			  <label>Número do Fogo *</label>
-			  <input type="text" id="fogoNumero" class="input" placeholder="Fogo único do pneu">
-			</div>
-			<div>
-			  <label>Valor (R$) *</label>
-			  <input type="number" id="fogoValor" class="input" step="0.01" min="0" placeholder="0.00">
-			</div>
-		  </div>
-		  <div class="field-row">
-			<div>
-			  <label>Marca *</label>
-			  <input type="text" id="fogoMarca" class="input" placeholder="Michelin">
-			</div>
-			<div>
-			  <label>Modelo *</label>
-			  <input type="text" id="fogoModelo" class="input" placeholder="X Line Energy">
-			</div>
-		  </div>
-		  <div class="field-row">
-			<div>
-			  <label>Medida *</label>
-			  <input type="text" id="fogoMedida" class="input" placeholder="295/80 R22.5">
-			</div>
-			<div>
-			  <label>Status</label>
-			  <select id="fogoStatus" class="input">
-				<option value="Estoque">Em Estoque</option>
-				<option value="Em uso">Em Uso</option>
-				<option value="Recapando">Recapando</option>
-				<option value="Vendido">Vendido</option>
-				<option value="Descartado">Descartado</option>
-			  </select>
-			</div>
-		  </div>
-		</div>
-		<div class="modal-actions">
-		  <button class="btn-xs" onclick="closeFogoModal()">Cancelar</button>
-		  <button onclick="saveFogo()">Salvar</button>
-		</div>
-	  </div>
-	</div>
 
-	<!-- Modal Recapagem -->
-	<div class="modal-backdrop" id="recapagemModal">
-	  <div class="modal">
-		<h2>Nova Recapagem</h2>
-		<div style="display: flex; flex-direction: column; gap: 10px;">
-		  <div class="field-row">
-			<div>
-			  <label>Fogo do Pneu *</label>
-			  <input type="text" id="recapagemFogo" class="input" placeholder="Número do fogo">
-			</div>
-			<div>
-			  <label>Data da Recapagem</label>
-			  <input type="date" id="recapagemData" class="input">
-			</div>
-		  </div>
-		  <div class="field-row">
-			<div>
-			  <label>Borracha Utilizada *</label>
-			  <input type="text" id="recapagemBorracha" class="input" placeholder="Tipo de borracha">
-			</div>
-			<div>
-			  <label>Recapadora *</label>
-			  <input type="text" id="recapagemRecapadora" class="input" placeholder="Nome da recapadora">
-			</div>
-		  </div>
-		  <div>
-			<label>Observações</label>
-			<textarea id="recapagemObs" class="input" placeholder="Observações da recapagem..." style="width: 100%; height: 60px;"></textarea>
-		  </div>
-		</div>
-		<div class="modal-actions">
-		  <button class="btn-xs" onclick="closeRecapagemModal()">Cancelar</button>
-		  <button onclick="saveRecapagem()">Salvar</button>
-		</div>
-	  </div>
-	</div>
-
-	<!-- Modal Descarte -->
-	<div class="modal-backdrop" id="descarteModal">
-	  <div class="modal">
-		<h2>Novo Descarte</h2>
-		<div style="display: flex; flex-direction: column; gap: 10px;">
-		  <div class="field-row">
-			<div>
-			  <label>Fogo do Pneu *</label>
-			  <input type="text" id="descarteFogo" class="input" placeholder="Número do fogo">
-			</div>
-			<div>
-			  <label>Data do Descarte</label>
-			  <input type="date" id="descarteData" class="input">
-			</div>
-		  </div>
-		  <div>
-			<label>Motivo do Descarte *</label>
-			<select id="descarteMotivo" class="input" style="width: 100%;">
-			  <option value="">Selecionar motivo</option>
-			  <option value="Sulco esgotado">Sulco esgotado</option>
-			  <option value="Danificado">Danificado</option>
-			  <option value="Reparo impossível">Reparo impossível</option>
-			  <option value="Vida útil esgotada">Vida útil esgotada</option>
-			  <option value="Outro">Outro</option>
-			</select>
-		  </div>
-		  <div>
-			<label>Observações</label>
-			<textarea id="descarteObs" class="input" placeholder="Detalhes do descarte..." style="width: 100%; height: 60px;"></textarea>
-		  </div>
-		</div>
-		<div class="modal-actions">
-		  <button class="btn-xs" onclick="closeDescarteModal()">Cancelar</button>
-		  <button onclick="saveDescarte()">Salvar</button>
-		</div>
-	  </div>
-	</div>
-
-	<!-- Modal Venda -->
-	<div class="modal-backdrop" id="vendaModal">
-	  <div class="modal">
-		<h2>Nova Venda</h2>
-		<div style="display: flex; flex-direction: column; gap: 10px;">
-		  <div class="field-row">
-			<div>
-			  <label>Fogo do Pneu *</label>
-			  <input type="text" id="vendaFogo" class="input" placeholder="Número do fogo">
-			</div>
-			<div>
-			  <label>Data da Venda</label>
-			  <input type="date" id="vendaData" class="input">
-			</div>
-		  </div>
-		  <div class="field-row">
-			<div>
-			  <label>Comprador *</label>
-			  <input type="text" id="vendaComprador" class="input" placeholder="Nome do comprador">
-			</div>
-			<div>
-			  <label>CPF/CNPJ *</label>
-			  <input type="text" id="vendaDocumento" class="input" placeholder="CPF ou CNPJ">
-			</div>
-		  </div>
-		  <div class="field-row">
-			<div>
-			  <label>Tipo do Pneu</label>
-			  <select id="vendaTipo" class="input">
-				<option value="Novo">Novo</option>
-				<option value="Usado">Usado</option>
-				<option value="Reformado">Reformado</option>
-			  </select>
-			</div>
-			<div>
-			  <label>Valor da Venda (R$) *</label>
-			  <input type="number" id="vendaValor" class="input" step="0.01" min="0" placeholder="0.00">
-			</div>
-		  </div>
-		</div>
-		<div class="modal-actions">
-		  <button class="btn-xs" onclick="closeVendaModal()">Cancelar</button>
-		  <button onclick="saveVenda()">Salvar</button>
-		</div>
-	  </div>
-	</div>
+  </main>
 
   <script>
     // Dados iniciais
@@ -888,11 +508,263 @@
         sulco: 8.5,
         status: "Novo",
         qty: 8,
-        reorderPoint: 5,
         preco: 1250.00,
         observacoes: "",
-        imagem: null,
         container: "container1"
       },
       { 
-        id: "PNEU-
+        id: "PNEU-002", 
+        medida: "11R22.5",
+        marca: "Bridgestone", 
+        modelo: "R194",
+        dot: "1234",
+        sulco: 4.2,
+        status: "Usado",
+        qty: 3,
+        preco: 850.00,
+        observacoes: "Pneu reformado",
+        container: "container1"
+      }
+    ];
+
+    let currentItem = null;
+    let currentContainer = "container1";
+
+    // Elementos da interface
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableBody = document.getElementById('tableBody');
+    const itemsCount = document.getElementById('itemsCount');
+
+    // Inicialização
+    function init() {
+      renderTable();
+      renderStats();
+      setupEventListeners();
+    }
+
+    function setupEventListeners() {
+      // Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('[id^="tab-"]').forEach(tab => tab.classList.add('hidden'));
+          btn.classList.add('active');
+          document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+        });
+      });
+
+      // Botões de Container
+      document.querySelectorAll('.container-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.container-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.container-content').forEach(content => content.classList.add('hidden'));
+          btn.classList.add('active');
+          document.getElementById(btn.dataset.container + '-content').classList.remove('hidden');
+          currentContainer = btn.dataset.container;
+          renderTable();
+        });
+      });
+
+      // Filtros
+      searchInput.addEventListener('input', renderTable);
+      statusFilter.addEventListener('change', renderTable);
+
+      // Botão novo item
+      document.getElementById('addItemBtn').addEventListener('click', () => openEditModal());
+    }
+
+    function renderTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const statusTerm = statusFilter.value;
+
+      const filtered = items.filter(item => {
+        const matchSearch = item.id.toLowerCase().includes(searchTerm) ||
+                          item.medida.toLowerCase().includes(searchTerm) ||
+                          (item.dot && item.dot.toLowerCase().includes(searchTerm)) ||
+                          item.marca.toLowerCase().includes(searchTerm) ||
+                          item.modelo.toLowerCase().includes(searchTerm);
+        const matchStatus = !statusTerm || item.status === statusTerm;
+        const matchContainer = item.container === currentContainer;
+        return matchSearch && matchStatus && matchContainer;
+      });
+
+      const tableBodyElement = document.getElementById('tableBody');
+      if (currentContainer === 'container2') {
+        tableBodyElement = document.getElementById('tableBody2');
+      } else if (currentContainer === 'container3') {
+        tableBodyElement = document.getElementById('tableBody3');
+      }
+
+      const countElement = document.getElementById('itemsCount');
+      if (currentContainer === 'container2') {
+        countElement = document.getElementById('itemsCount2');
+      } else if (currentContainer === 'container3') {
+        countElement = document.getElementById('itemsCount3');
+      }
+
+      tableBodyElement.innerHTML = filtered.map(item => {
+        const sulcoClass = item.sulco < 3.0 ? "sulco-critico" : 
+                          item.sulco < 5.0 ? "sulco-alerta" : "sulco-ok";
+        const needsReorder = item.qty <= 5;
+        const rowClass = needsReorder ? 'estoque-baixo' : '';
+        
+        // Imagem placeholder
+        const imagemSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iNiIgZmlsbD0icmdiYSgxNSwgMjMsIDQyLCAwLjYpIi8+CjxwYXRoIGQ9Ik0zOCAyNkMzOCAyOC4yMDkxIDM2LjIwOTEgMzAgMzQgMzBDMzEuNzkwOSAzMCAzMCAyOC4yMDkxIDMwIDI2QzMwIDIzLjc5MDkgMzEuNzkwOSAyMiAzNCAyMkMzNi4yMDkxIDIyIDM4IDIzLjc5MDkgMzggMjZaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPHBhdGggZD0iTTQyIDM4SDE4QzE2Ljg5NTQgMzggMTYgMzcuMTA0NiAxNiAzNlYyNEMxNiAyMi44OTU0IDE2Ljg5NTQgMjIgMTggMjJINDJDNDMuMTA0NiAyMiA0NCAyMi44OTU0IDQ0IDI0VjM2QzQ0IDM3LjEwNDYgNDMuMTA0NiAzOCA0MiAzOFpNMTggMjRWMzZINDJWMjRIMThaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPC9zdmc+';
+        
+        return `
+          <tr class="${rowClass}">
+            <td><img src="${imagemSrc}" class="pneu-image" alt="${item.id}"></td>
+            <td><strong>${item.id}</strong></td>
+            <td>${item.medida}</td>
+            <td>${item.marca}<br><small style="color: var(--muted);">${item.modelo}</small></td>
+            <td>${item.dot || '-'}</td>
+            <td><span class="badge ${sulcoClass}">${item.sulco}mm</span></td>
+            <td><span class="badge">${item.status}</span></td>
+            <td>
+              <span class="badge ${needsReorder ? 'qty-low' : ''}">${item.qty}</span>
+              ${needsReorder ? '<br><small style="color: var(--danger);">Estoque baixo!</small>' : ''}
+            </td>
+            <td>
+              <div class="actions">
+                <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
+                <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      countElement.textContent = `${filtered.length} pneu(s) encontrado(s)`;
+    }
+
+    function renderStats() {
+      const totalPneus = items.reduce((sum, item) => sum + item.qty, 0);
+      const pneusNovos = items.filter(item => item.status === "Novo").reduce((sum, item) => sum + item.qty, 0);
+      const pneusBaixoEstoque = items.filter(item => item.qty <= 5).reduce((sum, item) => sum + item.qty, 0);
+      const pneusSulcoCritico = items.filter(item => item.sulco < 3.0).reduce((sum, item) => sum + item.qty, 0);
+
+      document.getElementById('statsContainer').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value">${totalPneus}</div>
+          <div class="stat-label">Total em Estoque</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${pneusNovos}</div>
+          <div class="stat-label">Pneus Novos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${pneusBaixoEstoque}</div>
+          <div class="stat-label">Baixo Estoque</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">${pneusSulcoCritico}</div>
+          <div class="stat-label">Sulco Crítico</div>
+        </div>
+      `;
+    }
+
+    function openEditModal(itemId = null) {
+      currentItem = itemId ? items.find(item => item.id === itemId) : null;
+      
+      if (currentItem) {
+        document.getElementById('editTitle').textContent = 'Editar Pneu';
+        document.getElementById('editId').value = currentItem.id;
+        document.getElementById('editMedida').value = currentItem.medida;
+        document.getElementById('editMarca').value = currentItem.marca || '';
+        document.getElementById('editModelo').value = currentItem.modelo || '';
+        document.getElementById('editDot').value = currentItem.dot || '';
+        document.getElementById('editSulco').value = currentItem.sulco;
+        document.getElementById('editStatus').value = currentItem.status;
+        document.getElementById('editQty').value = currentItem.qty;
+        document.getElementById('editContainer').value = currentItem.container || currentContainer;
+        document.getElementById('editPreco').value = currentItem.preco || '';
+        document.getElementById('editObservacoes').value = currentItem.observacoes || '';
+      } else {
+        document.getElementById('editTitle').textContent = 'Novo Pneu';
+        document.getElementById('editId').value = '';
+        document.getElementById('editMedida').value = '';
+        document.getElementById('editMarca').value = '';
+        document.getElementById('editModelo').value = '';
+        document.getElementById('editDot').value = '';
+        document.getElementById('editSulco').value = '';
+        document.getElementById('editStatus').value = 'Novo';
+        document.getElementById('editQty').value = '';
+        document.getElementById('editContainer').value = currentContainer;
+        document.getElementById('editPreco').value = '';
+        document.getElementById('editObservacoes').value = '';
+      }
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+      currentItem = null;
+    }
+
+    function saveItem() {
+      const id = document.getElementById('editId').value.trim();
+      const medida = document.getElementById('editMedida').value.trim();
+      const marca = document.getElementById('editMarca').value.trim();
+      const modelo = document.getElementById('editModelo').value.trim();
+      const qty = parseInt(document.getElementById('editQty').value) || 0;
+      const container = document.getElementById('editContainer').value;
+
+      if (!id || !medida || !marca || !modelo) {
+        alert('Código, Medida, Marca e Modelo são obrigatórios!');
+        return;
+      }
+
+      const itemData = {
+        id: id,
+        medida: medida,
+        marca: marca,
+        modelo: modelo,
+        dot: document.getElementById('editDot').value.trim(),
+        sulco: parseFloat(document.getElementById('editSulco').value) || 0,
+        status: document.getElementById('editStatus').value,
+        qty: qty,
+        container: container,
+        preco: parseFloat(document.getElementById('editPreco').value) || 0,
+        observacoes: document.getElementById('editObservacoes').value.trim()
+      };
+
+      if (currentItem) {
+        // Editar
+        Object.assign(currentItem, itemData);
+      } else {
+        // Novo item - verificar se ID já existe
+        if (items.some(item => item.id === id)) {
+          alert('Já existe um pneu com este ID!');
+          return;
+        }
+        items.push(itemData);
+      }
+
+      saveData();
+      renderTable();
+      renderStats();
+      closeEditModal();
+
+      alert('Pneu salvo com sucesso!');
+    }
+
+    function deleteItem(itemId) {
+      if (!confirm('Tem certeza que deseja excluir este pneu?')) return;
+      
+      items = items.filter(item => item.id !== itemId);
+      saveData();
+      renderTable();
+      renderStats();
+    }
+
+    function saveData() {
+      localStorage.setItem('tc_pneus', JSON.stringify(items));
+    }
+
+    // Iniciar aplicação
+    init();
+  </script>
+</body>
+</html>
