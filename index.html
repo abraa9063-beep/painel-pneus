@@ -8,416 +8,261 @@
     :root {
       --bg: #0f172a;
       --panel: #111827;
-      --panel-light: #1f2937;
       --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.1);
       --text: #e2e8f0;
       --muted: #94a3b8;
       --danger: #f43f5e;
       --warn: #f97316;
       --success: #10b981;
-      --radius: 14px;
+      --radius: 12px;
     }
     * {
       box-sizing: border-box;
-      font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      font-family: "Segoe UI", system-ui, sans-serif;
     }
     body {
       margin: 0;
-      background: radial-gradient(circle at top, rgba(31, 41, 55, 0.95), #020617);
+      background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      font-size: 15px;
-      position: relative;
-      overflow-x: hidden;
     }
-    /* LOGO DE FUNDO GRANDE */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background:
-        radial-gradient(circle at center, rgba(2, 6, 23, 0) 0%, rgba(2, 6, 23, 0.65) 60%, #020617 100%),
-        url("Logo Nova_page-0001 (1).png") no-repeat center center;
-      background-size: 900px auto;
-      opacity: 0.12;
-      pointer-events: none;
-      z-index: -1;
-    }
-
     header {
       padding: 16px 24px;
       border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
       background: rgba(2, 6, 23, 0.78);
-      backdrop-filter: blur(16px);
     }
     header h1 {
-      font-size: 1.2rem;
       margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      white-space: nowrap;
-    }
-    .logo-icon {
-      height: 38px;
-      width: 38px;
-      border-radius: 999px;
-      object-fit: cover;
-      object-position: left center;
-      background: #020617;
-    }
-    .tag {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      padding: 3px 12px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
+      font-size: 1.3rem;
     }
     main {
-      padding: 20px 24px 40px;
-      max-width: 1400px;
-      width: 100%;
+      padding: 20px;
+      max-width: 1200px;
       margin: 0 auto;
+    }
+    .tabs {
       display: flex;
-      flex-direction: column;
-      gap: 18px;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #020617;
+    }
+    .hidden {
+      display: none;
     }
     .toolbar {
       display: flex;
       gap: 10px;
+      margin-bottom: 15px;
       flex-wrap: wrap;
-      align-items: center;
     }
-    .input, select, textarea {
+    .input, select, button {
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(148, 163, 184, 0.3);
       background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 999px;
-      padding: 8px 14px 8px 32px;
       color: var(--text);
-      font-size: 0.85rem;
-      position: relative;
-      outline: none;
     }
-    textarea {
-      border-radius: 12px;
-      min-height: 60px;
-      resize: vertical;
-    }
-    .input-wrapper { position: relative; }
-    .input-icon {
-      position: absolute;
-      left: 10px;
-      top: 7px;
-      font-size: 0.85rem;
-      color: var(--muted);
-    }
-    .btn {
-      background: linear-gradient(120deg, #38bdf8, #0ea5e9);
+    button {
+      background: var(--accent);
       color: #020617;
       border: none;
-      border-radius: 999px;
-      padding: 8px 16px;
       font-weight: 600;
-      font-size: 0.78rem;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.08s ease-out;
     }
-    .btn:active { transform: translateY(1px); }
     .card {
       background: rgba(2, 6, 23, 0.55);
-      border: 1px solid rgba(148, 163, 184, 0.06);
+      border: 1px solid rgba(148, 163, 184, 0.1);
       border-radius: var(--radius);
       overflow: hidden;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 600px;
     }
-    thead { background: rgba(15, 23, 42, 0.42); }
     th, td {
+      padding: 10px 12px;
       text-align: left;
-      padding: 10px 14px;
-      font-size: 0.8rem;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
     }
     th {
+      background: rgba(15, 23, 42, 0.4);
       color: var(--muted);
       font-weight: 600;
-      cursor: pointer;
-      user-select: none;
-      white-space: nowrap;
     }
-    tbody tr {
-      border-bottom: 1px solid rgba(148, 163, 184, 0.06);
-      transition: background 0.1s ease-out;
-    }
-    tbody tr:hover { background: rgba(15, 23, 42, 0.3); }
     .badge {
       background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.15);
+      padding: 4px 8px;
       border-radius: 999px;
-      padding: 2px 10px;
-      font-size: 0.7rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .qty-low {
-      background: rgba(244, 63, 94, 0.12);
-      color: #ffe4e6;
-      border-color: rgba(244, 63, 94, 0.4);
+      font-size: 0.8rem;
     }
     .sulco-critico {
       background: rgba(244, 63, 94, 0.2);
       color: #ffe4e6;
-      border-color: rgba(244, 63, 94, 0.6);
     }
     .sulco-alerta {
-      background: rgba(249, 115, 22, 0.15);
+      background: rgba(249, 115, 22, 0.2);
       color: #ffedd5;
-      border-color: rgba(249, 115, 22, 0.5);
     }
     .sulco-ok {
-      background: rgba(16, 185, 129, 0.15);
+      background: rgba(16, 185, 129, 0.2);
       color: #d1fae5;
-      border-color: rgba(16, 185, 129, 0.4);
     }
-    .actions { display: flex; gap: 6px; flex-wrap: wrap; }
-    .btn-xs {
-      background: rgba(15, 23, 42, 0.4);
-      border: 1px solid rgba(148, 163, 184, 0.12);
-      color: var(--text);
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.7rem;
-      cursor: pointer;
-    }
-    .btn-danger {
-      background: rgba(244, 63, 94, 0.1);
-      border: 1px solid rgba(244, 63, 94, 0.3);
+    .qty-low {
+      background: rgba(244, 63, 94, 0.2);
       color: #ffe4e6;
     }
+    .actions {
+      display: flex;
+      gap: 5px;
+    }
+    .btn-xs {
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.4);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 6px;
+      cursor: pointer;
+    }
     .btn-success {
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
+      background: rgba(16, 185, 129, 0.2);
       color: #d1fae5;
     }
-    .list-wrapper { overflow-x: auto; }
-    .section-title {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-    .small { font-size: 0.7rem; color: var(--muted); }
-
     .modal-backdrop {
       position: fixed;
-      inset: 0;
-      background: rgba(2, 6, 23, 0.6);
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(2, 6, 23, 0.8);
       display: none;
       align-items: center;
       justify-content: center;
-      z-index: 99;
+      z-index: 1000;
     }
     .modal {
-      background: #0f172a;
+      background: var(--bg);
       border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 16px;
-      padding: 18px;
-      min-width: 280px;
+      border-radius: var(--radius);
+      padding: 20px;
       max-width: 500px;
-      width: 100%;
+      width: 90%;
+    }
+    .modal h2 {
+      margin-top: 0;
+    }
+    .modal-actions {
       display: flex;
-      flex-direction: column;
       gap: 10px;
+      justify-content: flex-end;
+      margin-top: 15px;
     }
-    .modal h2 { font-size: 1rem; margin: 0; }
-    .modal label { font-size: 0.72rem; color: var(--muted); margin-bottom: 3px; }
-    .modal input, .modal select, .modal textarea {
-      width: 100%;
-      border-radius: 8px;
-      background: rgba(15, 23, 42, 0.3);
-      padding: 6px 8px;
-      border: 1px solid rgba(148, 163, 184, 0.15);
-      color: var(--text);
-    }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 6px; }
-
-    .tabs { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-    .tab-btn {
-      background: rgba(15, 23, 42, 0.2);
-      border: 1px solid transparent;
-      color: var(--muted);
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 0.72rem;
-      cursor: pointer;
-    }
-    .tab-btn.active {
-      background: rgba(56, 189, 248, 0.12);
-      border-color: rgba(56, 189, 248, 0.3);
-      color: var(--text);
-    }
-    .hidden { display: none; }
-
-    .img-thumb {
-      width: 38px;
-      height: 38px;
-      object-fit: cover;
-      border-radius: 8px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      background: rgba(148, 163, 184, 0.05);
-      cursor: pointer;
-    }
-
-    #photoModal .modal {
-      max-width: 520px;
-      align-items: center;
-    }
-    #photoModal img {
-      max-width: 480px;
-      max-height: 480px;
-      border-radius: 12px;
-    }
-
-    .alert-banner {
-      background: rgba(249, 115, 22, 0.15);
-      border: 1px solid rgba(249, 115, 22, 0.3);
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 15px;
-    }
-    .alert-banner.critical {
-      background: rgba(244, 63, 94, 0.15);
-      border-color: rgba(244, 63, 94, 0.3);
-    }
-
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-    .stat-card {
-      background: rgba(15, 23, 42, 0.3);
-      border-radius: 12px;
-      padding: 12px;
-      border: 1px solid rgba(148, 163, 184, 0.1);
-    }
-    .stat-value {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: var(--accent);
-    }
-    .stat-label {
-      font-size: 0.7rem;
-      color: var(--muted);
-    }
-
-    @media (max-width: 720px) {
-      header { flex-direction: column; align-items: flex-start; }
-      .toolbar { flex-direction: column; align-items: stretch; }
-      .input, select { width: 100%; }
-      body::before { background-size: 620px auto; }
-      .stats-grid { grid-template-columns: 1fr; }
-    }
-
     .field-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
+      margin-bottom: 10px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: rgba(15, 23, 42, 0.4);
+      padding: 15px;
+      border-radius: var(--radius);
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .alert-banner {
+      background: rgba(249, 115, 22, 0.2);
+      border: 1px solid rgba(249, 115, 22, 0.4);
+      padding: 10px;
+      border-radius: var(--radius);
+      margin-bottom: 15px;
+    }
+    .alert-banner.critical {
+      background: rgba(244, 63, 94, 0.2);
+      border-color: rgba(244, 63, 94, 0.4);
     }
   </style>
 </head>
 <body>
   <header>
-    <div>
-      <h1>
-        <img src="Logo Nova_page-0001 (1).png" alt="Transportes Canarinho" class="logo-icon" />
-        Transportes Canarinho - Controle de Pneus
-      </h1>
-      <div class="small">Sistema especializado em gestão de pneus</div>
-    </div>
-    <span class="tag" id="saveStatus">autosave ativo</span>
+    <h1>🚚 Transportes Canarinho - Controle de Pneus</h1>
   </header>
+  
   <main>
     <div class="tabs">
-      <button class="tab-btn active" data-tab="estoque">Estoque de Pneus</button>
+      <button class="tab-btn active" data-tab="estoque">Estoque</button>
       <button class="tab-btn" data-tab="saidas">Saídas</button>
-      <button class="tab-btn" data-tab="pneus-uso">Pneus em Uso</button>
       <button class="tab-btn" data-tab="alertas">Alertas</button>
     </div>
 
     <!-- ALERTAS -->
     <div id="tab-alertas" class="hidden">
       <div class="card">
-        <div class="section-title" style="padding: 14px 14px 0;">
-          <div>
-            <strong>Alertas do Sistema</strong>
-            <div class="small">Monitoramento de pneus com atenção necessária</div>
-          </div>
-        </div>
-        <div style="padding: 14px;" id="alertsContainer">
-          <!-- Alertas serão gerados dinamicamente -->
+        <div style="padding: 15px;">
+          <h3>Alertas do Sistema</h3>
+          <div id="alertsContainer"></div>
         </div>
       </div>
     </div>
 
     <!-- ESTOQUE -->
     <div id="tab-estoque">
-      <div class="stats-grid" id="statsContainer">
-        <!-- Estatísticas serão geradas dinamicamente -->
-      </div>
+      <div class="stats-grid" id="statsContainer"></div>
 
       <div class="toolbar">
-        <div class="input-wrapper">
-          <span class="input-icon">🔍</span>
-          <input id="searchInput" class="input" type="text" placeholder="Buscar por ID, medida, DOT..." />
-        </div>
-        <div class="input-wrapper">
-          <span class="input-icon">🗂</span>
-          <select id="statusFilter" class="input" style="padding-left:30px;">
-            <option value="">Todos os status</option>
-            <option value="Novo">Novo</option>
-            <option value="Usado">Usado</option>
-            <option value="Reformado">Reformado</option>
-          </select>
-        </div>
-        <button id="addItemBtn" class="btn">+ Novo Pneu</button>
+        <input type="text" id="searchInput" class="input" placeholder="Buscar por ID, medida, DOT..." style="flex:1;">
+        <select id="statusFilter" class="input">
+          <option value="">Todos status</option>
+          <option value="Novo">Novo</option>
+          <option value="Usado">Usado</option>
+          <option value="Reformado">Reformado</option>
+        </select>
+        <button id="addItemBtn">+ Novo Pneu</button>
       </div>
 
-      <div class="card" style="margin-top:10px;">
-        <div class="section-title" style="padding: 10px 14px 0;">
-          <div>
-            <strong>Estoque de Pneus</strong>
-            <div class="small" id="itemsCount"></div>
-          </div>
+      <div class="card">
+        <div style="padding: 15px;">
+          <h3>Estoque de Pneus</h3>
+          <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
         </div>
-        <div class="list-wrapper">
+        <div style="overflow-x: auto;">
           <table>
             <thead>
               <tr>
-                <th data-sort="id">ID</th>
-                <th data-sort="medida">Medida</th>
-                <th data-sort="marca">Marca</th>
-                <th data-sort="dot">DOT</th>
-                <th data-sort="sulco">Sulco (mm)</th>
-                <th data-sort="status">Status</th>
-                <th data-sort="qty">Qtd.</th>
-                <th style="width: 200px;">Ações</th>
+                <th>ID</th>
+                <th>Medida</th>
+                <th>Marca</th>
+                <th>DOT</th>
+                <th>Sulco</th>
+                <th>Status</th>
+                <th>Qtd</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -428,35 +273,26 @@
 
     <!-- SAÍDAS -->
     <div id="tab-saidas" class="hidden">
-      <div class="toolbar" style="margin-bottom:6px;">
-        <div class="input-wrapper">
-          <span class="input-icon">🚛</span>
-          <input id="filterPlaca" class="input" type="text" placeholder="Filtrar por placa (ex: ABC1D23)" />
-        </div>
-        <div class="input-wrapper">
-          <span class="input-icon">🔧</span>
-          <input id="filterPeca" class="input" type="text" placeholder="Filtrar por medida ou DOT" />
-        </div>
+      <div class="toolbar">
+        <input type="text" id="filterPlaca" class="input" placeholder="Filtrar por placa..." style="flex:1;">
+        <input type="text" id="filterPeca" class="input" placeholder="Filtrar por medida...">
       </div>
+      
       <div class="card">
-        <div class="section-title" style="padding: 10px 14px 0;">
-          <div>
-            <strong>Histórico de Saídas</strong>
-            <div class="small">Registro de todas as movimentações de pneus</div>
-          </div>
+        <div style="padding: 15px;">
+          <h3>Histórico de Saídas</h3>
         </div>
-        <div class="list-wrapper">
+        <div style="overflow-x: auto;">
           <table>
             <thead>
               <tr>
                 <th>Data</th>
                 <th>Pneu</th>
                 <th>Medida</th>
-                <th>Qtd.</th>
-                <th>Veículo/Placa</th>
+                <th>Qtd</th>
+                <th>Veículo</th>
                 <th>Posição</th>
                 <th>Motorista</th>
-                <th>KM</th>
               </tr>
             </thead>
             <tbody id="movementsBody"></tbody>
@@ -464,306 +300,225 @@
         </div>
       </div>
     </div>
-
-    <!-- PNEUS EM USO -->
-    <div id="tab-pneus-uso" class="hidden">
-      <div class="toolbar" style="margin-bottom:6px;">
-        <div class="input-wrapper">
-          <span class="input-icon">🚛</span>
-          <input id="filterUsoPlaca" class="input" type="text" placeholder="Filtrar por placa..." />
-        </div>
-      </div>
-      <div class="card">
-        <div class="section-title" style="padding: 10px 14px 0;">
-          <div>
-            <strong>Pneus em Uso</strong>
-            <div class="small">Pneus atualmente instalados em veículos</div>
-          </div>
-        </div>
-        <div class="list-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>Placa</th>
-                <th>Pneu</th>
-                <th>Medida</th>
-                <th>Posição</th>
-                <th>Data Instalação</th>
-                <th>KM Instalação</th>
-                <th>Motorista</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="pneusEmUsoBody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   </main>
 
-  <!-- Modal Saída Específica para Pneus -->
+  <!-- Modal Saída de Pneu -->
   <div class="modal-backdrop" id="pneuSaidaModal">
     <div class="modal">
       <h2>Saída de Pneu</h2>
-      <div class="small" id="pneuSaidaLabel"></div>
+      <div id="pneuSaidaLabel" style="color: var(--muted); margin-bottom: 15px;"></div>
       
-      <label for="saidaPlaca">Veículo/Placa *</label>
-      <input id="saidaPlaca" type="text" placeholder="ABC1D23" required />
-      
-      <label for="saidaPosicao">Posição no veículo *</label>
-      <select id="saidaPosicao">
-        <option value="">Selecionar posição</option>
-        <option value="Dianteira Esquerda">Dianteira Esquerda</option>
-        <option value="Dianteira Direita">Dianteira Direita</option>
-        <option value="Traseira Externa Esq">Traseira Externa Esq</option>
-        <option value="Traseira Externa Dir">Traseira Externa Dir</option>
-        <option value="Traseira Interna Esq">Traseira Interna Esq</option>
-        <option value="Traseira Interna Dir">Traseira Interna Dir</option>
-        <option value="Step">Step (Soco)</option>
-      </select>
-
-      <div class="field-row">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
         <div>
-          <label for="saidaMotorista">Motorista</label>
-          <input id="saidaMotorista" type="text" />
+          <label>Veículo/Placa *</label>
+          <input type="text" id="saidaPlaca" class="input" placeholder="ABC1D23" style="width: 100%;">
         </div>
+        
         <div>
-          <label for="saidaKm">KM do Veículo</label>
-          <input id="saidaKm" type="number" />
+          <label>Posição no veículo *</label>
+          <select id="saidaPosicao" class="input" style="width: 100%;">
+            <option value="">Selecionar posição</option>
+            <option value="Dianteira Esquerda">Dianteira Esquerda</option>
+            <option value="Dianteira Direita">Dianteira Direita</option>
+            <option value="Traseira Externa Esq">Traseira Externa Esq</option>
+            <option value="Traseira Externa Dir">Traseira Externa Dir</option>
+            <option value="Step">Step (Soco)</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label>Motorista</label>
+            <input type="text" id="saidaMotorista" class="input">
+          </div>
+          <div>
+            <label>KM do Veículo</label>
+            <input type="number" id="saidaKm" class="input">
+          </div>
+        </div>
+
+        <div>
+          <label>Observação</label>
+          <textarea id="saidaObs" class="input" placeholder="Motivo da troca..." style="width: 100%; height: 60px;"></textarea>
         </div>
       </div>
-
-      <label for="saidaObs">Observação</label>
-      <textarea id="saidaObs" placeholder="Motivo da troca, condições do pneu..."></textarea>
 
       <div class="modal-actions">
         <button class="btn-xs" onclick="closePneuSaidaModal()">Cancelar</button>
-        <button class="btn" onclick="confirmPneuSaida()">Confirmar Saída</button>
+        <button onclick="confirmPneuSaida()">Confirmar Saída</button>
       </div>
     </div>
   </div>
 
-  <!-- Modal Ajuste -->
-  <div class="modal-backdrop" id="adjustModal">
-    <div class="modal">
-      <h2>Ajustar estoque</h2>
-      <div class="small" id="adjustItemLabel"></div>
-      <label for="adjustType">Tipo de ajuste</label>
-      <select id="adjustType">
-        <option value="in">Entrada (+)</option>
-        <option value="out">Saída (-)</option>
-      </select>
-      <label for="adjustAmount">Quantidade</label>
-      <input id="adjustAmount" type="number" min="1" value="1" />
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closeAdjustModal()">Cancelar</button>
-        <button class="btn" onclick="confirmAdjust()">Confirmar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Editar/Adicionar Pneu -->
+  <!-- Modal Editar Pneu -->
   <div class="modal-backdrop" id="editModal">
     <div class="modal">
       <h2 id="editTitle">Novo Pneu</h2>
       
-      <div class="field-row">
-        <div>
-          <label for="editId">ID *</label>
-          <input id="editId" type="text" />
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div class="field-row">
+          <div>
+            <label>ID *</label>
+            <input type="text" id="editId" class="input">
+          </div>
+          <div>
+            <label>Medida *</label>
+            <input type="text" id="editMedida" class="input" placeholder="295/80 R22.5">
+          </div>
         </div>
-        <div>
-          <label for="editMedida">Medida *</label>
-          <input id="editMedida" type="text" placeholder="295/80 R22.5" />
+
+        <div class="field-row">
+          <div>
+            <label>Marca</label>
+            <input type="text" id="editMarca" class="input">
+          </div>
+          <div>
+            <label>Modelo</label>
+            <input type="text" id="editModelo" class="input">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label>DOT</label>
+            <input type="text" id="editDot" class="input" placeholder="4321">
+          </div>
+          <div>
+            <label>Sulco (mm)</label>
+            <input type="number" id="editSulco" class="input" step="0.1" min="0" max="20">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div>
+            <label>Status</label>
+            <select id="editStatus" class="input">
+              <option value="Novo">Novo</option>
+              <option value="Usado">Usado</option>
+              <option value="Reformado">Reformado</option>
+            </select>
+          </div>
+          <div>
+            <label>Quantidade *</label>
+            <input type="number" id="editQty" class="input" min="0">
+          </div>
         </div>
       </div>
-
-      <div class="field-row">
-        <div>
-          <label for="editMarca">Marca</label>
-          <input id="editMarca" type="text" />
-        </div>
-        <div>
-          <label for="editModelo">Modelo</label>
-          <input id="editModelo" type="text" />
-        </div>
-      </div>
-
-      <div class="field-row">
-        <div>
-          <label for="editDot">DOT</label>
-          <input id="editDot" type="text" placeholder="4321" />
-        </div>
-        <div>
-          <label for="editSulco">Sulco (mm)</label>
-          <input id="editSulco" type="number" step="0.1" min="0" max="20" />
-        </div>
-      </div>
-
-      <div class="field-row">
-        <div>
-          <label for="editStatus">Status</label>
-          <select id="editStatus">
-            <option value="Novo">Novo</option>
-            <option value="Usado">Usado</option>
-            <option value="Reformado">Reformado</option>
-          </select>
-        </div>
-        <div>
-          <label for="editPosicao">Posição</label>
-          <select id="editPosicao">
-            <option value="Direcional">Direcional</option>
-            <option value="Tração">Tração</option>
-            <option value="Rebocado">Rebocado</option>
-            <option value="Livre">Livre</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="field-row">
-        <div>
-          <label for="editQty">Quantidade *</label>
-          <input id="editQty" type="number" min="0" />
-        </div>
-        <div>
-          <label for="editReorder">Ponto de reposição</label>
-          <input id="editReorder" type="number" min="0" value="2" />
-        </div>
-      </div>
-
-      <label for="editIndiceCarga">Índice de Carga/Velocidade</label>
-      <input id="editIndiceCarga" type="text" placeholder="152/148 L" />
-
-      <label for="editPhoto">Foto do pneu (opcional)</label>
-      <input id="editPhoto" type="file" accept="image/*" />
-      <img id="photoPreview" alt="Prévia" style="width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid rgba(148,163,184,0.2);display:none;" />
 
       <div class="modal-actions">
         <button class="btn-xs" onclick="closeEditModal()">Cancelar</button>
-        <button class="btn" onclick="saveItem()">Salvar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Foto -->
-  <div class="modal-backdrop" id="photoModal">
-    <div class="modal">
-      <h2>Foto do Pneu</h2>
-      <img id="photoModalImg" src="" alt="Foto do pneu" />
-      <div class="modal-actions">
-        <button class="btn" onclick="closePhotoModal()">Fechar</button>
+        <button onclick="saveItem()">Salvar</button>
       </div>
     </div>
   </div>
 
   <script>
-    const STORAGE_KEY_ITEMS = "tc_pneus_items_v2";
-    const STORAGE_KEY_MOVES = "tc_pneus_moves_v2";
-    const STORAGE_KEY_EM_USO = "tc_pneus_em_uso_v2";
+    // Dados iniciais
+    let items = JSON.parse(localStorage.getItem('tc_pneus')) || [
+      { 
+        id: "PNEU-001", 
+        medida: "295/80 R22.5",
+        marca: "Michelin",
+        modelo: "X Line Energy",
+        dot: "4321",
+        sulco: 8.5,
+        status: "Novo",
+        qty: 8,
+        reorderPoint: 2
+      },
+      { 
+        id: "PNEU-002", 
+        medida: "11R22.5",
+        marca: "Bridgestone", 
+        modelo: "R194",
+        dot: "1234",
+        sulco: 4.2,
+        status: "Usado",
+        qty: 3,
+        reorderPoint: 2
+      }
+    ];
 
-    let items = loadItems();
-    let movements = loadMovements();
-    let pneusEmUso = loadPneusEmUso();
+    let movements = JSON.parse(localStorage.getItem('tc_movements')) || [];
+    let currentItem = null;
 
-    let currentSort = { key: "medida", dir: "asc" };
-    let filtered = [...items];
-    let adjustTarget = null;
-    let editTarget = null;
-    let tempPhotoData = null;
-    let saidaTarget = null;
+    // Elementos da interface
+    const searchInput = document.getElementById('searchInput');
+    const statusFilter = document.getElementById('statusFilter');
+    const tableBody = document.getElementById('tableBody');
+    const itemsCount = document.getElementById('itemsCount');
+    const movementsBody = document.getElementById('movementsBody');
 
     // Inicialização
-    const tableBody = document.getElementById("tableBody");
-    const itemsCount = document.getElementById("itemsCount");
-    const searchInput = document.getElementById("searchInput");
-    const statusFilter = document.getElementById("statusFilter");
-    const saveStatus = document.getElementById("saveStatus");
-    const filterPlacaInput = document.getElementById("filterPlaca");
-    const filterPecaInput = document.getElementById("filterPeca");
-    const filterUsoPlacaInput = document.getElementById("filterUsoPlaca");
-
-    function loadItems() {
-      const raw = localStorage.getItem(STORAGE_KEY_ITEMS);
-      if (raw) {
-        try { return JSON.parse(raw); } catch(e) {}
-      }
-      // Dados de exemplo para pneus
-      return [
-        { 
-          id: "PNEU-001", 
-          name: "Pneu 295/80 R22.5", 
-          medida: "295/80 R22.5",
-          marca: "Michelin",
-          modelo: "X Line Energy",
-          dot: "4321",
-          sulco: 8.5,
-          status: "Novo",
-          posicao: "Direcional",
-          indiceCarga: "152/148 L",
-          category: "Pneus", 
-          qty: 8, 
-          reorderPoint: 2,
-          photo: "" 
-        },
-        { 
-          id: "PNEU-002", 
-          name: "Pneu 11R22.5", 
-          medida: "11R22.5",
-          marca: "Bridgestone",
-          modelo: "R194",
-          dot: "1234",
-          sulco: 4.2,
-          status: "Usado",
-          posicao: "Tração",
-          indiceCarga: "148/145 L",
-          category: "Pneus", 
-          qty: 3, 
-          reorderPoint: 2,
-          photo: "" 
-        },
-        { 
-          id: "PNEU-003", 
-          name: "Pneu 385/65 R22.5", 
-          medida: "385/65 R22.5",
-          marca: "Goodyear",
-          modelo: "Fuel Max",
-          dot: "5678",
-          sulco: 2.8,
-          status: "Reformado",
-          posicao: "Rebocado",
-          indiceCarga: "160/158 M",
-          category: "Pneus", 
-          qty: 5, 
-          reorderPoint: 2,
-          photo: "" 
-        }
-      ];
+    function init() {
+      renderTable();
+      renderStats();
+      renderAlerts();
+      renderMovements();
+      setupEventListeners();
     }
 
-    function loadMovements() {
-      const raw = localStorage.getItem(STORAGE_KEY_MOVES);
-      if (raw) {
-        try { return JSON.parse(raw); } catch(e) {}
-      }
-      return [];
+    function setupEventListeners() {
+      // Tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('[id^="tab-"]').forEach(tab => tab.classList.add('hidden'));
+          btn.classList.add('active');
+          document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+        });
+      });
+
+      // Filtros
+      searchInput.addEventListener('input', renderTable);
+      statusFilter.addEventListener('change', renderTable);
+
+      // Botão novo item
+      document.getElementById('addItemBtn').addEventListener('click', () => openEditModal());
+
+      // Filtros de saída
+      document.getElementById('filterPlaca').addEventListener('input', renderMovements);
+      document.getElementById('filterPeca').addEventListener('input', renderMovements);
     }
 
-    function loadPneusEmUso() {
-      const raw = localStorage.getItem(STORAGE_KEY_EM_USO);
-      if (raw) {
-        try { return JSON.parse(raw); } catch(e) {}
-      }
-      return [];
-    }
+    function renderTable() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const statusTerm = statusFilter.value;
 
-    function saveAll() {
-      localStorage.setItem(STORAGE_KEY_ITEMS, JSON.stringify(items));
-      localStorage.setItem(STORAGE_KEY_MOVES, JSON.stringify(movements));
-      localStorage.setItem(STORAGE_KEY_EM_USO, JSON.stringify(pneusEmUso));
-      if (saveStatus) {
-        saveStatus.textContent = "salvo ✔";
-        setTimeout(() => saveStatus.textContent = "autosave ativo", 1500);
-      }
+      const filtered = items.filter(item => {
+        const matchSearch = item.id.toLowerCase().includes(searchTerm) ||
+                          item.medida.toLowerCase().includes(searchTerm) ||
+                          (item.dot && item.dot.toLowerCase().includes(searchTerm));
+        const matchStatus = !statusTerm || item.status === statusTerm;
+        return matchSearch && matchStatus;
+      });
+
+      tableBody.innerHTML = filtered.map(item => {
+        const sulcoClass = item.sulco < 3.0 ? "sulco-critico" : 
+                          item.sulco < 5.0 ? "sulco-alerta" : "sulco-ok";
+        const needsReorder = item.qty <= item.reorderPoint;
+        
+        return `
+          <tr>
+            <td><strong>${item.id}</strong></td>
+            <td>${item.medida}</td>
+            <td>${item.marca || '-'}</td>
+            <td>${item.dot || '-'}</td>
+            <td><span class="badge ${sulcoClass}">${item.sulco}mm</span></td>
+            <td><span class="badge">${item.status}</span></td>
+            <td><span class="badge ${needsReorder ? 'qty-low' : ''}">${item.qty}</span></td>
+            <td>
+              <div class="actions">
+                <button class="btn-xs btn-success" onclick="openPneuSaidaModal('${item.id}')">Saída</button>
+                <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
+                <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      itemsCount.textContent = `${filtered.length} pneu(s) encontrado(s)`;
     }
 
     function renderStats() {
@@ -793,79 +548,220 @@
     }
 
     function renderAlerts() {
-      const alerts = checkAlerts();
-      const container = document.getElementById('alertsContainer');
-      
-      if (alerts.length === 0) {
-        container.innerHTML = '<div class="alert-banner">✅ Todos os pneus estão em condições normais</div>';
-        return;
-      }
-
-      container.innerHTML = alerts.map(alert => `
-        <div class="alert-banner ${alert.type === 'CRITICO' ? 'critical' : ''}">
-          <strong>${alert.type === 'CRITICO' ? '🚨 CRÍTICO' : '⚠️ ALERTA'}:</strong> ${alert.message}
-        </div>
-      `).join('');
-    }
-
-    function checkAlerts() {
       const alerts = [];
       
       items.forEach(pneu => {
-        // Alertas de sulco
-        if (pneu.sulco < 2.0) {
+        if (pneu.sulco < 3.0) {
           alerts.push({
             type: "CRITICO",
-            message: `${pneu.id} - Sulco extremamente baixo: ${pneu.sulco}mm (TROCA URGENTE)`
-          });
-        } else if (pneu.sulco < 3.0) {
-          alerts.push({
-            type: "CRITICO", 
             message: `${pneu.id} - Sulco crítico: ${pneu.sulco}mm`
           });
-        } else if (pneu.sulco < 5.0) {
-          alerts.push({
-            type: "ALERTA",
-            message: `${pneu.id} - Sulco baixo: ${pneu.sulco}mm`
-          });
         }
-
-        // Alertas de estoque
         if (pneu.qty <= pneu.reorderPoint) {
           alerts.push({
             type: "ALERTA",
             message: `${pneu.id} - Estoque baixo: ${pneu.qty} unidade(s)`
           });
         }
-
-        // Alertas de DOT antigo (exemplo: mais de 5 anos)
-        if (pneu.dot && parseInt(pneu.dot) < 2019) {
-          alerts.push({
-            type: "ALERTA",
-            message: `${pneu.id} - DOT antigo: ${pneu.dot} (verificar validade)`
-          });
-        }
       });
 
-      return alerts;
+      const container = document.getElementById('alertsContainer');
+      if (alerts.length === 0) {
+        container.innerHTML = '<div class="alert-banner">✅ Todos os pneus estão em condições normais</div>';
+      } else {
+        container.innerHTML = alerts.map(alert => `
+          <div class="alert-banner ${alert.type === 'CRITICO' ? 'critical' : ''}">
+            <strong>${alert.type === 'CRITICO' ? '🚨 CRÍTICO' : '⚠️ ALERTA'}:</strong> ${alert.message}
+          </div>
+        `).join('');
+      }
     }
 
-    function renderTable() {
-      tableBody.innerHTML = "";
-      filtered.forEach((item) => {
-        const needsReorder = item.qty <= item.reorderPoint;
-        const sulcoClass = item.sulco < 3.0 ? "sulco-critico" : 
-                          item.sulco < 5.0 ? "sulco-alerta" : "sulco-ok";
-        
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><strong>${item.id}</strong></td>
-          <td>${item.medida}</td>
-          <td>${item.marca || '-'}</td>
-          <td>${item.dot || '-'}</td>
-          <td><span class="badge ${sulcoClass}">${item.sulco}mm</span></td>
-          <td><span class="badge">${item.status}</span></td>
-          <td><span class="badge ${needsReorder ? "qty-low" : ""}">${item.qty} ${needsReorder ? "⚠" : ""}</span></td>
-          <td>
-            <div class="actions">
-              <button class="btn-xs btn-success" onclick="openPneuSaidaModal('${item.id}')">Saída</button>
+    function renderMovements() {
+      const placaFilter = document.getElementById('filterPlaca').value.toLowerCase();
+      const pecaFilter = document.getElementById('filterPeca').value.toLowerCase();
+
+      const filtered = movements.filter(move => {
+        const matchPlaca = !placaFilter || (move.placa && move.placa.toLowerCase().includes(placaFilter));
+        const matchPeca = !pecaFilter || 
+                         move.itemId.toLowerCase().includes(pecaFilter) ||
+                         move.medida.toLowerCase().includes(pecaFilter);
+        return matchPlaca && matchPeca;
+      });
+
+      movementsBody.innerHTML = filtered.map(move => `
+        <tr>
+          <td>${move.date}</td>
+          <td>${move.itemId}</td>
+          <td>${move.medida}</td>
+          <td>${move.qty}</td>
+          <td>${move.placa}</td>
+          <td>${move.posicao}</td>
+          <td>${move.motorista || '-'}</td>
+        </tr>
+      `).join('');
+    }
+
+    function openPneuSaidaModal(itemId) {
+      currentItem = items.find(item => item.id === itemId);
+      if (!currentItem) return;
+
+      document.getElementById('pneuSaidaLabel').textContent = 
+        `${currentItem.id} - ${currentItem.medida} (${currentItem.marca})`;
+      
+      // Limpar campos
+      document.getElementById('saidaPlaca').value = '';
+      document.getElementById('saidaPosicao').value = '';
+      document.getElementById('saidaMotorista').value = '';
+      document.getElementById('saidaKm').value = '';
+      document.getElementById('saidaObs').value = '';
+
+      document.getElementById('pneuSaidaModal').style.display = 'flex';
+    }
+
+    function closePneuSaidaModal() {
+      document.getElementById('pneuSaidaModal').style.display = 'none';
+      currentItem = null;
+    }
+
+    function confirmPneuSaida() {
+      const placa = document.getElementById('saidaPlaca').value.trim();
+      const posicao = document.getElementById('saidaPosicao').value;
+      const motorista = document.getElementById('saidaMotorista').value.trim();
+      const km = document.getElementById('saidaKm').value;
+      const obs = document.getElementById('saidaObs').value.trim();
+
+      if (!placa || !posicao) {
+        alert('Placa e posição são obrigatórios!');
+        return;
+      }
+
+      if (currentItem.qty <= 0) {
+        alert('Estoque insuficiente!');
+        return;
+      }
+
+      // Registrar saída
+      const now = new Date();
+      movements.unshift({
+        date: now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}),
+        itemId: currentItem.id,
+        medida: currentItem.medida,
+        qty: 1,
+        placa: placa,
+        posicao: posicao,
+        motorista: motorista,
+        km: km,
+        observacao: obs
+      });
+
+      // Atualizar estoque
+      currentItem.qty--;
+
+      // Salvar e atualizar
+      saveData();
+      renderTable();
+      renderStats();
+      renderAlerts();
+      renderMovements();
+      closePneuSaidaModal();
+
+      alert('Saída registrada com sucesso!');
+    }
+
+    function openEditModal(itemId = null) {
+      currentItem = itemId ? items.find(item => item.id === itemId) : null;
+      
+      if (currentItem) {
+        document.getElementById('editTitle').textContent = 'Editar Pneu';
+        document.getElementById('editId').value = currentItem.id;
+        document.getElementById('editMedida').value = currentItem.medida;
+        document.getElementById('editMarca').value = currentItem.marca || '';
+        document.getElementById('editModelo').value = currentItem.modelo || '';
+        document.getElementById('editDot').value = currentItem.dot || '';
+        document.getElementById('editSulco').value = currentItem.sulco;
+        document.getElementById('editStatus').value = currentItem.status;
+        document.getElementById('editQty').value = currentItem.qty;
+      } else {
+        document.getElementById('editTitle').textContent = 'Novo Pneu';
+        document.getElementById('editId').value = '';
+        document.getElementById('editMedida').value = '';
+        document.getElementById('editMarca').value = '';
+        document.getElementById('editModelo').value = '';
+        document.getElementById('editDot').value = '';
+        document.getElementById('editSulco').value = '';
+        document.getElementById('editStatus').value = 'Novo';
+        document.getElementById('editQty').value = '';
+      }
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+      currentItem = null;
+    }
+
+    function saveItem() {
+      const id = document.getElementById('editId').value.trim();
+      const medida = document.getElementById('editMedida').value.trim();
+      const qty = parseInt(document.getElementById('editQty').value) || 0;
+
+      if (!id || !medida) {
+        alert('ID e Medida são obrigatórios!');
+        return;
+      }
+
+      const itemData = {
+        id: id,
+        medida: medida,
+        marca: document.getElementById('editMarca').value.trim(),
+        modelo: document.getElementById('editModelo').value.trim(),
+        dot: document.getElementById('editDot').value.trim(),
+        sulco: parseFloat(document.getElementById('editSulco').value) || 0,
+        status: document.getElementById('editStatus').value,
+        qty: qty,
+        reorderPoint: 2
+      };
+
+      if (currentItem) {
+        // Editar
+        Object.assign(currentItem, itemData);
+      } else {
+        // Novo item - verificar se ID já existe
+        if (items.some(item => item.id === id)) {
+          alert('Já existe um pneu com este ID!');
+          return;
+        }
+        items.push(itemData);
+      }
+
+      saveData();
+      renderTable();
+      renderStats();
+      renderAlerts();
+      closeEditModal();
+
+      alert('Pneu salvo com sucesso!');
+    }
+
+    function deleteItem(itemId) {
+      if (!confirm('Tem certeza que deseja excluir este pneu?')) return;
+      
+      items = items.filter(item => item.id !== itemId);
+      saveData();
+      renderTable();
+      renderStats();
+      renderAlerts();
+    }
+
+    function saveData() {
+      localStorage.setItem('tc_pneus', JSON.stringify(items));
+      localStorage.setItem('tc_movements', JSON.stringify(movements));
+    }
+
+    // Iniciar aplicação
+    init();
+  </script>
+</body>
+</html>
