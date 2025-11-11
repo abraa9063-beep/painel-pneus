@@ -207,6 +207,10 @@
       background: rgba(244, 63, 94, 0.2);
       border-color: rgba(244, 63, 94, 0.4);
     }
+    .sulco-disabled {
+      background: rgba(148, 163, 184, 0.1);
+      color: var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -236,12 +240,12 @@
       <div class="stats-grid" id="statsContainer"></div>
 
       <div class="toolbar">
-        <input type="text" id="searchInput" class="input" placeholder="Buscar por ID, medida, DOT..." style="flex:1;">
+        <input type="text" id="searchInput" class="input" placeholder="Buscar por FOGO, medida, DOT..." style="flex:1;">
         <select id="statusFilter" class="input">
           <option value="">Todos status</option>
           <option value="Novo">Novo</option>
           <option value="Usado">Usado</option>
-          <option value="Reformado">Reformado</option>
+          <option value="Recapado">Recapado</option>
         </select>
         <button id="addItemBtn">+ Novo Pneu</button>
       </div>
@@ -255,11 +259,11 @@
           <table>
             <thead>
               <tr>
-                <th>ID</th>
+                <th>FOGO</th>
                 <th>Medida</th>
                 <th>Marca</th>
                 <th>DOT</th>
-                <th>Sulco</th>
+                <th>Sulco (mm)</th>
                 <th>Status</th>
                 <th>Qtd</th>
                 <th>Ações</th>
@@ -287,7 +291,7 @@
             <thead>
               <tr>
                 <th>Data</th>
-                <th>Pneu</th>
+                <th>FOGO</th>
                 <th>Medida</th>
                 <th>Qtd</th>
                 <th>Veículo</th>
@@ -301,6 +305,51 @@
       </div>
     </div>
   </main>
+
+  <!-- Modal Baixa de Pneu -->
+  <div class="modal-backdrop" id="baixaModal">
+    <div class="modal">
+      <h2>Baixa de Pneu</h2>
+      <div id="baixaLabel" style="color: var(--muted); margin-bottom: 15px;"></div>
+      
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div>
+          <label>Motivo da Baixa *</label>
+          <select id="baixaMotivo" class="input" style="width: 100%;">
+            <option value="">Selecionar motivo</option>
+            <option value="Desgaste">Desgaste Natural</option>
+            <option value="Danificado">Pneu Danificado</option>
+            <option value="Furou">Furo Irreparável</option>
+            <option value="Reforma">Enviado para Reforma</option>
+            <option value="Venda">Vendido</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div>
+          <label>Veículo/Placa (se aplicável)</label>
+          <input type="text" id="baixaPlaca" class="input" placeholder="ABC1D23" style="width: 100%;">
+        </div>
+
+        <div>
+          <label>Observação</label>
+          <textarea id="baixaObs" class="input" placeholder="Detalhes da baixa..." style="width: 100%; height: 60px;"></textarea>
+        </div>
+
+        <div>
+          <label>
+            <input type="checkbox" id="baixaTotal">
+            Baixa total do estoque deste pneu
+          </label>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeBaixaModal()">Cancelar</button>
+        <button onclick="confirmBaixa()" style="background: var(--danger);">Confirmar Baixa</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Modal Saída de Pneu -->
   <div class="modal-backdrop" id="pneuSaidaModal">
@@ -358,8 +407,8 @@
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <div class="field-row">
           <div>
-            <label>ID *</label>
-            <input type="text" id="editId" class="input">
+            <label>FOGO *</label>
+            <input type="text" id="editFogo" class="input" placeholder="Número do pneu">
           </div>
           <div>
             <label>Medida *</label>
@@ -384,23 +433,28 @@
             <input type="text" id="editDot" class="input" placeholder="4321">
           </div>
           <div>
-            <label>Sulco (mm)</label>
-            <input type="number" id="editSulco" class="input" step="0.1" min="0" max="20">
+            <label>Status *</label>
+            <select id="editStatus" class="input" onchange="toggleSulcoField()">
+              <option value="Novo">Novo</option>
+              <option value="Recapado">Recapado</option>
+              <option value="Usado">Usado</option>
+            </select>
           </div>
+        </div>
+
+        <div id="sulcoField">
+          <label>Sulco (mm) *</label>
+          <input type="number" id="editSulco" class="input" step="0.1" min="0" max="20" placeholder="8.5">
         </div>
 
         <div class="field-row">
           <div>
-            <label>Status</label>
-            <select id="editStatus" class="input">
-              <option value="Novo">Novo</option>
-              <option value="Usado">Usado</option>
-              <option value="Reformado">Reformado</option>
-            </select>
+            <label>Quantidade *</label>
+            <input type="number" id="editQty" class="input" min="1" value="1">
           </div>
           <div>
-            <label>Quantidade *</label>
-            <input type="number" id="editQty" class="input" min="0">
+            <label>Ponto de Reposição</label>
+            <input type="number" id="editReorder" class="input" min="1" value="2">
           </div>
         </div>
       </div>
@@ -416,18 +470,18 @@
     // Dados iniciais
     let items = JSON.parse(localStorage.getItem('tc_pneus')) || [
       { 
-        id: "PNEU-001", 
+        fogo: "001", 
         medida: "295/80 R22.5",
         marca: "Michelin",
         modelo: "X Line Energy",
         dot: "4321",
         sulco: 8.5,
         status: "Novo",
-        qty: 8,
+        qty: 7,
         reorderPoint: 2
       },
       { 
-        id: "PNEU-002", 
+        fogo: "002", 
         medida: "11R22.5",
         marca: "Bridgestone", 
         modelo: "R194",
@@ -486,7 +540,7 @@
       const statusTerm = statusFilter.value;
 
       const filtered = items.filter(item => {
-        const matchSearch = item.id.toLowerCase().includes(searchTerm) ||
+        const matchSearch = item.fogo.toLowerCase().includes(searchTerm) ||
                           item.medida.toLowerCase().includes(searchTerm) ||
                           (item.dot && item.dot.toLowerCase().includes(searchTerm));
         const matchStatus = !statusTerm || item.status === statusTerm;
@@ -494,24 +548,27 @@
       });
 
       tableBody.innerHTML = filtered.map(item => {
-        const sulcoClass = item.sulco < 3.0 ? "sulco-critico" : 
-                          item.sulco < 5.0 ? "sulco-alerta" : "sulco-ok";
+        const sulcoClass = getSulcoClass(item);
         const needsReorder = item.qty <= item.reorderPoint;
         
         return `
           <tr>
-            <td><strong>${item.id}</strong></td>
+            <td><strong>${item.fogo}</strong></td>
             <td>${item.medida}</td>
             <td>${item.marca || '-'}</td>
             <td>${item.dot || '-'}</td>
-            <td><span class="badge ${sulcoClass}">${item.sulco}mm</span></td>
+            <td>
+              <span class="badge ${sulcoClass}">
+                ${item.status === 'Usado' ? 'N/A' : item.sulco + 'mm'}
+              </span>
+            </td>
             <td><span class="badge">${item.status}</span></td>
             <td><span class="badge ${needsReorder ? 'qty-low' : ''}">${item.qty}</span></td>
             <td>
               <div class="actions">
-                <button class="btn-xs btn-success" onclick="openPneuSaidaModal('${item.id}')">Saída</button>
-                <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
-                <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
+                <button class="btn-xs btn-success" onclick="openPneuSaidaModal('${item.fogo}')">Saída</button>
+                <button class="btn-xs" onclick="openBaixaModal('${item.fogo}')" style="background: rgba(244, 63, 94, 0.1); color: #ffe4e6;">Baixa</button>
+                <button class="btn-xs" onclick="openEditModal('${item.fogo}')">Editar</button>
               </div>
             </td>
           </tr>
@@ -521,11 +578,20 @@
       itemsCount.textContent = `${filtered.length} pneu(s) encontrado(s)`;
     }
 
+    function getSulcoClass(item) {
+      if (item.status === 'Usado') return 'sulco-disabled';
+      if (item.sulco < 3.0) return "sulco-critico";
+      if (item.sulco < 5.0) return "sulco-alerta";
+      return "sulco-ok";
+    }
+
     function renderStats() {
       const totalPneus = items.reduce((sum, item) => sum + item.qty, 0);
       const pneusNovos = items.filter(item => item.status === "Novo").reduce((sum, item) => sum + item.qty, 0);
       const pneusBaixoEstoque = items.filter(item => item.qty <= item.reorderPoint).reduce((sum, item) => sum + item.qty, 0);
-      const pneusSulcoCritico = items.filter(item => item.sulco < 3.0).reduce((sum, item) => sum + item.qty, 0);
+      const pneusSulcoCritico = items.filter(item => 
+        item.status !== 'Usado' && item.sulco < 3.0
+      ).reduce((sum, item) => sum + item.qty, 0);
 
       document.getElementById('statsContainer').innerHTML = `
         <div class="stat-card">
@@ -551,16 +617,16 @@
       const alerts = [];
       
       items.forEach(pneu => {
-        if (pneu.sulco < 3.0) {
+        if (pneu.status !== 'Usado' && pneu.sulco < 3.0) {
           alerts.push({
             type: "CRITICO",
-            message: `${pneu.id} - Sulco crítico: ${pneu.sulco}mm`
+            message: `FOGO ${pneu.fogo} - Sulco crítico: ${pneu.sulco}mm`
           });
         }
         if (pneu.qty <= pneu.reorderPoint) {
           alerts.push({
             type: "ALERTA",
-            message: `${pneu.id} - Estoque baixo: ${pneu.qty} unidade(s)`
+            message: `FOGO ${pneu.fogo} - Estoque baixo: ${pneu.qty} unidade(s)`
           });
         }
       });
@@ -584,7 +650,7 @@
       const filtered = movements.filter(move => {
         const matchPlaca = !placaFilter || (move.placa && move.placa.toLowerCase().includes(placaFilter));
         const matchPeca = !pecaFilter || 
-                         move.itemId.toLowerCase().includes(pecaFilter) ||
+                         move.fogo.toLowerCase().includes(pecaFilter) ||
                          move.medida.toLowerCase().includes(pecaFilter);
         return matchPlaca && matchPeca;
       });
@@ -592,7 +658,7 @@
       movementsBody.innerHTML = filtered.map(move => `
         <tr>
           <td>${move.date}</td>
-          <td>${move.itemId}</td>
+          <td>${move.fogo}</td>
           <td>${move.medida}</td>
           <td>${move.qty}</td>
           <td>${move.placa}</td>
@@ -602,12 +668,78 @@
       `).join('');
     }
 
-    function openPneuSaidaModal(itemId) {
-      currentItem = items.find(item => item.id === itemId);
+    function openBaixaModal(fogo) {
+      currentItem = items.find(item => item.fogo === fogo);
+      if (!currentItem) return;
+
+      document.getElementById('baixaLabel').textContent = 
+        `FOGO ${currentItem.fogo} - ${currentItem.medida} (${currentItem.marca}) - Estoque: ${currentItem.qty}`;
+      
+      // Limpar campos
+      document.getElementById('baixaMotivo').value = '';
+      document.getElementById('baixaPlaca').value = '';
+      document.getElementById('baixaObs').value = '';
+      document.getElementById('baixaTotal').checked = false;
+
+      document.getElementById('baixaModal').style.display = 'flex';
+    }
+
+    function closeBaixaModal() {
+      document.getElementById('baixaModal').style.display = 'none';
+      currentItem = null;
+    }
+
+    function confirmBaixa() {
+      const motivo = document.getElementById('baixaMotivo').value;
+      const placa = document.getElementById('baixaPlaca').value.trim();
+      const obs = document.getElementById('baixaObs').value.trim();
+      const baixaTotal = document.getElementById('baixaTotal').checked;
+
+      if (!motivo) {
+        alert('Motivo da baixa é obrigatório!');
+        return;
+      }
+
+      const qtyBaixa = baixaTotal ? currentItem.qty : 1;
+
+      if (currentItem.qty < qtyBaixa) {
+        alert('Estoque insuficiente para baixa!');
+        return;
+      }
+
+      // Registrar baixa
+      const now = new Date();
+      movements.unshift({
+        date: now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}),
+        tipo: 'BAIXA',
+        fogo: currentItem.fogo,
+        medida: currentItem.medida,
+        qty: qtyBaixa,
+        placa: placa,
+        motivo: motivo,
+        observacao: obs
+      });
+
+      // Atualizar estoque
+      currentItem.qty -= qtyBaixa;
+
+      // Salvar e atualizar
+      saveData();
+      renderTable();
+      renderStats();
+      renderAlerts();
+      renderMovements();
+      closeBaixaModal();
+
+      alert('Baixa registrada com sucesso!');
+    }
+
+    function openPneuSaidaModal(fogo) {
+      currentItem = items.find(item => item.fogo === fogo);
       if (!currentItem) return;
 
       document.getElementById('pneuSaidaLabel').textContent = 
-        `${currentItem.id} - ${currentItem.medida} (${currentItem.marca})`;
+        `FOGO ${currentItem.fogo} - ${currentItem.medida} (${currentItem.marca})`;
       
       // Limpar campos
       document.getElementById('saidaPlaca').value = '';
@@ -645,7 +777,8 @@
       const now = new Date();
       movements.unshift({
         date: now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}),
-        itemId: currentItem.id,
+        tipo: 'SAÍDA',
+        fogo: currentItem.fogo,
         medida: currentItem.medida,
         qty: 1,
         placa: placa,
@@ -669,32 +802,49 @@
       alert('Saída registrada com sucesso!');
     }
 
-    function openEditModal(itemId = null) {
-      currentItem = itemId ? items.find(item => item.id === itemId) : null;
+    function openEditModal(fogo = null) {
+      currentItem = fogo ? items.find(item => item.fogo === fogo) : null;
       
       if (currentItem) {
         document.getElementById('editTitle').textContent = 'Editar Pneu';
-        document.getElementById('editId').value = currentItem.id;
+        document.getElementById('editFogo').value = currentItem.fogo;
         document.getElementById('editMedida').value = currentItem.medida;
         document.getElementById('editMarca').value = currentItem.marca || '';
         document.getElementById('editModelo').value = currentItem.modelo || '';
         document.getElementById('editDot').value = currentItem.dot || '';
-        document.getElementById('editSulco').value = currentItem.sulco;
         document.getElementById('editStatus').value = currentItem.status;
+        document.getElementById('editSulco').value = currentItem.sulco;
         document.getElementById('editQty').value = currentItem.qty;
+        document.getElementById('editReorder').value = currentItem.reorderPoint;
       } else {
         document.getElementById('editTitle').textContent = 'Novo Pneu';
-        document.getElementById('editId').value = '';
+        document.getElementById('editFogo').value = '';
         document.getElementById('editMedida').value = '';
         document.getElementById('editMarca').value = '';
         document.getElementById('editModelo').value = '';
         document.getElementById('editDot').value = '';
-        document.getElementById('editSulco').value = '';
         document.getElementById('editStatus').value = 'Novo';
-        document.getElementById('editQty').value = '';
+        document.getElementById('editSulco').value = '';
+        document.getElementById('editQty').value = '1';
+        document.getElementById('editReorder').value = '2';
       }
 
+      toggleSulcoField();
       document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function toggleSulcoField() {
+      const status = document.getElementById('editStatus').value;
+      const sulcoField = document.getElementById('sulcoField');
+      const sulcoInput = document.getElementById('editSulco');
+      
+      if (status === 'Usado') {
+        sulcoField.style.display = 'none';
+        sulcoInput.required = false;
+      } else {
+        sulcoField.style.display = 'block';
+        sulcoInput.required = true;
+      }
     }
 
     function closeEditModal() {
@@ -703,34 +853,41 @@
     }
 
     function saveItem() {
-      const id = document.getElementById('editId').value.trim();
+      const fogo = document.getElementById('editFogo').value.trim();
       const medida = document.getElementById('editMedida').value.trim();
+      const status = document.getElementById('editStatus').value;
       const qty = parseInt(document.getElementById('editQty').value) || 0;
+      const sulco = parseFloat(document.getElementById('editSulco').value) || 0;
 
-      if (!id || !medida) {
-        alert('ID e Medida são obrigatórios!');
+      if (!fogo || !medida) {
+        alert('FOGO e Medida são obrigatórios!');
+        return;
+      }
+
+      if (status !== 'Usado' && (!sulco || sulco <= 0)) {
+        alert('Sulco é obrigatório para pneus novos e recapados!');
         return;
       }
 
       const itemData = {
-        id: id,
+        fogo: fogo,
         medida: medida,
         marca: document.getElementById('editMarca').value.trim(),
         modelo: document.getElementById('editModelo').value.trim(),
         dot: document.getElementById('editDot').value.trim(),
-        sulco: parseFloat(document.getElementById('editSulco').value) || 0,
-        status: document.getElementById('editStatus').value,
+        sulco: status === 'Usado' ? 0 : sulco,
+        status: status,
         qty: qty,
-        reorderPoint: 2
+        reorderPoint: parseInt(document.getElementById('editReorder').value) || 2
       };
 
       if (currentItem) {
         // Editar
         Object.assign(currentItem, itemData);
       } else {
-        // Novo item - verificar se ID já existe
-        if (items.some(item => item.id === id)) {
-          alert('Já existe um pneu com este ID!');
+        // Novo item - verificar se FOGO já existe
+        if (items.some(item => item.fogo === fogo)) {
+          alert('Já existe um pneu com este FOGO!');
           return;
         }
         items.push(itemData);
@@ -743,16 +900,6 @@
       closeEditModal();
 
       alert('Pneu salvo com sucesso!');
-    }
-
-    function deleteItem(itemId) {
-      if (!confirm('Tem certeza que deseja excluir este pneu?')) return;
-      
-      items = items.filter(item => item.id !== itemId);
-      saveData();
-      renderTable();
-      renderStats();
-      renderAlerts();
     }
 
     function saveData() {
