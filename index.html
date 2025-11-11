@@ -19,9 +19,10 @@
     * {
       box-sizing: border-box;
       font-family: "Segoe UI", system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
     }
     body {
-      margin: 0;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
@@ -53,13 +54,17 @@
       padding: 8px 16px;
       border-radius: var(--radius);
       cursor: pointer;
+      transition: all 0.3s;
+    }
+    .tab-btn:hover {
+      background: rgba(15, 23, 42, 0.6);
     }
     .tab-btn.active {
       background: var(--accent);
       color: #020617;
     }
     .hidden {
-      display: none;
+      display: none !important;
     }
     .toolbar {
       display: flex;
@@ -80,6 +85,11 @@
       border: none;
       font-weight: 600;
       cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
     .card {
       background: rgba(2, 6, 23, 0.55);
@@ -106,6 +116,7 @@
       padding: 4px 8px;
       border-radius: 999px;
       font-size: 0.8rem;
+      display: inline-block;
     }
     .sulco-critico {
       background: rgba(244, 63, 94, 0.2);
@@ -135,6 +146,10 @@
       border: 1px solid rgba(148, 163, 184, 0.2);
       border-radius: 6px;
       cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-xs:hover {
+      background: rgba(15, 23, 42, 0.6);
     }
     .btn-success {
       background: rgba(16, 185, 129, 0.2);
@@ -164,6 +179,7 @@
     }
     .modal h2 {
       margin-top: 0;
+      margin-bottom: 20px;
     }
     .modal-actions {
       display: flex;
@@ -198,59 +214,6 @@
       font-size: 0.8rem;
       color: var(--muted);
     }
-    .alert-banner {
-      background: rgba(249, 115, 22, 0.2);
-      border: 1px solid rgba(249, 115, 22, 0.4);
-      padding: 10px;
-      border-radius: var(--radius);
-      margin-bottom: 15px;
-    }
-    .alert-banner.critical {
-      background: rgba(244, 63, 94, 0.2);
-      border-color: rgba(244, 63, 94, 0.4);
-    }
-    
-    /* Novos estilos para a melhoria */
-    .pneu-image {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-    }
-    .image-upload-container {
-      border: 2px dashed rgba(148, 163, 184, 0.3);
-      border-radius: var(--radius);
-      padding: 20px;
-      text-align: center;
-      margin-bottom: 15px;
-      cursor: pointer;
-      transition: border-color 0.3s;
-    }
-    .image-upload-container:hover {
-      border-color: var(--accent);
-    }
-    .image-upload-container img {
-      max-width: 100%;
-      max-height: 200px;
-      border-radius: var(--radius);
-    }
-    .image-preview {
-      display: none;
-      margin-top: 10px;
-    }
-    .estoque-baixo {
-      background: rgba(244, 63, 94, 0.1);
-      border-left: 3px solid var(--danger);
-    }
-    .full-width {
-      grid-column: 1 / -1;
-    }
-    .pneu-card {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
     
     /* Estilos para os botões de container */
     .container-buttons {
@@ -277,6 +240,13 @@
       color: #020617;
       border-color: var(--accent);
     }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -295,19 +265,26 @@
       <button class="tab-btn" data-tab="alertas">Alertas</button>
     </div>
 
-    <!-- ALERTAS -->
-    <div id="tab-alertas" class="hidden">
-      <div class="card">
-        <div style="padding: 15px;">
-          <h3>Alertas do Sistema</h3>
-          <div id="alertsContainer"></div>
-        </div>
-      </div>
-    </div>
-
     <!-- CONTAINER -->
     <div id="tab-container">
-      <div class="stats-grid" id="statsContainer"></div>
+      <div class="stats-grid" id="statsContainer">
+        <div class="stat-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Total em Estoque</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Pneus Novos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Baixo Estoque</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">0</div>
+          <div class="stat-label">Sulco Crítico</div>
+        </div>
+      </div>
 
       <div class="toolbar">
         <input type="text" id="searchInput" class="input" placeholder="Buscar por ID, medida, DOT..." style="flex:1;">
@@ -332,7 +309,7 @@
         <div class="card">
           <div style="padding: 15px;">
             <h3>Container 1 - Estoque de Pneus</h3>
-            <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
+            <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
           </div>
           <div style="overflow-x: auto;">
             <table>
@@ -349,7 +326,13 @@
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody id="tableBody"></tbody>
+              <tbody id="tableBody">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 20px; color: var(--muted);">
+                    Nenhum pneu cadastrado. Clique em "+ Novo Pneu" para adicionar.
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -360,7 +343,7 @@
         <div class="card">
           <div style="padding: 15px;">
             <h3>Container 2 - Estoque de Pneus</h3>
-            <div id="itemsCount2" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
+            <div id="itemsCount2" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
           </div>
           <div style="overflow-x: auto;">
             <table>
@@ -377,7 +360,13 @@
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody id="tableBody2"></tbody>
+              <tbody id="tableBody2">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 20px; color: var(--muted);">
+                    Nenhum pneu cadastrado no Container 2.
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -388,7 +377,7 @@
         <div class="card">
           <div style="padding: 15px;">
             <h3>Container 3 - Estoque de Pneus</h3>
-            <div id="itemsCount3" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
+            <div id="itemsCount3" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
           </div>
           <div style="overflow-x: auto;">
             <table>
@@ -405,7 +394,13 @@
                   <th>Ações</th>
                 </tr>
               </thead>
-              <tbody id="tableBody3"></tbody>
+              <tbody id="tableBody3">
+                <tr>
+                  <td colspan="9" style="text-align: center; padding: 20px; color: var(--muted);">
+                    Nenhum pneu cadastrado no Container 3.
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -417,43 +412,43 @@
       <div class="modal">
         <h2 id="editTitle">Novo Pneu</h2>
         
-        <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; flex-direction: column; gap: 15px;">
           <div class="field-row">
             <div>
-              <label>Código/Fogo *</label>
+              <label for="editId">Código/Fogo *</label>
               <input type="text" id="editId" class="input" placeholder="Código único do pneu">
             </div>
             <div>
-              <label>Medida *</label>
+              <label for="editMedida">Medida *</label>
               <input type="text" id="editMedida" class="input" placeholder="295/80 R22.5">
             </div>
           </div>
 
           <div class="field-row">
             <div>
-              <label>Marca *</label>
+              <label for="editMarca">Marca *</label>
               <input type="text" id="editMarca" class="input" placeholder="Michelin">
             </div>
             <div>
-              <label>Modelo *</label>
+              <label for="editModelo">Modelo *</label>
               <input type="text" id="editModelo" class="input" placeholder="X Line Energy">
             </div>
           </div>
 
           <div class="field-row">
             <div>
-              <label>DOT</label>
+              <label for="editDot">DOT</label>
               <input type="text" id="editDot" class="input" placeholder="4321">
             </div>
             <div>
-              <label>Sulco (mm)</label>
+              <label for="editSulco">Sulco (mm)</label>
               <input type="number" id="editSulco" class="input" step="0.1" min="0" max="20" value="0">
             </div>
           </div>
 
           <div class="field-row">
             <div>
-              <label>Status</label>
+              <label for="editStatus">Status</label>
               <select id="editStatus" class="input">
                 <option value="Novo">Novo</option>
                 <option value="Usado">Usado</option>
@@ -461,14 +456,14 @@
               </select>
             </div>
             <div>
-              <label>Quantidade em Estoque *</label>
+              <label for="editQty">Quantidade em Estoque *</label>
               <input type="number" id="editQty" class="input" min="0" value="0">
             </div>
           </div>
 
           <div class="field-row">
             <div>
-              <label>Container</label>
+              <label for="editContainer">Container</label>
               <select id="editContainer" class="input">
                 <option value="container1">Container 1</option>
                 <option value="container2">Container 2</option>
@@ -476,13 +471,13 @@
               </select>
             </div>
             <div>
-              <label>Preço (R$)</label>
+              <label for="editPreco">Preço (R$)</label>
               <input type="number" id="editPreco" class="input" step="0.01" min="0" placeholder="0.00">
             </div>
           </div>
 
-          <div class="full-width">
-            <label>Observações</label>
+          <div>
+            <label for="editObservacoes">Observações</label>
             <textarea id="editObservacoes" class="input" placeholder="Observações adicionais..." style="width: 100%; height: 60px;"></textarea>
           </div>
         </div>
@@ -530,53 +525,63 @@
     let currentItem = null;
     let currentContainer = "container1";
 
-    // Elementos da interface
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const tableBody = document.getElementById('tableBody');
-    const itemsCount = document.getElementById('itemsCount');
-
     // Inicialização
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('DOM carregado, inicializando...');
+      init();
+    });
+
     function init() {
+      console.log('Inicializando aplicação...');
+      setupEventListeners();
       renderTable();
       renderStats();
-      setupEventListeners();
     }
 
     function setupEventListeners() {
+      console.log('Configurando event listeners...');
+      
       // Tabs
       document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', function() {
+          console.log('Clicou na tab:', this.dataset.tab);
           document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
           document.querySelectorAll('[id^="tab-"]').forEach(tab => tab.classList.add('hidden'));
-          btn.classList.add('active');
-          document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
+          this.classList.add('active');
+          document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
         });
       });
 
       // Botões de Container
       document.querySelectorAll('.container-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', function() {
+          console.log('Clicou no container:', this.dataset.container);
           document.querySelectorAll('.container-btn').forEach(b => b.classList.remove('active'));
           document.querySelectorAll('.container-content').forEach(content => content.classList.add('hidden'));
-          btn.classList.add('active');
-          document.getElementById(btn.dataset.container + '-content').classList.remove('hidden');
-          currentContainer = btn.dataset.container;
+          this.classList.add('active');
+          document.getElementById(this.dataset.container + '-content').classList.remove('hidden');
+          currentContainer = this.dataset.container;
           renderTable();
         });
       });
 
       // Filtros
-      searchInput.addEventListener('input', renderTable);
-      statusFilter.addEventListener('change', renderTable);
+      document.getElementById('searchInput').addEventListener('input', renderTable);
+      document.getElementById('statusFilter').addEventListener('change', renderTable);
 
       // Botão novo item
-      document.getElementById('addItemBtn').addEventListener('click', () => openEditModal());
+      document.getElementById('addItemBtn').addEventListener('click', function() {
+        console.log('Clicou em novo pneu');
+        openEditModal();
+      });
+      
+      console.log('Event listeners configurados');
     }
 
     function renderTable() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const statusTerm = statusFilter.value;
+      console.log('Renderizando tabela...');
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusTerm = document.getElementById('statusFilter').value;
 
       const filtered = items.filter(item => {
         const matchSearch = item.id.toLowerCase().includes(searchTerm) ||
@@ -589,53 +594,62 @@
         return matchSearch && matchStatus && matchContainer;
       });
 
-      const tableBodyElement = document.getElementById('tableBody');
-      if (currentContainer === 'container2') {
+      let tableBodyElement, countElement;
+      
+      if (currentContainer === 'container1') {
+        tableBodyElement = document.getElementById('tableBody');
+        countElement = document.getElementById('itemsCount');
+      } else if (currentContainer === 'container2') {
         tableBodyElement = document.getElementById('tableBody2');
-      } else if (currentContainer === 'container3') {
-        tableBodyElement = document.getElementById('tableBody3');
-      }
-
-      const countElement = document.getElementById('itemsCount');
-      if (currentContainer === 'container2') {
         countElement = document.getElementById('itemsCount2');
       } else if (currentContainer === 'container3') {
+        tableBodyElement = document.getElementById('tableBody3');
         countElement = document.getElementById('itemsCount3');
       }
 
-      tableBodyElement.innerHTML = filtered.map(item => {
-        const sulcoClass = item.sulco < 3.0 ? "sulco-critico" : 
-                          item.sulco < 5.0 ? "sulco-alerta" : "sulco-ok";
-        const needsReorder = item.qty <= 5;
-        const rowClass = needsReorder ? 'estoque-baixo' : '';
-        
-        // Imagem placeholder
-        const imagemSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iNiIgZmlsbD0icmdiYSgxNSwgMjMsIDQyLCAwLjYpIi8+CjxwYXRoIGQ9Ik0zOCAyNkMzOCAyOC4yMDkxIDM2LjIwOTEgMzAgMzQgMzBDMzEuNzkwOSAzMCAzMCAyOC4yMDkxIDMwIDI2QzMwIDIzLjc5MDkgMzEuNzkwOSAyMiAzNCAyMkMzNi4yMDkxIDIyIDM4IDIzLjc5MDkgMzggMjZaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPHBhdGggZD0iTTQyIDM4SDE4QzE2Ljg5NTQgMzggMTYgMzcuMTA0NiAxNiAzNlYyNEMxNiAyMi44OTU0IDE2Ljg5NTQgMjIgMTggMjJINDJDNDMuMTA0NiAyMiA0NCAyMi44OTU0IDQ0IDI0VjM2QzQ0IDM3LjEwNDYgNDMuMTA0NiAzOCA0MiAzOFpNMTggMjRWMzZINDJWMjRIMThaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPC9zdmc+';
-        
-        return `
-          <tr class="${rowClass}">
-            <td><img src="${imagemSrc}" class="pneu-image" alt="${item.id}"></td>
-            <td><strong>${item.id}</strong></td>
-            <td>${item.medida}</td>
-            <td>${item.marca}<br><small style="color: var(--muted);">${item.modelo}</small></td>
-            <td>${item.dot || '-'}</td>
-            <td><span class="badge ${sulcoClass}">${item.sulco}mm</span></td>
-            <td><span class="badge">${item.status}</span></td>
-            <td>
-              <span class="badge ${needsReorder ? 'qty-low' : ''}">${item.qty}</span>
-              ${needsReorder ? '<br><small style="color: var(--danger);">Estoque baixo!</small>' : ''}
-            </td>
-            <td>
-              <div class="actions">
-                <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
-                <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
-              </div>
+      if (filtered.length === 0) {
+        tableBodyElement.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 20px; color: var(--muted);">
+              Nenhum pneu encontrado.
             </td>
           </tr>
         `;
-      }).join('');
+      } else {
+        tableBodyElement.innerHTML = filtered.map(item => {
+          const sulcoClass = item.sulco < 3.0 ? "sulco-critico" : 
+                            item.sulco < 5.0 ? "sulco-alerta" : "sulco-ok";
+          const needsReorder = item.qty <= 5;
+          
+          // Imagem placeholder
+          const imagemSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iNiIgZmlsbD0icmdiYSgxNSwgMjMsIDQyLCAwLjYpIi8+CjxwYXRoIGQ9Ik0zOCAyNkMzOCAyOC4yMDkxIDM2LjIwOTEgMzAgMzQgMzBDMzEuNzkwOSAzMCAzMCAyOC4yMDkxIDMwIDI2QzMwIDIzLjc5MDkgMzEuNzkwOSAyMiAzNCAyMkMzNi4yMDkxIDIyIDM4IDIzLjc5MDkgMzggMjZaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPHBhdGggZD0iTTQyIDM4SDE4QzE2Ljg5NTQgMzggMTYgMzcuMTA0NiAxNiAzNlYyNEMxNiAyMi44OTU0IDE2Ljg5NTQgMjIgMTggMjJINDJDNDMuMTA0NiAyMiA0NCAyMi44OTU0IDQ0IDI0VjM2QzQ0IDM3LjEwNDYgNDMuMTA0NiAzOCA0MiAzOFpNMTggMjRWMzZINDJWMjRIMThaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPC9zdmc+';
+          
+          return `
+            <tr>
+              <td><img src="${imagemSrc}" class="pneu-image" alt="${item.id}"></td>
+              <td><strong>${item.id}</strong></td>
+              <td>${item.medida}</td>
+              <td>${item.marca}<br><small style="color: var(--muted);">${item.modelo}</small></td>
+              <td>${item.dot || '-'}</td>
+              <td><span class="badge ${sulcoClass}">${item.sulco}mm</span></td>
+              <td><span class="badge">${item.status}</span></td>
+              <td>
+                <span class="badge ${needsReorder ? 'qty-low' : ''}">${item.qty}</span>
+                ${needsReorder ? '<br><small style="color: var(--danger);">Estoque baixo!</small>' : ''}
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
+                  <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
 
       countElement.textContent = `${filtered.length} pneu(s) encontrado(s)`;
+      console.log('Tabela renderizada com', filtered.length, 'itens');
     }
 
     function renderStats() {
@@ -665,19 +679,20 @@
     }
 
     function openEditModal(itemId = null) {
+      console.log('Abrindo modal para:', itemId);
       currentItem = itemId ? items.find(item => item.id === itemId) : null;
       
       if (currentItem) {
         document.getElementById('editTitle').textContent = 'Editar Pneu';
         document.getElementById('editId').value = currentItem.id;
         document.getElementById('editMedida').value = currentItem.medida;
-        document.getElementById('editMarca').value = currentItem.marca || '';
-        document.getElementById('editModelo').value = currentItem.modelo || '';
+        document.getElementById('editMarca').value = currentItem.marca;
+        document.getElementById('editModelo').value = currentItem.modelo;
         document.getElementById('editDot').value = currentItem.dot || '';
         document.getElementById('editSulco').value = currentItem.sulco;
         document.getElementById('editStatus').value = currentItem.status;
         document.getElementById('editQty').value = currentItem.qty;
-        document.getElementById('editContainer').value = currentItem.container || currentContainer;
+        document.getElementById('editContainer').value = currentItem.container;
         document.getElementById('editPreco').value = currentItem.preco || '';
         document.getElementById('editObservacoes').value = currentItem.observacoes || '';
       } else {
@@ -763,8 +778,11 @@
       localStorage.setItem('tc_pneus', JSON.stringify(items));
     }
 
-    // Iniciar aplicação
-    init();
+    // Funções globais para acesso pelo HTML
+    window.openEditModal = openEditModal;
+    window.closeEditModal = closeEditModal;
+    window.saveItem = saveItem;
+    window.deleteItem = deleteItem;
   </script>
 </body>
 </html>
