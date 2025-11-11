@@ -251,6 +251,32 @@
       align-items: center;
       gap: 10px;
     }
+    
+    /* Estilos para os botões de container */
+    .container-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .container-btn {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--text);
+      padding: 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .container-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+    }
+    .container-btn.active {
+      background: var(--accent);
+      color: #020617;
+      border-color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -260,7 +286,7 @@
   
   <main>
 	 <div class="tabs">
-	  <button class="tab-btn active" data-tab="estoque">Estoque</button>
+	  <button class="tab-btn active" data-tab="container">Container</button>
 	  <button class="tab-btn" data-tab="fogo">Controle por Fogo</button>
 	  <button class="tab-btn" data-tab="recapagem">Recapagem</button>
 	  <button class="tab-btn" data-tab="descarte">Descarte</button>
@@ -279,8 +305,8 @@
       </div>
     </div>
 
-    <!-- ESTOQUE -->
-    <div id="tab-estoque">
+    <!-- CONTAINER -->
+    <div id="tab-container">
       <div class="stats-grid" id="statsContainer"></div>
 
       <div class="toolbar">
@@ -293,29 +319,95 @@
         </select>
         <button id="addItemBtn">+ Novo Pneu</button>
       </div>
+      
+      <!-- Botões de Container -->
+      <div class="container-buttons">
+        <button class="container-btn active" data-container="container1">Container 1</button>
+        <button class="container-btn" data-container="container2">Container 2</button>
+        <button class="container-btn" data-container="container3">Container 3</button>
+      </div>
 
-      <div class="card">
-        <div style="padding: 15px;">
-          <h3>Estoque de Pneus</h3>
-          <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
+      <!-- Container 1 -->
+      <div id="container1-content" class="container-content">
+        <div class="card">
+          <div style="padding: 15px;">
+            <h3>Container 1 - Estoque de Pneus</h3>
+            <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Imagem</th>
+                  <th>ID</th>
+                  <th>Medida</th>
+                  <th>Marca/Modelo</th>
+                  <th>DOT</th>
+                  <th>Sulco</th>
+                  <th>Status</th>
+                  <th>Qtd</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
         </div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Imagem</th>
-                <th>ID</th>
-                <th>Medida</th>
-                <th>Marca/Modelo</th>
-                <th>DOT</th>
-                <th>Sulco</th>
-                <th>Status</th>
-                <th>Qtd</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody"></tbody>
-          </table>
+      </div>
+      
+      <!-- Container 2 -->
+      <div id="container2-content" class="container-content hidden">
+        <div class="card">
+          <div style="padding: 15px;">
+            <h3>Container 2 - Estoque de Pneus</h3>
+            <div id="itemsCount2" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Imagem</th>
+                  <th>ID</th>
+                  <th>Medida</th>
+                  <th>Marca/Modelo</th>
+                  <th>DOT</th>
+                  <th>Sulco</th>
+                  <th>Status</th>
+                  <th>Qtd</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody2"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Container 3 -->
+      <div id="container3-content" class="container-content hidden">
+        <div class="card">
+          <div style="padding: 15px;">
+            <h3>Container 3 - Estoque de Pneus</h3>
+            <div id="itemsCount3" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;"></div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Imagem</th>
+                  <th>ID</th>
+                  <th>Medida</th>
+                  <th>Marca/Modelo</th>
+                  <th>DOT</th>
+                  <th>Sulco</th>
+                  <th>Status</th>
+                  <th>Qtd</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody3"></tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -799,771 +891,8 @@
         reorderPoint: 5,
         preco: 1250.00,
         observacoes: "",
-        imagem: null
+        imagem: null,
+        container: "container1"
       },
       { 
-        id: "PNEU-002", 
-        medida: "11R22.5",
-        marca: "Bridgestone", 
-        modelo: "R194",
-        dot: "1234",
-        sulco: 4.2,
-        status: "Usado",
-        qty: 3,
-        reorderPoint: 5,
-        preco: 850.00,
-        observacoes: "Pneu reformado",
-        imagem: null
-      }
-    ];
-
-    let movements = JSON.parse(localStorage.getItem('tc_movements')) || [];
-    let currentItem = null;
-    let currentImageFile = null;
-	let fogos = JSON.parse(localStorage.getItem('tc_fogos')) || [];
-	let recapagens = JSON.parse(localStorage.getItem('tc_recapagens')) || [];
-	let descartes = JSON.parse(localStorage.getItem('tc_descartes')) || [];
-	let vendas = JSON.parse(localStorage.getItem('tc_vendas')) || [];
-
-    // Elementos da interface
-    const searchInput = document.getElementById('searchInput');
-    const statusFilter = document.getElementById('statusFilter');
-    const tableBody = document.getElementById('tableBody');
-    const itemsCount = document.getElementById('itemsCount');
-    const movementsBody = document.getElementById('movementsBody');
-
-    // Inicialização
-	function init() {
-	  renderTable();
-	  renderStats();
-	  renderAlerts();
-	  renderMovements();
-	  renderFogos();
-	  renderRecapagens();
-	  renderDescartes();
-	  renderVendas();
-	  setupEventListeners();
-	}
-
-    function setupEventListeners() {
-      // Tabs
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('[id^="tab-"]').forEach(tab => tab.classList.add('hidden'));
-          btn.classList.add('active');
-          document.getElementById('tab-' + btn.dataset.tab).classList.remove('hidden');
-        });
-      });
-
-      // Filtros
-      searchInput.addEventListener('input', renderTable);
-      statusFilter.addEventListener('change', renderTable);
-
-      // Botão novo item
-      document.getElementById('addItemBtn').addEventListener('click', () => openEditModal());
-
-		  // Filtros de saída
-		  document.getElementById('filterPlaca').addEventListener('input', renderMovements);
-		  document.getElementById('filterPeca').addEventListener('input', renderMovements);
-
-		  // ==== NOVOS EVENT LISTENERS - ADICIONE ESTA PARTE ====
-		  document.getElementById('addFogoBtn').addEventListener('click', () => openFogoModal());
-		  document.getElementById('addRecapagemBtn').addEventListener('click', openRecapagemModal);
-		  document.getElementById('addDescarteBtn').addEventListener('click', openDescarteModal);
-		  document.getElementById('addVendaBtn').addEventListener('click', openVendaModal);
-		  
-		  document.getElementById('searchFogo').addEventListener('input', renderFogos);
-		  document.getElementById('searchRecapagem').addEventListener('input', renderRecapagens);
-		  document.getElementById('searchDescarte').addEventListener('input', renderDescartes);
-		  document.getElementById('searchVenda').addEventListener('input', renderVendas);
-    }
-
-    function renderTable() {
-      const searchTerm = searchInput.value.toLowerCase();
-      const statusTerm = statusFilter.value;
-
-      const filtered = items.filter(item => {
-        const matchSearch = item.id.toLowerCase().includes(searchTerm) ||
-                          item.medida.toLowerCase().includes(searchTerm) ||
-                          (item.dot && item.dot.toLowerCase().includes(searchTerm)) ||
-                          item.marca.toLowerCase().includes(searchTerm) ||
-                          item.modelo.toLowerCase().includes(searchTerm);
-        const matchStatus = !statusTerm || item.status === statusTerm;
-        return matchSearch && matchStatus;
-      });
-
-      tableBody.innerHTML = filtered.map(item => {
-        const sulcoClass = item.sulco < 3.0 ? "sulco-critico" : 
-                          item.sulco < 5.0 ? "sulco-alerta" : "sulco-ok";
-        const needsReorder = item.qty <= item.reorderPoint;
-        const rowClass = needsReorder ? 'estoque-baixo' : '';
-        
-        // Imagem do pneu ou placeholder
-        const imagemSrc = item.imagem || 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iNiIgZmlsbD0icmdiYSgxNSwgMjMsIDQyLCAwLjYpIi8+CjxwYXRoIGQ9Ik0zOCAyNkMzOCAyOC4yMDkxIDM2LjIwOTEgMzAgMzQgMzBDMzEuNzkwOSAzMCAzMCAyOC4yMDkxIDMwIDI2QzMwIDIzLjc5MDkgMzEuNzkwOSAyMiAzNCAyMkMzNi4yMDkxIDIyIDM4IDIzLjc5MDkgMzggMjZaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPHBhdGggZD0iTTQyIDM4SDE4QzE2Ljg5NTQgMzggMTYgMzcuMTA0NiAxNiAzNlYyNEMxNiAyMi44OTU0IDE2Ljg5NTQgMjIgMTggMjJINDJDNDMuMTA0NiAyMiA0NCAyMi44OTU0IDQ0IDI0VjM2QzQ0IDM3LjEwNDYgNDMuMTA0NiAzOCA0MiAzOFpNMTggMjRWMzZINDJWMjRIMThaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPC9zdmc+';
-        
-        return `
-          <tr class="${rowClass}">
-            <td><img src="${imagemSrc}" class="pneu-image" alt="${item.id}"></td>
-            <td><strong>${item.id}</strong></td>
-            <td>${item.medida}</td>
-            <td>${item.marca}<br><small style="color: var(--muted);">${item.modelo}</small></td>
-            <td>${item.dot || '-'}</td>
-            <td><span class="badge ${sulcoClass}">${item.sulco}mm</span></td>
-            <td><span class="badge">${item.status}</span></td>
-            <td>
-              <span class="badge ${needsReorder ? 'qty-low' : ''}">${item.qty}</span>
-              ${needsReorder ? '<br><small style="color: var(--danger);">Estoque baixo!</small>' : ''}
-            </td>
-            <td>
-              <div class="actions">
-                <button class="btn-xs btn-success" onclick="openPneuSaidaModal('${item.id}')">Saída</button>
-                <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
-                <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
-              </div>
-            </td>
-          </tr>
-        `;
-      }).join('');
-
-      itemsCount.textContent = `${filtered.length} pneu(s) encontrado(s)`;
-    }
-
-    function renderStats() {
-      const totalPneus = items.reduce((sum, item) => sum + item.qty, 0);
-      const pneusNovos = items.filter(item => item.status === "Novo").reduce((sum, item) => sum + item.qty, 0);
-      const pneusBaixoEstoque = items.filter(item => item.qty <= item.reorderPoint).reduce((sum, item) => sum + item.qty, 0);
-      const pneusSulcoCritico = items.filter(item => item.sulco < 3.0).reduce((sum, item) => sum + item.qty, 0);
-
-      document.getElementById('statsContainer').innerHTML = `
-        <div class="stat-card">
-          <div class="stat-value">${totalPneus}</div>
-          <div class="stat-label">Total em Estoque</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${pneusNovos}</div>
-          <div class="stat-label">Pneus Novos</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${pneusBaixoEstoque}</div>
-          <div class="stat-label">Baixo Estoque</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-value">${pneusSulcoCritico}</div>
-          <div class="stat-label">Sulco Crítico</div>
-        </div>
-      `;
-    }
-
-    function renderAlerts() {
-      const alerts = [];
-      
-      items.forEach(pneu => {
-        if (pneu.sulco < 3.0) {
-          alerts.push({
-            type: "CRITICO",
-            message: `${pneu.id} - Sulco crítico: ${pneu.sulco}mm`
-          });
-        }
-        if (pneu.qty <= pneu.reorderPoint) {
-          alerts.push({
-            type: "ALERTA",
-            message: `${pneu.id} - Estoque baixo: ${pneu.qty} unidade(s) (mínimo: ${pneu.reorderPoint})`
-          });
-        }
-      });
-
-      const container = document.getElementById('alertsContainer');
-      if (alerts.length === 0) {
-        container.innerHTML = '<div class="alert-banner">✅ Todos os pneus estão em condições normais</div>';
-      } else {
-        container.innerHTML = alerts.map(alert => `
-          <div class="alert-banner ${alert.type === 'CRITICO' ? 'critical' : ''}">
-            <strong>${alert.type === 'CRITICO' ? '🚨 CRÍTICO' : '⚠️ ALERTA'}:</strong> ${alert.message}
-          </div>
-        `).join('');
-      }
-    }
-
-    function renderMovements() {
-      const placaFilter = document.getElementById('filterPlaca').value.toLowerCase();
-      const pecaFilter = document.getElementById('filterPeca').value.toLowerCase();
-
-      const filtered = movements.filter(move => {
-        const matchPlaca = !placaFilter || (move.placa && move.placa.toLowerCase().includes(placaFilter));
-        const matchPeca = !pecaFilter || 
-                         move.itemId.toLowerCase().includes(pecaFilter) ||
-                         move.medida.toLowerCase().includes(pecaFilter);
-        return matchPlaca && matchPeca;
-      });
-
-      movementsBody.innerHTML = filtered.map(move => `
-        <tr>
-          <td>${move.date}</td>
-          <td>${move.itemId}</td>
-          <td>${move.medida}</td>
-          <td>${move.qty}</td>
-          <td>${move.placa}</td>
-          <td>${move.posicao}</td>
-          <td>${move.motorista || '-'}</td>
-        </tr>
-      `).join('');
-    }
-
-    // Funções para manipulação de imagens
-    function previewImage(event) {
-      const input = event.target;
-      const preview = document.getElementById('previewImage');
-      const previewContainer = document.getElementById('imagePreview');
-      const uploadText = document.getElementById('imageUploadText');
-      
-      if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-          preview.src = e.target.result;
-          previewContainer.style.display = 'block';
-          uploadText.style.display = 'none';
-        }
-        
-        reader.readAsDataURL(input.files[0]);
-        currentImageFile = input.files[0];
-      }
-    }
-
-    function imageToBase64(file, callback) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = function () {
-        callback(reader.result);
-      };
-      reader.onerror = function (error) {
-        console.log('Error converting image: ', error);
-        callback(null);
-      };
-    }
-
-    function openPneuSaidaModal(itemId) {
-      currentItem = items.find(item => item.id === itemId);
-      if (!currentItem) return;
-
-      document.getElementById('pneuSaidaLabel').textContent = 
-        `${currentItem.id} - ${currentItem.medida} (${currentItem.marca})`;
-      
-      // Limpar campos
-      document.getElementById('saidaPlaca').value = '';
-      document.getElementById('saidaPosicao').value = '';
-      document.getElementById('saidaMotorista').value = '';
-      document.getElementById('saidaKm').value = '';
-      document.getElementById('saidaObs').value = '';
-
-      document.getElementById('pneuSaidaModal').style.display = 'flex';
-    }
-
-    function closePneuSaidaModal() {
-      document.getElementById('pneuSaidaModal').style.display = 'none';
-      currentItem = null;
-    }
-
-    function confirmPneuSaida() {
-      const placa = document.getElementById('saidaPlaca').value.trim();
-      const posicao = document.getElementById('saidaPosicao').value;
-      const motorista = document.getElementById('saidaMotorista').value.trim();
-      const km = document.getElementById('saidaKm').value;
-      const obs = document.getElementById('saidaObs').value.trim();
-
-      if (!placa || !posicao) {
-        alert('Placa e posição são obrigatórios!');
-        return;
-      }
-
-      if (currentItem.qty <= 0) {
-        alert('Estoque insuficiente!');
-        return;
-      }
-
-      // Registrar saída
-      const now = new Date();
-      movements.unshift({
-        date: now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'}),
-        itemId: currentItem.id,
-        medida: currentItem.medida,
-        qty: 1,
-        placa: placa,
-        posicao: posicao,
-        motorista: motorista,
-        km: km,
-        observacao: obs
-      });
-
-      // Atualizar estoque
-      currentItem.qty--;
-
-      // Salvar e atualizar
-      saveData();
-      renderTable();
-      renderStats();
-      renderAlerts();
-      renderMovements();
-      closePneuSaidaModal();
-
-      alert('Saída registrada com sucesso!');
-    }
-
-    function openEditModal(itemId = null) {
-      currentItem = itemId ? items.find(item => item.id === itemId) : null;
-      currentImageFile = null;
-      
-      // Resetar preview de imagem
-      document.getElementById('imagePreview').style.display = 'none';
-      document.getElementById('imageUploadText').style.display = 'block';
-      document.getElementById('imageInput').value = '';
-      
-      if (currentItem) {
-        document.getElementById('editTitle').textContent = 'Editar Pneu';
-        document.getElementById('editId').value = currentItem.id;
-        document.getElementById('editMedida').value = currentItem.medida;
-        document.getElementById('editMarca').value = currentItem.marca || '';
-        document.getElementById('editModelo').value = currentItem.modelo || '';
-        document.getElementById('editDot').value = currentItem.dot || '';
-        document.getElementById('editSulco').value = currentItem.sulco;
-        document.getElementById('editStatus').value = currentItem.status;
-        document.getElementById('editQty').value = currentItem.qty;
-        document.getElementById('editReorderPoint').value = currentItem.reorderPoint || 5;
-        document.getElementById('editPreco').value = currentItem.preco || '';
-        document.getElementById('editObservacoes').value = currentItem.observacoes || '';
-        
-        // Mostrar imagem atual se existir
-        if (currentItem.imagem) {
-          document.getElementById('previewImage').src = currentItem.imagem;
-          document.getElementById('imagePreview').style.display = 'block';
-          document.getElementById('imageUploadText').style.display = 'none';
-        }
-      } else {
-        document.getElementById('editTitle').textContent = 'Novo Pneu';
-        document.getElementById('editId').value = '';
-        document.getElementById('editMedida').value = '';
-        document.getElementById('editMarca').value = '';
-        document.getElementById('editModelo').value = '';
-        document.getElementById('editDot').value = '';
-        document.getElementById('editSulco').value = '';
-        document.getElementById('editStatus').value = 'Novo';
-        document.getElementById('editQty').value = '';
-        document.getElementById('editReorderPoint').value = 5;
-        document.getElementById('editPreco').value = '';
-        document.getElementById('editObservacoes').value = '';
-      }
-
-      document.getElementById('editModal').style.display = 'flex';
-    }
-
-    function closeEditModal() {
-      document.getElementById('editModal').style.display = 'none';
-      currentItem = null;
-      currentImageFile = null;
-    }
-
-    function saveItem() {
-      const id = document.getElementById('editId').value.trim();
-      const medida = document.getElementById('editMedida').value.trim();
-      const marca = document.getElementById('editMarca').value.trim();
-      const modelo = document.getElementById('editModelo').value.trim();
-      const qty = parseInt(document.getElementById('editQty').value) || 0;
-
-      if (!id || !medida || !marca || !modelo) {
-        alert('Código, Medida, Marca e Modelo são obrigatórios!');
-        return;
-      }
-
-      // Processar imagem se houver
-      const processImage = (callback) => {
-        if (currentImageFile) {
-          imageToBase64(currentImageFile, (base64) => {
-            callback(base64);
-          });
-        } else {
-          callback(currentItem ? currentItem.imagem : null);
-        }
-      };
-
-      processImage((imagemData) => {
-        const itemData = {
-          id: id,
-          medida: medida,
-          marca: marca,
-          modelo: modelo,
-          dot: document.getElementById('editDot').value.trim(),
-          sulco: parseFloat(document.getElementById('editSulco').value) || 0,
-          status: document.getElementById('editStatus').value,
-          qty: qty,
-          reorderPoint: parseInt(document.getElementById('editReorderPoint').value) || 5,
-          preco: parseFloat(document.getElementById('editPreco').value) || 0,
-          observacoes: document.getElementById('editObservacoes').value.trim(),
-          imagem: imagemData
-        };
-
-        if (currentItem) {
-          // Editar - manter imagem atual se não foi alterada
-          if (!currentImageFile && currentItem.imagem) {
-            itemData.imagem = currentItem.imagem;
-          }
-          Object.assign(currentItem, itemData);
-        } else {
-          // Novo item - verificar se ID já existe
-          if (items.some(item => item.id === id)) {
-            alert('Já existe um pneu com este ID!');
-            return;
-          }
-          items.push(itemData);
-        }
-
-        saveData();
-        renderTable();
-        renderStats();
-        renderAlerts();
-        closeEditModal();
-
-        alert('Pneu salvo com sucesso!');
-      });
-    }
-
-    function deleteItem(itemId) {
-      if (!confirm('Tem certeza que deseja excluir este pneu?')) return;
-      
-      items = items.filter(item => item.id !== itemId);
-      saveData();
-      renderTable();
-      renderStats();
-      renderAlerts();
-    }
-
-    function saveData() {
-      localStorage.setItem('tc_pneus', JSON.stringify(items));
-      localStorage.setItem('tc_movements', JSON.stringify(movements));
-    }
-		
-		// ===== FUNÇÕES PARA CONTROLE POR FOGO =====
-	function openFogoModal(fogoNumero = null) {
-	  const modal = document.getElementById('fogoModal');
-	  const currentFogo = fogoNumero ? fogos.find(f => f.numero === fogoNumero) : null;
-	  
-	  if (currentFogo) {
-		document.getElementById('fogoTitle').textContent = 'Editar Pneu Individual';
-		document.getElementById('fogoNumero').value = currentFogo.numero;
-		document.getElementById('fogoMarca').value = currentFogo.marca;
-		document.getElementById('fogoModelo').value = currentFogo.modelo;
-		document.getElementById('fogoMedida').value = currentFogo.medida;
-		document.getElementById('fogoValor').value = currentFogo.valor;
-		document.getElementById('fogoStatus').value = currentFogo.status;
-	  } else {
-		document.getElementById('fogoTitle').textContent = 'Novo Pneu Individual';
-		document.getElementById('fogoNumero').value = '';
-		document.getElementById('fogoMarca').value = '';
-		document.getElementById('fogoModelo').value = '';
-		document.getElementById('fogoMedida').value = '';
-		document.getElementById('fogoValor').value = '';
-		document.getElementById('fogoStatus').value = 'Estoque';
-	  }
-	  
-	  modal.style.display = 'flex';
-	}
-
-	function closeFogoModal() {
-	  document.getElementById('fogoModal').style.display = 'none';
-	}
-
-	function saveFogo() {
-	  const numero = document.getElementById('fogoNumero').value.trim();
-	  const marca = document.getElementById('fogoMarca').value.trim();
-	  const modelo = document.getElementById('fogoModelo').value.trim();
-	  const medida = document.getElementById('fogoMedida').value.trim();
-	  const valor = parseFloat(document.getElementById('fogoValor').value) || 0;
-	  const status = document.getElementById('fogoStatus').value;
-
-	  if (!numero || !marca || !modelo || !medida) {
-		alert('Fogo, Marca, Modelo e Medida são obrigatórios!');
-		return;
-	  }
-
-	  const fogoData = {
-		numero,
-		marca,
-		modelo,
-		medida,
-		valor,
-		status,
-		dataCadastro: new Date().toLocaleDateString('pt-BR')
-	  };
-
-	  const existingIndex = fogos.findIndex(f => f.numero === numero);
-	  
-	  if (existingIndex >= 0) {
-		fogos[existingIndex] = fogoData;
-	  } else {
-		fogos.push(fogoData);
-	  }
-
-	  localStorage.setItem('tc_fogos', JSON.stringify(fogos));
-	  renderFogos();
-	  closeFogoModal();
-	  alert('Pneu individual salvo com sucesso!');
-	}
-
-	function renderFogos() {
-	  const searchTerm = document.getElementById('searchFogo').value.toLowerCase();
-	  const filtered = fogos.filter(fogo => 
-		fogo.numero.toLowerCase().includes(searchTerm) ||
-		fogo.marca.toLowerCase().includes(searchTerm) ||
-		fogo.modelo.toLowerCase().includes(searchTerm)
-	  );
-
-	  document.getElementById('fogoBody').innerHTML = filtered.map(fogo => `
-		<tr>
-		  <td><strong>${fogo.numero}</strong></td>
-		  <td>${fogo.marca}</td>
-		  <td>${fogo.modelo}</td>
-		  <td>${fogo.medida}</td>
-		  <td>R$ ${fogo.valor.toFixed(2)}</td>
-		  <td><span class="badge">${fogo.status}</span></td>
-		  <td>
-			<div class="actions">
-			  <button class="btn-xs" onclick="openFogoModal('${fogo.numero}')">Editar</button>
-			  <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteFogo('${fogo.numero}')">Excluir</button>
-			</div>
-		  </td>
-		</tr>
-	  `).join('');
-
-	  document.getElementById('fogoCount').textContent = `${filtered.length} pneu(s) individual(is) encontrado(s)`;
-	}
-
-	function deleteFogo(numero) {
-	  if (!confirm('Tem certeza que deseja excluir este pneu individual?')) return;
-	  fogos = fogos.filter(f => f.numero !== numero);
-	  localStorage.setItem('tc_fogos', JSON.stringify(fogos));
-	  renderFogos();
-	}
-
-	// ===== FUNÇÕES PARA RECAPAGEM =====
-	function openRecapagemModal() {
-	  document.getElementById('recapagemModal').style.display = 'flex';
-	  document.getElementById('recapagemData').value = new Date().toISOString().split('T')[0];
-	}
-
-	function closeRecapagemModal() {
-	  document.getElementById('recapagemModal').style.display = 'none';
-	}
-
-	function saveRecapagem() {
-	  const fogo = document.getElementById('recapagemFogo').value.trim();
-	  const data = document.getElementById('recapagemData').value;
-	  const borracha = document.getElementById('recapagemBorracha').value.trim();
-	  const recapadora = document.getElementById('recapagemRecapadora').value.trim();
-	  const observacoes = document.getElementById('recapagemObs').value.trim();
-
-	  if (!fogo || !borracha || !recapadora) {
-		alert('Fogo, Borracha e Recapadora são obrigatórios!');
-		return;
-	  }
-
-	  const recapagemData = {
-		id: Date.now().toString(),
-		fogo,
-		data: data || new Date().toLocaleDateString('pt-BR'),
-		borracha,
-		recapadora,
-		observacoes,
-		dataRegistro: new Date().toLocaleDateString('pt-BR')
-	  };
-
-	  recapagens.unshift(recapagemData);
-	  localStorage.setItem('tc_recapagens', JSON.stringify(recapagens));
-	  renderRecapagens();
-	  closeRecapagemModal();
-	  alert('Recapagem registrada com sucesso!');
-	}
-
-	function renderRecapagens() {
-	  const searchTerm = document.getElementById('searchRecapagem').value.toLowerCase();
-	  const filtered = recapagens.filter(recap => 
-		recap.fogo.toLowerCase().includes(searchTerm) ||
-		recap.recapadora.toLowerCase().includes(searchTerm)
-	  );
-
-	  document.getElementById('recapagemBody').innerHTML = filtered.map(recap => `
-		<tr>
-		  <td>${recap.data}</td>
-		  <td><strong>${recap.fogo}</strong></td>
-		  <td>${getMarcaModeloByFogo(recap.fogo)}</td>
-		  <td>${getMedidaByFogo(recap.fogo)}</td>
-		  <td>${recap.borracha}</td>
-		  <td>${recap.recapadora}</td>
-		  <td>${recap.observacoes || '-'}</td>
-		  <td>
-			<button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteRecapagem('${recap.id}')">Excluir</button>
-		  </td>
-		</tr>
-	  `).join('');
-	}
-
-	function deleteRecapagem(id) {
-	  if (!confirm('Tem certeza que deseja excluir este registro de recapagem?')) return;
-	  recapagens = recapagens.filter(r => r.id !== id);
-	  localStorage.setItem('tc_recapagens', JSON.stringify(recapagens));
-	  renderRecapagens();
-	}
-
-	// ===== FUNÇÕES PARA DESCARTE =====
-	function openDescarteModal() {
-	  document.getElementById('descarteModal').style.display = 'flex';
-	  document.getElementById('descarteData').value = new Date().toISOString().split('T')[0];
-	}
-
-	function closeDescarteModal() {
-	  document.getElementById('descarteModal').style.display = 'none';
-	}
-
-	function saveDescarte() {
-	  const fogo = document.getElementById('descarteFogo').value.trim();
-	  const data = document.getElementById('descarteData').value;
-	  const motivo = document.getElementById('descarteMotivo').value;
-	  const observacoes = document.getElementById('descarteObs').value.trim();
-
-	  if (!fogo || !motivo) {
-		alert('Fogo e Motivo são obrigatórios!');
-		return;
-	  }
-
-	  const descarteData = {
-		id: Date.now().toString(),
-		fogo,
-		data: data || new Date().toLocaleDateString('pt-BR'),
-		motivo,
-		observacoes,
-		dataRegistro: new Date().toLocaleDateString('pt-BR')
-	  };
-
-	  descartes.unshift(descarteData);
-	  localStorage.setItem('tc_descartes', JSON.stringify(descartes));
-	  renderDescartes();
-	  closeDescarteModal();
-	  alert('Descarte registrado com sucesso!');
-	}
-
-	function renderDescartes() {
-	  const searchTerm = document.getElementById('searchDescarte').value.toLowerCase();
-	  const filtered = descartes.filter(descarte => 
-		descarte.fogo.toLowerCase().includes(searchTerm) ||
-		descarte.motivo.toLowerCase().includes(searchTerm)
-	  );
-
-	  document.getElementById('descarteBody').innerHTML = filtered.map(descarte => `
-		<tr>
-		  <td>${descarte.data}</td>
-		  <td><strong>${descarte.fogo}</strong></td>
-		  <td>${getMarcaModeloByFogo(descarte.fogo)}</td>
-		  <td>${getMedidaByFogo(descarte.fogo)}</td>
-		  <td>${descarte.motivo}</td>
-		  <td>${descarte.observacoes || '-'}</td>
-		  <td>
-			<button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteDescarte('${descarte.id}')">Excluir</button>
-		  </td>
-		</tr>
-	  `).join('');
-	}
-
-	function deleteDescarte(id) {
-	  if (!confirm('Tem certeza que deseja excluir este registro de descarte?')) return;
-	  descartes = descartes.filter(d => d.id !== id);
-	  localStorage.setItem('tc_descartes', JSON.stringify(descartes));
-	  renderDescartes();
-	}
-
-	// ===== FUNÇÕES PARA VENDAS =====
-	function openVendaModal() {
-	  document.getElementById('vendaModal').style.display = 'flex';
-	  document.getElementById('vendaData').value = new Date().toISOString().split('T')[0];
-	}
-
-	function closeVendaModal() {
-	  document.getElementById('vendaModal').style.display = 'none';
-	}
-
-	function saveVenda() {
-	  const fogo = document.getElementById('vendaFogo').value.trim();
-	  const data = document.getElementById('vendaData').value;
-	  const comprador = document.getElementById('vendaComprador').value.trim();
-	  const documento = document.getElementById('vendaDocumento').value.trim();
-	  const tipo = document.getElementById('vendaTipo').value;
-	  const valor = parseFloat(document.getElementById('vendaValor').value) || 0;
-
-	  if (!fogo || !comprador || !documento || !valor) {
-		alert('Fogo, Comprador, Documento e Valor são obrigatórios!');
-		return;
-	  }
-
-	  const vendaData = {
-		id: Date.now().toString(),
-		fogo,
-		data: data || new Date().toLocaleDateString('pt-BR'),
-		comprador,
-		documento,
-		tipo,
-		valor,
-		dataRegistro: new Date().toLocaleDateString('pt-BR')
-	  };
-
-	  vendas.unshift(vendaData);
-	  localStorage.setItem('tc_vendas', JSON.stringify(vendas));
-	  renderVendas();
-	  closeVendaModal();
-	  alert('Venda registrada com sucesso!');
-	}
-
-	function renderVendas() {
-	  const searchTerm = document.getElementById('searchVenda').value.toLowerCase();
-	  const filtered = vendas.filter(venda => 
-		venda.fogo.toLowerCase().includes(searchTerm) ||
-		venda.comprador.toLowerCase().includes(searchTerm)
-	  );
-
-	  document.getElementById('vendaBody').innerHTML = filtered.map(venda => `
-		<tr>
-		  <td>${venda.data}</td>
-		  <td><strong>${venda.fogo}</strong></td>
-		  <td>${getMarcaModeloByFogo(venda.fogo)}</td>
-		  <td>${getMedidaByFogo(venda.fogo)}</td>
-		  <td>${venda.tipo}</td>
-		  <td>${venda.comprador}</td>
-		  <td>${venda.documento}</td>
-		  <td>R$ ${venda.valor.toFixed(2)}</td>
-		  <td>
-			<button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteVenda('${venda.id}')">Excluir</button>
-		  </td>
-		</tr>
-	  `).join('');
-	}
-
-	function deleteVenda(id) {
-	  if (!confirm('Tem certeza que deseja excluir este registro de venda?')) return;
-	  vendas = vendas.filter(v => v.id !== id);
-	  localStorage.setItem('tc_vendas', JSON.stringify(vendas));
-	  renderVendas();
-	}
-
-	// ===== FUNÇÕES AUXILIARES =====
-	function getMarcaModeloByFogo(fogoNumero) {
-	  const fogo = fogos.find(f => f.numero === fogoNumero);
-	  return fogo ? `${fogo.marca} / ${fogo.modelo}` : 'Não encontrado';
-	}
-
-	function getMedidaByFogo(fogoNumero) {
-	  const fogo = fogos.find(f => f.numero === fogoNumero);
-	  return fogo ? fogo.medida : 'Não encontrado';
-	}
-
-    // Iniciar aplicação
-    init();
-  </script>
-</body>
-</html>
+        id: "PNEU-
