@@ -378,11 +378,11 @@
       <div class="stats-grid" id="statsContainer">
         <div class="stat-card">
           <div class="stat-value stat-total">0</div>
-          <div class="stat-label">TOTAL ESTOQUE</div>
+          <div class="stat-label">ESTOQUE CONTAINER</div>
         </div>
         <div class="stat-card">
           <div class="stat-value stat-novo">0</div>
-          <div class="stat-label">PNEUS NOVOS</div>
+          <div class="stat-label">PNEUS COM FOGO</div>
         </div>
         <div class="stat-card">
           <div class="stat-value stat-recapado">0</div>
@@ -404,6 +404,7 @@
         </select>
         <button id="addItemBtn">+ Novo Pneu</button>
         <button onclick="exportData()" class="btn-xs" style="background: rgba(16, 185, 129, 0.2); color: #d1fae5;">Exportar Backup</button>
+        <button onclick="exportToExcel()" class="btn-xs" style="background: rgba(147, 51, 234, 0.2); color: #e9d5ff;">Exportar Excel</button>
         <label for="importInput" class="btn-xs" style="background: rgba(249, 115, 22, 0.2); color: #ffedd5; cursor: pointer;">
           Importar Backup
           <input type="file" id="importInput" accept=".json" style="display: none;" onchange="importData(event)">
@@ -1018,19 +1019,21 @@
     }
 
     function renderStats() {
-      const totalEstoque = items.reduce((sum, item) => sum + item.qty, 0);
-      const pneusNovos = items.filter(item => item.status === "Novo").reduce((sum, item) => sum + item.qty, 0);
+      // Calcular totais
+      const estoqueContainer = items.reduce((sum, item) => sum + item.qty, 0);
+      const pneusComFogo = fogos.length;  // Agora conta quantos fogos existem
       const pneusRecapados = items.filter(item => item.status === "Reformado").reduce((sum, item) => sum + item.qty, 0);
       const pneusUsados = items.filter(item => item.status === "Usado").reduce((sum, item) => sum + item.qty, 0);
 
+      // Atualizar os valores na interface
       document.getElementById('statsContainer').innerHTML = `
         <div class="stat-card">
-          <div class="stat-value stat-total">${totalEstoque}</div>
-          <div class="stat-label">TOTAL ESTOQUE</div>
+          <div class="stat-value stat-total">${estoqueContainer}</div>
+          <div class="stat-label">ESTOQUE CONTAINER</div>
         </div>
         <div class="stat-card">
-          <div class="stat-value stat-novo">${pneusNovos}</div>
-          <div class="stat-label">PNEUS NOVOS</div>
+          <div class="stat-value stat-novo">${pneusComFogo}</div>
+          <div class="stat-label">PNEUS COM FOGO</div>
         </div>
         <div class="stat-card">
           <div class="stat-value stat-recapado">${pneusRecapados}</div>
@@ -1308,6 +1311,152 @@
       showNotification('Backup exportado com sucesso!');
     }
 
+    function exportToExcel() {
+      // Criar dados formatados para Excel
+      const excelData = [];
+      
+      // Cabeçalho do relatório
+      excelData.push(['RELATÓRIO DE PNEUS - TRANSPORTES CANARINHO']);
+      excelData.push(['Exportado em:', new Date().toLocaleDateString('pt-BR')]);
+      excelData.push([]);
+      
+      // CONTAINER 1
+      excelData.push(['CONTAINER 1']);
+      excelData.push(['ID', 'Medida', 'Marca', 'Modelo', 'Status', 'Quantidade', 'Data Entrada', 'Preço (R$)', 'Observações']);
+      
+      const container1Items = items.filter(item => item.container === 'container1');
+      container1Items.forEach(item => {
+          excelData.push([
+              item.id,
+              item.medida,
+              item.marca,
+              item.modelo,
+              item.status,
+              item.qty,
+              new Date(item.dataEntrada).toLocaleDateString('pt-BR'),
+              item.preco ? `R$ ${item.preco.toFixed(2)}` : 'R$ 0.00',
+              item.observacoes || ''
+          ]);
+      });
+      
+      // Total Container 1
+      const totalContainer1 = container1Items.reduce((sum, item) => sum + item.qty, 0);
+      excelData.push([]);
+      excelData.push(['TOTAL CONTAINER 1:', totalContainer1, '', '', '', '', '', '', '']);
+      
+      // Espaçamento
+      excelData.push([]);
+      excelData.push([]);
+      
+      // CONTAINER 2
+      excelData.push(['CONTAINER 2']);
+      excelData.push(['ID', 'Medida', 'Marca', 'Modelo', 'Status', 'Quantidade', 'Data Entrada', 'Preço (R$)', 'Observações']);
+      
+      const container2Items = items.filter(item => item.container === 'container2');
+      container2Items.forEach(item => {
+          excelData.push([
+              item.id,
+              item.medida,
+              item.marca,
+              item.modelo,
+              item.status,
+              item.qty,
+              new Date(item.dataEntrada).toLocaleDateString('pt-BR'),
+              item.preco ? `R$ ${item.preco.toFixed(2)}` : 'R$ 0.00',
+              item.observacoes || ''
+          ]);
+      });
+      
+      // Total Container 2
+      const totalContainer2 = container2Items.reduce((sum, item) => sum + item.qty, 0);
+      excelData.push([]);
+      excelData.push(['TOTAL CONTAINER 2:', totalContainer2, '', '', '', '', '', '', '']);
+      
+      // Espaçamento
+      excelData.push([]);
+      excelData.push([]);
+      
+      // CONTAINER 3
+      excelData.push(['CONTAINER 3']);
+      excelData.push(['ID', 'Medida', 'Marca', 'Modelo', 'Status', 'Quantidade', 'Data Entrada', 'Preço (R$)', 'Observações']);
+      
+      const container3Items = items.filter(item => item.container === 'container3');
+      container3Items.forEach(item => {
+          excelData.push([
+              item.id,
+              item.medida,
+              item.marca,
+              item.modelo,
+              item.status,
+              item.qty,
+              new Date(item.dataEntrada).toLocaleDateString('pt-BR'),
+              item.preco ? `R$ ${item.preco.toFixed(2)}` : 'R$ 0.00',
+              item.observacoes || ''
+          ]);
+      });
+      
+      // Total Container 3
+      const totalContainer3 = container3Items.reduce((sum, item) => sum + item.qty, 0);
+      excelData.push([]);
+      excelData.push(['TOTAL CONTAINER 3:', totalContainer3, '', '', '', '', '', '', '']);
+      
+      // Total Geral
+      const totalGeral = totalContainer1 + totalContainer2 + totalContainer3;
+      excelData.push([]);
+      excelData.push(['TOTAL GERAL CONTAINERS:', totalGeral, '', '', '', '', '', '', '']);
+      
+      // Espaçamento
+      excelData.push([]);
+      excelData.push([]);
+      
+      // CONTROLE POR FOGO
+      excelData.push(['CONTROLE POR FOGO']);
+      excelData.push(['Número Fogo', 'Medida', 'Marca', 'Modelo', 'Status', 'Data Entrada', 'Container Origem', 'ID Pneu Origem']);
+      
+      fogos.forEach(fogo => {
+          excelData.push([
+              fogo.fogo,
+              fogo.medida,
+              fogo.marca,
+              fogo.modelo,
+              fogo.status,
+              new Date(fogo.dataEntrada).toLocaleDateString('pt-BR'),
+              fogo.containerOrigem,
+              fogo.pneuId
+          ]);
+      });
+      
+      // Total Fogos
+      excelData.push([]);
+      excelData.push(['TOTAL PNEUS COM FOGO:', fogos.length, '', '', '', '', '', '']);
+      
+      // Criar CSV formatado corretamente para Excel
+      const csvContent = excelData.map(row => 
+          row.map(cell => {
+              // Se o cell for número ou data, não coloca aspas
+              if (cell === null || cell === undefined) return '';
+              if (typeof cell === 'number') return cell.toString();
+              if (!isNaN(cell) && cell.trim() !== '') return cell;
+              // Para textos, coloca entre aspas e escapa aspas internas
+              return `"${cell.toString().replace(/"/g, '""')}"`;
+          }).join(',')
+      ).join('\n');
+      
+      const blob = new Blob(['\uFEFF' + csvContent], { 
+          type: 'text/csv;charset=utf-8;' 
+      });
+      
+      const url = URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `relatorio-pneus-${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      
+      URL.revokeObjectURL(url);
+      showNotification('Planilha Excel exportada com sucesso!');
+    }
+
     function importData(event) {
       const file = event.target.files[0];
       if (!file) return;
@@ -1346,6 +1495,7 @@
     window.confirmTransfer = confirmTransfer;
     window.deleteFogo = deleteFogo;
     window.exportData = exportData;
+    window.exportToExcel = exportToExcel;
     window.importData = importData;
   </script>
 </body>
