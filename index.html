@@ -164,6 +164,10 @@
       background: rgba(249, 115, 22, 0.2);
       color: #ffedd5;
     }
+    .btn-danger {
+      background: rgba(244, 63, 94, 0.2);
+      color: #ffe4e6;
+    }
     .modal-backdrop {
       position: fixed;
       top: 0;
@@ -350,6 +354,63 @@
       50% { opacity: 0.5; }
       100% { opacity: 1; }
     }
+
+    /* Novos estilos para botões laterais */
+    .content-with-sidebar {
+      display: flex;
+      gap: 20px;
+    }
+    
+    .main-content {
+      flex: 1;
+    }
+    
+    .sidebar-actions {
+      width: 200px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    
+    .sidebar-btn {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--text);
+      padding: 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+    
+    .sidebar-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+      transform: translateY(-2px);
+    }
+    
+    .sidebar-btn.transfer {
+      background: rgba(249, 115, 22, 0.2);
+      color: #ffedd5;
+    }
+    
+    .sidebar-btn.saida {
+      background: rgba(244, 63, 94, 0.2);
+      color: #ffe4e6;
+    }
+
+    /* Estilos para seleção de fogos */
+    .fogo-checkbox {
+      margin-right: 8px;
+    }
+    
+    .selected-count {
+      background: rgba(56, 189, 248, 0.2);
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -418,99 +479,110 @@
         <button class="container-btn" data-container="container3">Container 3</button>
       </div>
 
-      <!-- Container 1 -->
-      <div id="container1-content" class="container-content">
-        <div class="card">
-          <div style="padding: 15px;">
-            <h3>Container 1 - Estoque de Pneus</h3>
-            <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
+      <div class="content-with-sidebar">
+        <!-- Container 1 -->
+        <div class="main-content">
+          <div id="container1-content" class="container-content">
+            <div class="card">
+              <div style="padding: 15px;">
+                <h3>Container 1 - Estoque de Pneus</h3>
+                <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
+              </div>
+              <div style="overflow-x: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Imagem</th>
+                      <th>Medida</th>
+                      <th>Marca/Modelo</th>
+                      <th>Data Entrada</th>
+                      <th>Status</th>
+                      <th>Qtd</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableBody">
+                    <tr>
+                      <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+                        Nenhum pneu cadastrado. Clique em "+ Novo Pneu" para adicionar.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-          <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Imagem</th>
-                  <th>Medida</th>
-                  <th>Marca/Modelo</th>
-                  <th>Data Entrada</th>
-                  <th>Status</th>
-                  <th>Qtd</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tableBody">
-                <tr>
-                  <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
-                    Nenhum pneu cadastrado. Clique em "+ Novo Pneu" para adicionar.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          
+          <!-- Container 2 -->
+          <div id="container2-content" class="container-content hidden">
+            <div class="card">
+              <div style="padding: 15px;">
+                <h3>Container 2 - Estoque de Pneus</h3>
+                <div id="itemsCount2" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
+              </div>
+              <div style="overflow-x: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Imagem</th>
+                      <th>Medida</th>
+                      <th>Marca/Modelo</th>
+                      <th>Data Entrada</th>
+                      <th>Status</th>
+                      <th>Qtd</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableBody2">
+                    <tr>
+                      <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+                        Nenhum pneu cadastrado no Container 2.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Container 3 -->
+          <div id="container3-content" class="container-content hidden">
+            <div class="card">
+              <div style="padding: 15px;">
+                <h3>Container 3 - Estoque de Pneus</h3>
+                <div id="itemsCount3" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
+              </div>
+              <div style="overflow-x: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Imagem</th>
+                      <th>Medida</th>
+                      <th>Marca/Modelo</th>
+                      <th>Data Entrada</th>
+                      <th>Status</th>
+                      <th>Qtd</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tableBody3">
+                    <tr>
+                      <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+                        Nenhum pneu cadastrado no Container 3.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-      
-      <!-- Container 2 -->
-      <div id="container2-content" class="container-content hidden">
-        <div class="card">
-          <div style="padding: 15px;">
-            <h3>Container 2 - Estoque de Pneus</h3>
-            <div id="itemsCount2" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
-          </div>
-          <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Imagem</th>
-                  <th>Medida</th>
-                  <th>Marca/Modelo</th>
-                  <th>Data Entrada</th>
-                  <th>Status</th>
-                  <th>Qtd</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tableBody2">
-                <tr>
-                  <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
-                    Nenhum pneu cadastrado no Container 2.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Container 3 -->
-      <div id="container3-content" class="container-content hidden">
-        <div class="card">
-          <div style="padding: 15px;">
-            <h3>Container 3 - Estoque de Pneus</h3>
-            <div id="itemsCount3" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
-          </div>
-          <div style="overflow-x: auto;">
-            <table>
-              <thead>
-                <tr>
-                  <th>Imagem</th>
-                  <th>Medida</th>
-                  <th>Marca/Modelo</th>
-                  <th>Data Entrada</th>
-                  <th>Status</th>
-                  <th>Qtd</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody id="tableBody3">
-                <tr>
-                  <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
-                    Nenhum pneu cadastrado no Container 3.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+
+        <!-- Sidebar com botão de Transferir -->
+        <div class="sidebar-actions">
+          <button class="sidebar-btn transfer" onclick="openBulkTransferModal()">
+            📤 Transferir para Fogo
+          </button>
         </div>
       </div>
     </div>
@@ -522,32 +594,44 @@
         <button id="addFogoBtn">+ Novo Fogo</button>
       </div>
       
-      <div class="card">
-        <div style="padding: 15px;">
-          <h3>Controle por Fogo</h3>
-          <div id="fogoCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 fogo(s) cadastrado(s)</div>
+      <div class="content-with-sidebar">
+        <div class="main-content">
+          <div class="card">
+            <div style="padding: 15px;">
+              <h3>Controle por Fogo</h3>
+              <div id="fogoCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 fogo(s) cadastrado(s)</div>
+            </div>
+            <div style="overflow-x: auto;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Selecionar</th>
+                    <th>Fogo</th>
+                    <th>Medida</th>
+                    <th>Marca/Modelo</th>
+                    <th>Data Entrada</th>
+                    <th>Status</th>
+                    <th>Container Origem</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="fogoTableBody">
+                  <tr>
+                    <td colspan="8" style="text-align: center; padding: 20px; color: var(--muted);">
+                      Nenhum fogo cadastrado.
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-        <div style="overflow-x: auto;">
-          <table>
-            <thead>
-              <tr>
-                <th>Fogo</th>
-                <th>Medida</th>
-                <th>Marca/Modelo</th>
-                <th>Data Entrada</th>
-                <th>Status</th>
-                <th>Container Origem</th>
-                <th>Ações</th>
-              </tr>
-            </thead>
-            <tbody id="fogoTableBody">
-              <tr>
-                <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
-                  Nenhum fogo cadastrado.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+        <!-- Sidebar com botão de Saída -->
+        <div class="sidebar-actions">
+          <button class="sidebar-btn saida" onclick="openSaidaModal()">
+            🚪 Saída
+          </button>
         </div>
       </div>
     </div>
@@ -689,6 +773,64 @@
       </div>
     </div>
 
+    <!-- Modal Saída de Fogos -->
+    <div class="modal-backdrop" id="saidaModal">
+      <div class="modal">
+        <h2>Saída de Fogos</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+          <div id="selectedFogosCount" class="selected-count">
+            Nenhum fogo selecionado
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="saidaData">Data de Saída</label>
+              <input type="date" id="saidaData" class="input">
+            </div>
+            <div>
+              <label for="saidaMotivo">Motivo da Saída</label>
+              <select id="saidaMotivo" class="input">
+                <option value="venda">Venda</option>
+                <option value="uso">Uso em Veículo</option>
+                <option value="descarte">Descarte</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label for="saidaObservacoes">Observações</label>
+            <textarea id="saidaObservacoes" class="input" placeholder="Observações sobre a saída..." style="width: 100%; height: 60px;"></textarea>
+          </div>
+
+          <div>
+            <label>Fogos selecionados para saída:</label>
+            <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+              <table class="transfer-table">
+                <thead>
+                  <tr>
+                    <th>Fogo</th>
+                    <th>Medida</th>
+                    <th>Marca/Modelo</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="saidaTableBody">
+                  <!-- Será preenchido dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-xs" onclick="closeSaidaModal()">Cancelar</button>
+          <button onclick="confirmSaida()" class="btn-danger">Confirmar Saída</button>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <script>
@@ -733,6 +875,7 @@
     let currentItem = null;
     let currentContainer = "container1";
     let currentTransferItem = null;
+    let selectedFogos = new Set();
 
     // =============================================
     // FUNÇÕES DO BANCO DE DADOS
@@ -959,7 +1102,6 @@
               <td>
                 <div class="actions">
                   <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
-                  <button class="btn-xs btn-transfer" onclick="openTransferModal('${item.id}')">Transferir p/ Fogo</button>
                   <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
                 </div>
               </td>
@@ -987,7 +1129,7 @@
       if (filtered.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+            <td colspan="8" style="text-align: center; padding: 20px; color: var(--muted);">
               Nenhum fogo encontrado.
             </td>
           </tr>
@@ -996,9 +1138,14 @@
         tableBody.innerHTML = filtered.map(fogo => {
           const dataEntradaFormatada = fogo.dataEntrada ? 
             new Date(fogo.dataEntrada).toLocaleDateString('pt-BR') : '-';
+          const isSelected = selectedFogos.has(fogo.id);
           
           return `
             <tr>
+              <td>
+                <input type="checkbox" class="fogo-checkbox" ${isSelected ? 'checked' : ''} 
+                       onchange="toggleFogoSelection('${fogo.id}', this.checked)">
+              </td>
               <td><strong>${fogo.fogo}</strong></td>
               <td>${fogo.medida}</td>
               <td>${fogo.marca}<br><small style="color: var(--muted);">${fogo.modelo}</small></td>
@@ -1016,6 +1163,7 @@
       }
 
       countElement.textContent = `${filtered.length} fogo(s) cadastrado(s)`;
+      updateSelectedCount();
     }
 
     function renderStats() {
@@ -1045,6 +1193,129 @@
         </div>
       `;
     }
+
+    // =============================================
+    // FUNÇÕES DE SELEÇÃO DE FOGOS
+    // =============================================
+
+    function toggleFogoSelection(fogoId, isSelected) {
+      if (isSelected) {
+        selectedFogos.add(fogoId);
+      } else {
+        selectedFogos.delete(fogoId);
+      }
+      updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+      const countElement = document.getElementById('selectedFogosCount');
+      const count = selectedFogos.size;
+      
+      if (count === 0) {
+        countElement.textContent = 'Nenhum fogo selecionado';
+        countElement.style.background = 'rgba(148, 163, 184, 0.2)';
+      } else {
+        countElement.textContent = `${count} fogo(s) selecionado(s)`;
+        countElement.style.background = 'rgba(56, 189, 248, 0.2)';
+      }
+    }
+
+    function openSaidaModal() {
+      if (selectedFogos.size === 0) {
+        showNotification('Selecione pelo menos um fogo para dar saída!', 'warning');
+        return;
+      }
+
+      const dataAtual = new Date().toISOString().split('T')[0];
+      document.getElementById('saidaData').value = dataAtual;
+      
+      // Preencher tabela com fogos selecionados
+      const tableBody = document.getElementById('saidaTableBody');
+      const selectedFogosList = Array.from(selectedFogos).map(id => fogos.find(f => f.id === id)).filter(f => f);
+      
+      tableBody.innerHTML = selectedFogosList.map(fogo => `
+        <tr>
+          <td><strong>${fogo.fogo}</strong></td>
+          <td>${fogo.medida}</td>
+          <td>${fogo.marca} ${fogo.modelo}</td>
+          <td><span class="badge">${fogo.status}</span></td>
+        </tr>
+      `).join('');
+      
+      document.getElementById('saidaModal').style.display = 'flex';
+    }
+
+    function closeSaidaModal() {
+      document.getElementById('saidaModal').style.display = 'none';
+    }
+
+    async function confirmSaida() {
+      const dataSaida = document.getElementById('saidaData').value;
+      const motivo = document.getElementById('saidaMotivo').value;
+      const observacoes = document.getElementById('saidaObservacoes').value.trim();
+
+      if (!dataSaida) {
+        showNotification('Informe a data de saída!', 'error');
+        return;
+      }
+
+      const selectedFogosList = Array.from(selectedFogos);
+      
+      // Registrar saída (aqui você pode adaptar para salvar em um histórico)
+      const saidas = selectedFogosList.map(fogoId => {
+        const fogo = fogos.find(f => f.id === fogoId);
+        return {
+          fogoId: fogoId,
+          fogo: fogo.fogo,
+          medida: fogo.medida,
+          marca: fogo.marca,
+          modelo: fogo.modelo,
+          dataSaida: dataSaida,
+          motivo: motivo,
+          observacoes: observacoes
+        };
+      });
+
+      // Remover fogos do estoque
+      fogos = fogos.filter(fogo => !selectedFogos.has(fogo.id));
+      
+      await saveData();
+      renderFogoTable();
+      renderStats();
+      closeSaidaModal();
+      selectedFogos.clear();
+      updateSelectedCount();
+      
+      showNotification(`${saidas.length} fogo(s) removido(s) do estoque com sucesso!`);
+    }
+
+    function openBulkTransferModal() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusTerm = document.getElementById('statusFilter').value;
+
+      const filtered = items.filter(item => {
+        const matchSearch = item.medida.toLowerCase().includes(searchTerm) ||
+                          item.marca.toLowerCase().includes(searchTerm) ||
+                          item.modelo.toLowerCase().includes(searchTerm);
+        const matchStatus = !statusTerm || item.status === statusTerm;
+        const matchContainer = item.container === currentContainer;
+        return matchSearch && matchStatus && matchContainer;
+      });
+
+      if (filtered.length === 0) {
+        showNotification('Nenhum pneu encontrado para transferência!', 'warning');
+        return;
+      }
+
+      // Por enquanto, vamos transferir apenas o primeiro pneu encontrado
+      // Você pode expandir isso para permitir seleção múltipla
+      const itemToTransfer = filtered[0];
+      openTransferModal(itemToTransfer.id);
+    }
+
+    // =============================================
+    // FUNÇÕES EXISTENTES (mantidas do código original)
+    // =============================================
 
     function openEditModal(itemId = null) {
       currentItem = itemId ? items.find(item => item.id === itemId) : null;
@@ -1497,6 +1768,11 @@
     window.exportData = exportData;
     window.exportToExcel = exportToExcel;
     window.importData = importData;
+    window.toggleFogoSelection = toggleFogoSelection;
+    window.openSaidaModal = openSaidaModal;
+    window.closeSaidaModal = closeSaidaModal;
+    window.confirmSaida = confirmSaida;
+    window.openBulkTransferModal = openBulkTransferModal;
   </script>
 </body>
 </html>
