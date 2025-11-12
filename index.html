@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Transportes Canarinho - Controle de Pneus</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Adicione o Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+  
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --accent: #38bdf8;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --danger: #f43f5e;
+      --warn: #f97316;
+      --success: #10b981;
+      --radius: 12px;
+    }
+    * {
+      box-sizing: border-box;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    header {
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      background: rgba(2, 6, 23, 0.78);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+    main {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: rgba(15, 23, 42, 0.3);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--text);
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .tab-btn:hover {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: #020617;
+    }
+    .hidden {
+      display: none !important;
+    }
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+    .input, select, button {
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.6);
+      color: var(--text);
+    }
+    button {
+      background: var(--accent);
+      color: #020617;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    button:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+    }
+    .card {
+      background: rgba(2, 6, 23, 0.55);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    th {
+      background: rgba(15, 23, 42, 0.4);
+      color: var(--muted);
+      font-weight: 600;
+    }
+    .badge {
+      background: rgba(15, 23, 42, 0.6);
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      display: inline-block;
+    }
+    .sulco-critico {
+      background: rgba(244, 63, 94, 0.2);
+      color: #ffe4e6;
+    }
+    .sulco-alerta {
+      background: rgba(249, 115, 22, 0.2);
+      color: #ffedd5;
+    }
+    .sulco-ok {
+      background: rgba(16, 185, 129, 0.2);
+      color: #d1fae5;
+    }
+    .qty-low {
+      background: rgba(244, 63, 94, 0.2);
+      color: #ffe4e6;
+    }
+    .actions {
+      display: flex;
+      gap: 5px;
+    }
+    .btn-xs {
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.4);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-xs:hover {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .btn-success {
+      background: rgba(16, 185, 129, 0.2);
+      color: #d1fae5;
+    }
+    .btn-transfer {
+      background: rgba(249, 115, 22, 0.2);
+      color: #ffedd5;
+    }
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(2, 6, 23, 0.8);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: var(--bg);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: var(--radius);
+      padding: 20px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 15px;
+    }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: rgba(15, 23, 42, 0.4);
+      padding: 15px;
+      border-radius: var(--radius);
+      text-align: center;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--accent);
+      margin-bottom: 5px;
+    }
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    
+    /* Estilos para os botões de container */
+    .container-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .container-btn {
+      flex: 1;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--text);
+      padding: 12px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+    }
+    .container-btn:hover {
+      background: rgba(56, 189, 248, 0.2);
+    }
+    .container-btn.active {
+      background: var(--accent);
+      color: #020617;
+      border-color: var(--accent);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Indicadores de status */
+    .stat-novo {
+      color: #38bdf8;
+    }
+    .stat-recapado {
+      color: #10b981;
+    }
+    .stat-usado {
+      color: #f97316;
+    }
+    .stat-total {
+      color: #818cf8;
+    }
+    
+    /* Notificações */
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      color: white;
+      z-index: 1001;
+      animation: slideIn 0.3s ease;
+    }
+    .notification.success { background: var(--success); }
+    .notification.error { background: var(--danger); }
+    .notification.warning { background: var(--warn); }
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    /* Estilos para a tabela de transferência */
+    .transfer-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .transfer-table th, .transfer-table td {
+      padding: 8px;
+      text-align: left;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+    }
+    .transfer-table th {
+      background: rgba(15, 23, 42, 0.6);
+    }
+    .fogo-input {
+      width: 100%;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      padding: 4px;
+    }
+
+    /* Status de conexão */
+    .connection-status {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 8px 16px;
+      border-radius: var(--radius);
+      font-size: 0.8rem;
+      z-index: 1000;
+    }
+    
+    .connection-online {
+      background: var(--success);
+      color: white;
+    }
+    
+    .connection-offline {
+      background: var(--danger);
+      color: white;
+    }
+
+    .sync-indicator {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚚 Transportes Canarinho - Controle de Pneus</h1>
+    <div id="connectionStatus" class="connection-status hidden">
+      <span class="sync-indicator"></span>
+      <span id="connectionText">Conectado</span>
+    </div>
+  </header>
+  
+  <main>
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="container">Container</button>
+      <button class="tab-btn" data-tab="fogo">Controle por Fogo</button>
+      <button class="tab-btn" data-tab="recapagem">Recapagem</button>
+      <button class="tab-btn" data-tab="descarte">Descarte</button>
+      <button class="tab-btn" data-tab="venda">Vendas</button>
+      <button class="tab-btn" data-tab="saidas">Saídas</button>
+      <button class="tab-btn" data-tab="alertas">Alertas</button>
+    </div>
+
+    <!-- CONTAINER -->
+    <div id="tab-container" class="tab-content">
+      <!-- Estatísticas atualizadas -->
+      <div class="stats-grid" id="statsContainer">
+        <div class="stat-card">
+          <div class="stat-value stat-total">0</div>
+          <div class="stat-label">TOTAL ESTOQUE</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-novo">0</div>
+          <div class="stat-label">PNEUS NOVOS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-recapado">0</div>
+          <div class="stat-label">PNEUS RECAPADOS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-usado">0</div>
+          <div class="stat-label">PNEUS USADOS</div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <input type="text" id="searchInput" class="input" placeholder="Buscar por medida, marca, modelo..." style="flex:1;">
+        <select id="statusFilter" class="input">
+          <option value="">Todos status</option>
+          <option value="Novo">Novo</option>
+          <option value="Usado">Usado</option>
+          <option value="Reformado">Reformado</option>
+        </select>
+        <button id="addItemBtn">+ Novo Pneu</button>
+        <button onclick="exportData()" class="btn-xs" style="background: rgba(16, 185, 129, 0.2); color: #d1fae5;">Exportar Backup</button>
+        <label for="importInput" class="btn-xs" style="background: rgba(249, 115, 22, 0.2); color: #ffedd5; cursor: pointer;">
+          Importar Backup
+          <input type="file" id="importInput" accept=".json" style="display: none;" onchange="importData(event)">
+        </label>
+      </div>
+      
+      <!-- Botões de Container -->
+      <div class="container-buttons">
+        <button class="container-btn active" data-container="container1">Container 1</button>
+        <button class="container-btn" data-container="container2">Container 2</button>
+        <button class="container-btn" data-container="container3">Container 3</button>
+      </div>
+
+      <!-- Container 1 -->
+      <div id="container1-content" class="container-content">
+        <div class="card">
+          <div style="padding: 15px;">
+            <h3>Container 1 - Estoque de Pneus</h3>
+            <div id="itemsCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Imagem</th>
+                  <th>Medida</th>
+                  <th>Marca/Modelo</th>
+                  <th>Data Entrada</th>
+                  <th>Status</th>
+                  <th>Qtd</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+                    Nenhum pneu cadastrado. Clique em "+ Novo Pneu" para adicionar.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Container 2 -->
+      <div id="container2-content" class="container-content hidden">
+        <div class="card">
+          <div style="padding: 15px;">
+            <h3>Container 2 - Estoque de Pneus</h3>
+            <div id="itemsCount2" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Imagem</th>
+                  <th>Medida</th>
+                  <th>Marca/Modelo</th>
+                  <th>Data Entrada</th>
+                  <th>Status</th>
+                  <th>Qtd</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody2">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+                    Nenhum pneu cadastrado no Container 2.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Container 3 -->
+      <div id="container3-content" class="container-content hidden">
+        <div class="card">
+          <div style="padding: 15px;">
+            <h3>Container 3 - Estoque de Pneus</h3>
+            <div id="itemsCount3" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 pneu(s) encontrado(s)</div>
+          </div>
+          <div style="overflow-x: auto;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Imagem</th>
+                  <th>Medida</th>
+                  <th>Marca/Modelo</th>
+                  <th>Data Entrada</th>
+                  <th>Status</th>
+                  <th>Qtd</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tableBody3">
+                <tr>
+                  <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+                    Nenhum pneu cadastrado no Container 3.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTROLE POR FOGO -->
+    <div id="tab-fogo" class="tab-content hidden">
+      <div class="toolbar">
+        <input type="text" id="fogoSearchInput" class="input" placeholder="Buscar por fogo, medida, marca..." style="flex:1;">
+        <button id="addFogoBtn">+ Novo Fogo</button>
+      </div>
+      
+      <div class="card">
+        <div style="padding: 15px;">
+          <h3>Controle por Fogo</h3>
+          <div id="fogoCount" style="color: var(--muted); font-size: 0.9rem; margin-bottom: 10px;">0 fogo(s) cadastrado(s)</div>
+        </div>
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Fogo</th>
+                <th>Medida</th>
+                <th>Marca/Modelo</th>
+                <th>Data Entrada</th>
+                <th>Status</th>
+                <th>Container Origem</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="fogoTableBody">
+              <tr>
+                <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+                  Nenhum fogo cadastrado.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Editar Pneu -->
+    <div class="modal-backdrop" id="editModal">
+      <div class="modal">
+        <h2 id="editTitle">Novo Pneu</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+          <div class="field-row">
+            <div>
+              <label for="editMedida">Medida *</label>
+              <input type="text" id="editMedida" class="input" placeholder="295/80 R22.5">
+            </div>
+            <div>
+              <label for="editMarca">Marca *</label>
+              <input type="text" id="editMarca" class="input" placeholder="Michelin">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="editModelo">Modelo *</label>
+              <input type="text" id="editModelo" class="input" placeholder="X Line Energy">
+            </div>
+            <div>
+              <label for="editDataEntrada">Data de Entrada *</label>
+              <input type="date" id="editDataEntrada" class="input">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="editStatus">Status</label>
+              <select id="editStatus" class="input">
+                <option value="Novo">Novo</option>
+                <option value="Usado">Usado</option>
+                <option value="Reformado">Reformado</option>
+              </select>
+            </div>
+            <div>
+              <label for="editContainer">Container</label>
+              <select id="editContainer" class="input">
+                <option value="container1">Container 1</option>
+                <option value="container2">Container 2</option>
+                <option value="container3">Container 3</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="editQty">Quantidade em Estoque *</label>
+              <input type="number" id="editQty" class="input" min="0" value="0">
+            </div>
+            <div>
+              <label for="editPreco">Preço (R$)</label>
+              <input type="number" id="editPreco" class="input" step="0.01" min="0" placeholder="0.00">
+            </div>
+          </div>
+
+          <div>
+            <label for="editObservacoes">Observações</label>
+            <textarea id="editObservacoes" class="input" placeholder="Observações adicionais..." style="width: 100%; height: 60px;"></textarea>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-xs" onclick="closeEditModal()">Cancelar</button>
+          <button onclick="saveItem()">Salvar Pneu</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Transferir para Fogo -->
+    <div class="modal-backdrop" id="transferModal">
+      <div class="modal">
+        <h2>Transferir para Controle por Fogo</h2>
+        
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+          <div class="field-row">
+            <div>
+              <label for="transferMedida">Medida</label>
+              <input type="text" id="transferMedida" class="input" readonly>
+            </div>
+            <div>
+              <label for="transferMarca">Marca</label>
+              <input type="text" id="transferMarca" class="input" readonly>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="transferModelo">Modelo</label>
+              <input type="text" id="transferModelo" class="input" readonly>
+            </div>
+            <div>
+              <label for="transferData">Data de Transferência</label>
+              <input type="date" id="transferData" class="input">
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div>
+              <label for="transferQty">Quantidade a Transferir</label>
+              <input type="number" id="transferQty" class="input" min="1" value="1">
+            </div>
+            <div>
+              <label for="startFogo">Número Inicial do Fogo</label>
+              <input type="number" id="startFogo" class="input" min="1" value="23450" placeholder="Ex: 23450">
+            </div>
+          </div>
+
+          <div>
+            <label>Pneus a serem transferidos:</label>
+            <div style="max-height: 200px; overflow-y: auto; margin-top: 10px;">
+              <table class="transfer-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Número do Fogo</th>
+                    <th>Medida</th>
+                    <th>Marca/Modelo</th>
+                  </tr>
+                </thead>
+                <tbody id="transferTableBody">
+                  <!-- Será preenchido dinamicamente -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn-xs" onclick="closeTransferModal()">Cancelar</button>
+          <button onclick="confirmTransfer()">Confirmar Transferência</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // =============================================
+    // CONFIGURAÇÃO DO FIREBASE - COLE AQUI SUAS CONFIGURAÇÕES!
+    // =============================================
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyABu5q020yrtRvtZnyFg0-tSvQgsYwthpE",
+      authDomain: "controlepneus-canarinho-27af6.firebaseapp.com",
+      projectId: "controlepneus-canarinho-27af6",
+      storageBucket: "controlepneus-canarinho-27af6.firebasestorage.app",
+      messagingSenderId: "94971984157",
+      appId: "1:94971984157:web:72b451a99a9ae39b65994"
+    };
+
+    // =============================================
+    // INICIALIZAÇÃO DO FIREBASE
+    // =============================================
+    
+    let db = null;
+    let isOnline = false;
+
+    try {
+      firebase.initializeApp(firebaseConfig);
+      db = firebase.firestore();
+      isOnline = true;
+      console.log('Firebase conectado com sucesso!');
+      updateConnectionStatus(true);
+    } catch (error) {
+      console.log('Firebase não configurado, usando localStorage:', error);
+      isOnline = false;
+      updateConnectionStatus(false);
+    }
+
+    // =============================================
+    // DADOS INICIAIS
+    // =============================================
+    
+    let items = [];
+    let fogos = [];
+    let currentItem = null;
+    let currentContainer = "container1";
+    let currentTransferItem = null;
+
+    // =============================================
+    // FUNÇÕES DO BANCO DE DADOS
+    // =============================================
+
+    async function saveData() {
+      const data = {
+        items: items,
+        fogos: fogos,
+        lastUpdate: new Date().toISOString()
+      };
+
+      localStorage.setItem('tc_pneus', JSON.stringify(items));
+      localStorage.setItem('tc_fogos', JSON.stringify(fogos));
+
+      if (isOnline && db) {
+        try {
+          await db.collection('system').doc('pneusData').set(data);
+          console.log('Dados salvos no Firebase');
+        } catch (error) {
+          console.error('Erro ao salvar no Firebase:', error);
+        }
+      }
+    }
+
+    async function loadData() {
+      if (isOnline && db) {
+        try {
+          const doc = await db.collection('system').doc('pneusData').get();
+          if (doc.exists) {
+            const data = doc.data();
+            items = data.items || [];
+            fogos = data.fogos || [];
+            console.log('Dados carregados do Firebase');
+            return true;
+          }
+        } catch (error) {
+          console.error('Erro ao carregar do Firebase:', error);
+        }
+      }
+
+      const localItems = localStorage.getItem('tc_pneus');
+      const localFogos = localStorage.getItem('tc_fogos');
+      
+      if (localItems) items = JSON.parse(localItems);
+      if (localFogos) fogos = JSON.parse(localFogos);
+      
+      console.log('Dados carregados do localStorage');
+      return false;
+    }
+
+    function setupRealtimeSync() {
+      if (!isOnline || !db) return;
+
+      db.collection('system').doc('pneusData')
+        .onSnapshot((doc) => {
+          if (doc.exists) {
+            const data = doc.data();
+            const currentData = JSON.stringify({ items, fogos });
+            const newData = JSON.stringify({ 
+              items: data.items || [], 
+              fogos: data.fogos || [] 
+            });
+            
+            if (currentData !== newData) {
+              items = data.items || [];
+              fogos = data.fogos || [];
+              renderTable();
+              renderStats();
+              renderFogoTable();
+              showNotification('Dados atualizados em tempo real!', 'success');
+            }
+          }
+        });
+    }
+
+    function updateConnectionStatus(online) {
+      isOnline = online;
+      const statusElement = document.getElementById('connectionStatus');
+      const textElement = document.getElementById('connectionText');
+      
+      if (online) {
+        statusElement.classList.remove('hidden', 'connection-offline');
+        statusElement.classList.add('connection-online');
+        textElement.textContent = 'Conectado';
+      } else {
+        statusElement.classList.remove('hidden', 'connection-online');
+        statusElement.classList.add('connection-offline');
+        textElement.textContent = 'Offline (Local)';
+      }
+    }
+
+    // =============================================
+    // FUNÇÕES PRINCIPAIS DO SISTEMA
+    // =============================================
+
+    document.addEventListener('DOMContentLoaded', async function() {
+      console.log('DOM carregado, inicializando...');
+      await init();
+    });
+
+    async function init() {
+      console.log('Inicializando aplicação...');
+      
+      await loadData();
+      
+      if (items.length === 0 && fogos.length === 0) {
+        items = [
+          { 
+            id: "PNEU-001", 
+            medida: "295/80 R22.5",
+            marca: "Michelin",
+            modelo: "X Line Energy",
+            dataEntrada: "2024-01-15",
+            status: "Novo",
+            qty: 8,
+            preco: 1250.00,
+            observacoes: "",
+            container: "container1"
+          }
+        ];
+        fogos = [];
+        await saveData();
+      }
+      
+      updateConnectionStatus(isOnline);
+      setupEventListeners();
+      renderTable();
+      renderStats();
+      renderFogoTable();
+      setupRealtimeSync();
+    }
+
+    function setupEventListeners() {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+          this.classList.add('active');
+          document.getElementById('tab-' + this.dataset.tab).classList.remove('hidden');
+        });
+      });
+
+      document.querySelectorAll('.container-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.container-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('.container-content').forEach(content => content.classList.add('hidden'));
+          this.classList.add('active');
+          document.getElementById(this.dataset.container + '-content').classList.remove('hidden');
+          currentContainer = this.dataset.container;
+          renderTable();
+        });
+      });
+
+      document.getElementById('searchInput').addEventListener('input', renderTable);
+      document.getElementById('statusFilter').addEventListener('change', renderTable);
+      document.getElementById('fogoSearchInput').addEventListener('input', renderFogoTable);
+
+      document.getElementById('addItemBtn').addEventListener('click', function() {
+        openEditModal();
+      });
+
+      document.getElementById('addFogoBtn').addEventListener('click', function() {
+        showNotification('Use a função "Transferir para Fogo" a partir do container', 'warning');
+      });
+
+      document.getElementById('transferQty').addEventListener('input', updateTransferTable);
+      document.getElementById('startFogo').addEventListener('input', updateTransferTable);
+    }
+
+    function renderTable() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const statusTerm = document.getElementById('statusFilter').value;
+
+      const filtered = items.filter(item => {
+        const matchSearch = item.medida.toLowerCase().includes(searchTerm) ||
+                          item.marca.toLowerCase().includes(searchTerm) ||
+                          item.modelo.toLowerCase().includes(searchTerm);
+        const matchStatus = !statusTerm || item.status === statusTerm;
+        const matchContainer = item.container === currentContainer;
+        return matchSearch && matchStatus && matchContainer;
+      });
+
+      let tableBodyElement, countElement;
+      
+      if (currentContainer === 'container1') {
+        tableBodyElement = document.getElementById('tableBody');
+        countElement = document.getElementById('itemsCount');
+      } else if (currentContainer === 'container2') {
+        tableBodyElement = document.getElementById('tableBody2');
+        countElement = document.getElementById('itemsCount2');
+      } else if (currentContainer === 'container3') {
+        tableBodyElement = document.getElementById('tableBody3');
+        countElement = document.getElementById('itemsCount3');
+      }
+
+      if (filtered.length === 0) {
+        tableBodyElement.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+              Nenhum pneu encontrado.
+            </td>
+          </tr>
+        `;
+      } else {
+        tableBodyElement.innerHTML = filtered.map(item => {
+          const needsReorder = item.qty <= 5;
+          const dataEntradaFormatada = item.dataEntrada ? 
+            new Date(item.dataEntrada).toLocaleDateString('pt-BR') : '-';
+          
+          const imagemSrc = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjYwIiBoZWlnaHQ9IjYwIiByeD0iNiIgZmlsbD0icmdiYSgxNSwgMjMsIDQyLCAwLjYpIi8+CjxwYXRoIGQ9Ik0zOCAyNkMzOCAyOC4yMDkxIDM2LjIwOTEgMzAgMzQgMzBDMzEuNzkwOSAzMCAzMCAyOC4yMDkxIDMwIDI2QzMwIDIzLjc5MDkgMzEuNzkwOSAyMiAzNCAyMkMzNi4yMDkxIDIyIDM4IDIzLjc5MDkgMzggMjZaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPHBhdGggZD0iTTQyIDM4SDE4QzE2Ljg5NTQgMzggMTYgMzcuMTA0NiAxNiAzNlYyNEMxNiAyMi44OTU0IDE2Ljg5NTQgMjIgMTggMjJINDJDNDMuMTA0NiAyMiA0NCAyMi44OTU0IDQ0IDI0VjM2QzQ0IDM3LjEwNDYgNDMuMTA0NiAzOCA0MiAzOFpNMTggMjRWMzZINDJWMjRIMThaIiBmaWxsPSJyZ2JhKDE0OCwgMTYzLCAxODQsIDAuNCkiLz4KPC9zdmc+';
+          
+          return `
+            <tr>
+              <td><img src="${imagemSrc}" class="pneu-image" alt="${item.medida}" style="width: 60px; height: 60px; border-radius: 6px;"></td>
+              <td><strong>${item.medida}</strong></td>
+              <td>${item.marca}<br><small style="color: var(--muted);">${item.modelo}</small></td>
+              <td>${dataEntradaFormatada}</td>
+              <td><span class="badge">${item.status}</span></td>
+              <td>
+                <span class="badge ${needsReorder ? 'qty-low' : ''}">${item.qty}</span>
+                ${needsReorder ? '<br><small style="color: var(--danger);">Estoque baixo!</small>' : ''}
+              </td>
+              <td>
+                <div class="actions">
+                  <button class="btn-xs" onclick="openEditModal('${item.id}')">Editar</button>
+                  <button class="btn-xs btn-transfer" onclick="openTransferModal('${item.id}')">Transferir p/ Fogo</button>
+                  <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteItem('${item.id}')">Excluir</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      countElement.textContent = `${filtered.length} pneu(s) encontrado(s)`;
+    }
+
+    function renderFogoTable() {
+      const searchTerm = document.getElementById('fogoSearchInput').value.toLowerCase();
+      
+      const filtered = fogos.filter(fogo => {
+        return fogo.fogo.includes(searchTerm) ||
+               fogo.medida.toLowerCase().includes(searchTerm) ||
+               fogo.marca.toLowerCase().includes(searchTerm) ||
+               fogo.modelo.toLowerCase().includes(searchTerm);
+      });
+
+      const tableBody = document.getElementById('fogoTableBody');
+      const countElement = document.getElementById('fogoCount');
+
+      if (filtered.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" style="text-align: center; padding: 20px; color: var(--muted);">
+              Nenhum fogo encontrado.
+            </td>
+          </tr>
+        `;
+      } else {
+        tableBody.innerHTML = filtered.map(fogo => {
+          const dataEntradaFormatada = fogo.dataEntrada ? 
+            new Date(fogo.dataEntrada).toLocaleDateString('pt-BR') : '-';
+          
+          return `
+            <tr>
+              <td><strong>${fogo.fogo}</strong></td>
+              <td>${fogo.medida}</td>
+              <td>${fogo.marca}<br><small style="color: var(--muted);">${fogo.modelo}</small></td>
+              <td>${dataEntradaFormatada}</td>
+              <td><span class="badge">${fogo.status}</span></td>
+              <td>${fogo.containerOrigem}</td>
+              <td>
+                <div class="actions">
+                  <button class="btn-xs" style="background: rgba(244, 63, 94, 0.2); color: #ffe4e6;" onclick="deleteFogo('${fogo.id}')">Excluir</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      countElement.textContent = `${filtered.length} fogo(s) cadastrado(s)`;
+    }
+
+    function renderStats() {
+      const totalEstoque = items.reduce((sum, item) => sum + item.qty, 0);
+      const pneusNovos = items.filter(item => item.status === "Novo").reduce((sum, item) => sum + item.qty, 0);
+      const pneusRecapados = items.filter(item => item.status === "Reformado").reduce((sum, item) => sum + item.qty, 0);
+      const pneusUsados = items.filter(item => item.status === "Usado").reduce((sum, item) => sum + item.qty, 0);
+
+      document.getElementById('statsContainer').innerHTML = `
+        <div class="stat-card">
+          <div class="stat-value stat-total">${totalEstoque}</div>
+          <div class="stat-label">TOTAL ESTOQUE</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-novo">${pneusNovos}</div>
+          <div class="stat-label">PNEUS NOVOS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-recapado">${pneusRecapados}</div>
+          <div class="stat-label">PNEUS RECAPADOS</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value stat-usado">${pneusUsados}</div>
+          <div class="stat-label">PNEUS USADOS</div>
+        </div>
+      `;
+    }
+
+    function openEditModal(itemId = null) {
+      currentItem = itemId ? items.find(item => item.id === itemId) : null;
+      
+      const dataAtual = new Date().toISOString().split('T')[0];
+      
+      if (currentItem) {
+        document.getElementById('editTitle').textContent = 'Editar Pneu';
+        document.getElementById('editMedida').value = currentItem.medida;
+        document.getElementById('editMarca').value = currentItem.marca;
+        document.getElementById('editModelo').value = currentItem.modelo;
+        document.getElementById('editDataEntrada').value = currentItem.dataEntrada || dataAtual;
+        document.getElementById('editStatus').value = currentItem.status;
+        document.getElementById('editQty').value = currentItem.qty;
+        document.getElementById('editContainer').value = currentItem.container;
+        document.getElementById('editPreco').value = currentItem.preco || '';
+        document.getElementById('editObservacoes').value = currentItem.observacoes || '';
+      } else {
+        document.getElementById('editTitle').textContent = 'Novo Pneu';
+        document.getElementById('editMedida').value = '';
+        document.getElementById('editMarca').value = '';
+        document.getElementById('editModelo').value = '';
+        document.getElementById('editDataEntrada').value = dataAtual;
+        document.getElementById('editStatus').value = 'Novo';
+        document.getElementById('editQty').value = '';
+        document.getElementById('editContainer').value = currentContainer;
+        document.getElementById('editPreco').value = '';
+        document.getElementById('editObservacoes').value = '';
+      }
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+      currentItem = null;
+    }
+
+    function openTransferModal(itemId) {
+      currentTransferItem = items.find(item => item.id === itemId);
+      
+      if (!currentTransferItem) {
+        showNotification('Pneu não encontrado!', 'error');
+        return;
+      }
+
+      const dataAtual = new Date().toISOString().split('T')[0];
+      
+      document.getElementById('transferMedida').value = currentTransferItem.medida;
+      document.getElementById('transferMarca').value = currentTransferItem.marca;
+      document.getElementById('transferModelo').value = currentTransferItem.modelo;
+      document.getElementById('transferData').value = dataAtual;
+      document.getElementById('transferQty').value = 1;
+      document.getElementById('transferQty').max = currentTransferItem.qty;
+      
+      const ultimoFogo = fogos.reduce((max, fogo) => {
+        const num = parseInt(fogo.fogo);
+        return num > max ? num : max;
+      }, 23449);
+      
+      document.getElementById('startFogo').value = ultimoFogo + 1;
+      
+      updateTransferTable();
+      document.getElementById('transferModal').style.display = 'flex';
+    }
+
+    function closeTransferModal() {
+      document.getElementById('transferModal').style.display = 'none';
+      currentTransferItem = null;
+    }
+
+    function updateTransferTable() {
+      const qty = parseInt(document.getElementById('transferQty').value) || 0;
+      const startFogo = parseInt(document.getElementById('startFogo').value) || 23450;
+      const tableBody = document.getElementById('transferTableBody');
+      
+      let html = '';
+      for (let i = 0; i < qty; i++) {
+        const fogoNum = startFogo + i;
+        html += `
+          <tr>
+            <td>${i + 1}</td>
+            <td><strong>${fogoNum}</strong></td>
+            <td>${currentTransferItem.medida}</td>
+            <td>${currentTransferItem.marca} ${currentTransferItem.modelo}</td>
+          </tr>
+        `;
+      }
+      
+      tableBody.innerHTML = html;
+    }
+
+    async function confirmTransfer() {
+      const qty = parseInt(document.getElementById('transferQty').value) || 0;
+      const startFogo = parseInt(document.getElementById('startFogo').value) || 23450;
+      const dataTransferencia = document.getElementById('transferData').value;
+      
+      if (!dataTransferencia) {
+        showNotification('Informe a data de transferência!', 'error');
+        return;
+      }
+      
+      if (qty > currentTransferItem.qty) {
+        showNotification('Quantidade solicitada maior que o estoque disponível!', 'error');
+        return;
+      }
+      
+      for (let i = 0; i < qty; i++) {
+        const fogoNum = startFogo + i;
+        const fogoId = `FOGO-${fogoNum}`;
+        
+        fogos.push({
+          id: fogoId,
+          fogo: fogoNum.toString(),
+          medida: currentTransferItem.medida,
+          marca: currentTransferItem.marca,
+          modelo: currentTransferItem.modelo,
+          dataEntrada: dataTransferencia,
+          status: currentTransferItem.status,
+          containerOrigem: currentTransferItem.container,
+          pneuId: currentTransferItem.id
+        });
+      }
+      
+      currentTransferItem.qty -= qty;
+      
+      if (currentTransferItem.qty <= 0) {
+        items = items.filter(item => item.id !== currentTransferItem.id);
+      }
+      
+      await saveData();
+      renderTable();
+      renderStats();
+      renderFogoTable();
+      closeTransferModal();
+      
+      showNotification(`${qty} pneu(s) transferido(s) para controle por fogo com sucesso!`);
+    }
+
+    async function saveItem() {
+      const medida = document.getElementById('editMedida').value.trim();
+      const marca = document.getElementById('editMarca').value.trim();
+      const modelo = document.getElementById('editModelo').value.trim();
+      const dataEntrada = document.getElementById('editDataEntrada').value;
+      const qty = parseInt(document.getElementById('editQty').value) || 0;
+      const container = document.getElementById('editContainer').value;
+
+      if (!medida || !marca || !modelo || !dataEntrada) {
+        showNotification('Medida, Marca, Modelo e Data de Entrada são obrigatórios!', 'error');
+        return;
+      }
+
+      const id = currentItem ? currentItem.id : generateUniqueId(medida, marca, modelo);
+
+      const itemData = {
+        id: id,
+        medida: medida,
+        marca: marca,
+        modelo: modelo,
+        dataEntrada: dataEntrada,
+        status: document.getElementById('editStatus').value,
+        qty: qty,
+        container: container,
+        preco: parseFloat(document.getElementById('editPreco').value) || 0,
+        observacoes: document.getElementById('editObservacoes').value.trim()
+      };
+
+      if (currentItem) {
+        Object.assign(currentItem, itemData);
+        showNotification('Pneu atualizado com sucesso!');
+      } else {
+        items.push(itemData);
+        showNotification('Pneu cadastrado com sucesso!');
+      }
+
+      await saveData();
+      renderTable();
+      renderStats();
+      closeEditModal();
+    }
+
+    async function deleteItem(itemId) {
+      const item = items.find(item => item.id === itemId);
+      if (!item) return;
+
+      const confirmMessage = `Tem certeza que deseja excluir o pneu?\n\n` +
+                            `Medida: ${item.medida}\n` +
+                            `Marca/Modelo: ${item.marca} ${item.modelo}\n` +
+                            `Quantidade: ${item.qty} unidades`;
+      
+      if (!confirm(confirmMessage)) return;
+      
+      items = items.filter(item => item.id !== itemId);
+      await saveData();
+      renderTable();
+      renderStats();
+      showNotification('Pneu excluído com sucesso!', 'warning');
+    }
+
+    async function deleteFogo(fogoId) {
+      const fogo = fogos.find(f => f.id === fogoId);
+      if (!fogo) return;
+
+      if (!confirm(`Tem certeza que deseja excluir o fogo ${fogo.fogo}?`)) return;
+      
+      fogos = fogos.filter(f => f.id !== fogoId);
+      await saveData();
+      renderFogoTable();
+      showNotification('Fogo excluído com sucesso!', 'warning');
+    }
+
+    function generateUniqueId(medida, marca, modelo) {
+      const baseId = `${medida.replace(/\s+/g, '-')}-${marca}-${modelo}`.toUpperCase();
+      const existingIds = items.filter(item => item.id.startsWith(baseId)).map(item => item.id);
+      
+      if (existingIds.length === 0) return baseId;
+      
+      let counter = 1;
+      let newId = `${baseId}-${counter}`;
+      
+      while (existingIds.includes(newId)) {
+        counter++;
+        newId = `${baseId}-${counter}`;
+      }
+      
+      return newId;
+    }
+
+    function showNotification(message, type = 'success') {
+      const existingNotifications = document.querySelectorAll('.notification');
+      existingNotifications.forEach(notif => notif.remove());
+      
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 3000);
+    }
+
+    function exportData() {
+      const data = {
+        items: items,
+        fogos: fogos,
+        exportDate: new Date().toISOString(),
+        version: '1.0'
+      };
+      
+      const dataStr = JSON.stringify(data, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `backup-pneus-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+      
+      URL.revokeObjectURL(url);
+      showNotification('Backup exportado com sucesso!');
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          
+          if (confirm(`Importar ${data.items?.length || 0} pneus e ${data.fogos?.length || 0} fogos? Isso substituirá os dados atuais.`)) {
+            items = data.items || [];
+            fogos = data.fogos || [];
+            await saveData();
+            renderTable();
+            renderStats();
+            renderFogoTable();
+            showNotification('Dados importados com sucesso!');
+          }
+        } catch (error) {
+          showNotification('Erro ao importar arquivo!', 'error');
+          console.error('Erro na importação:', error);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    }
+
+    // Funções globais
+    window.openEditModal = openEditModal;
+    window.closeEditModal = closeEditModal;
+    window.saveItem = saveItem;
+    window.deleteItem = deleteItem;
+    window.openTransferModal = openTransferModal;
+    window.closeTransferModal = closeTransferModal;
+    window.updateTransferTable = updateTransferTable;
+    window.confirmTransfer = confirmTransfer;
+    window.deleteFogo = deleteFogo;
+    window.exportData = exportData;
+    window.importData = importData;
+  </script>
+</body>
+</html>
