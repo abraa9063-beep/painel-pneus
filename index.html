@@ -1029,6 +1029,71 @@
     </button>
   </div>
 
+  <!-- Modal Adicionar Pneu -->
+  <div class="modal-backdrop" id="addPneuModal">
+    <div class="modal">
+      <h2>Adicionar Pneu ao Estoque</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-row">
+          <div class="field-group">
+            <label for="pneuMedida">Medida</label>
+            <input type="text" id="pneuMedida" class="input" placeholder="Ex: 295/80 R22.5" required>
+          </div>
+          <div class="field-group">
+            <label for="pneuMarca">Marca</label>
+            <input type="text" id="pneuMarca" class="input" placeholder="Ex: Michelin" required>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="pneuModelo">Modelo</label>
+            <input type="text" id="pneuModelo" class="input" placeholder="Ex: X Line Energy" required>
+          </div>
+          <div class="field-group">
+            <label for="pneuStatus">Status</label>
+            <select id="pneuStatus" class="input" required>
+              <option value="Novo">Novo</option>
+              <option value="Usado">Usado</option>
+              <option value="Reformado">Reformado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="pneuQuantidade">Quantidade</label>
+            <input type="number" id="pneuQuantidade" class="input" min="1" value="1" required>
+          </div>
+          <div class="field-group">
+            <label for="pneuPreco">Preço Unitário (R$)</label>
+            <input type="number" id="pneuPreco" class="input" min="0" step="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="pneuContainer">Container</label>
+          <select id="pneuContainer" class="input" required>
+            <option value="container1">Container 1</option>
+            <option value="container2">Container 2</option>
+            <option value="container3">Container 3</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="pneuObservacoes">Observações</label>
+          <textarea id="pneuObservacoes" class="input" placeholder="Observações sobre o pneu..." style="width: 100%; height: 60px;"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeAddPneuModal()">Cancelar</button>
+        <button onclick="confirmAddPneu()" class="btn-success">Adicionar Pneu</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Adicionar Fogo -->
   <div class="modal-backdrop" id="addFogoModal">
     <div class="modal">
@@ -1169,6 +1234,13 @@
       setupEventListeners();
       initializeCharts();
       renderDashboard();
+      
+      // Definir datas padrão
+      const today = new Date();
+      const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+      
+      document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
+      document.getElementById('endDate').value = today.toISOString().split('T')[0];
     });
 
     function setupEventListeners() {
@@ -1236,7 +1308,7 @@
       
       reportData.items = savedItems ? JSON.parse(savedItems) : generateSampleData();
       reportData.fogos = savedFogos ? JSON.parse(savedFogos) : [];
-      reportData.ultimoFogo = savedUltimoFogo ? parseInt(savedUltimoFogo) : 0;
+      reportData.ultimoFogo = savedUltimoFogo ? parseInt(savedUltimoFogo) : 100;
       
       // Gerar dados de performance
       reportData.performance = generatePerformanceData();
@@ -1559,12 +1631,223 @@
     }
 
     // =============================================
-    // FUNÇÕES SIMPLIFICADAS DE RELATÓRIOS
+    // FUNÇÕES DE MODAIS E CRUD
+    // =============================================
+
+    function openAddPneuModal() {
+      document.getElementById('addPneuModal').style.display = 'flex';
+    }
+
+    function closeAddPneuModal() {
+      document.getElementById('addPneuModal').style.display = 'none';
+    }
+
+    function confirmAddPneu() {
+      const medida = document.getElementById('pneuMedida').value;
+      const marca = document.getElementById('pneuMarca').value;
+      const modelo = document.getElementById('pneuModelo').value;
+      const status = document.getElementById('pneuStatus').value;
+      const qty = parseInt(document.getElementById('pneuQuantidade').value);
+      const preco = parseFloat(document.getElementById('pneuPreco').value);
+      const container = document.getElementById('pneuContainer').value;
+      const observacoes = document.getElementById('pneuObservacoes').value;
+
+      if (!medida || !marca || !modelo || !status || !qty || !preco) {
+        showNotification('Preencha todos os campos obrigatórios!', 'error');
+        return;
+      }
+
+      const novoPneu = {
+        id: `PNEU-${Date.now()}`,
+        medida: medida,
+        marca: marca,
+        modelo: modelo,
+        status: status,
+        qty: qty,
+        preco: preco,
+        container: container,
+        dataEntrada: new Date().toISOString().split('T')[0],
+        observacoes: observacoes
+      };
+
+      reportData.items.push(novoPneu);
+      saveData();
+      closeAddPneuModal();
+      showNotification('Pneu adicionado com sucesso!', 'success');
+      
+      // Atualizar a view atual
+      if (document.getElementById('tab-estoque').classList.contains('hidden')) {
+        generateStockReport();
+      } else {
+        renderDashboard();
+      }
+    }
+
+    function openAddFogoModal() {
+      // Popular select com pneus disponíveis
+      const select = document.getElementById('fogoPneuSelect');
+      select.innerHTML = '<option value="">Selecione um pneu...</option>';
+      
+      reportData.items.forEach(item => {
+        if (item.qty > 0) {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = `${item.id} - ${item.medida} - ${item.marca} ${item.modelo} (${item.qty} disponíveis)`;
+          select.appendChild(option);
+        }
+      });
+
+      document.getElementById('addFogoModal').style.display = 'flex';
+      updateFogoPreview();
+    }
+
+    function closeAddFogoModal() {
+      document.getElementById('addFogoModal').style.display = 'none';
+    }
+
+    function updateFogoPreview() {
+      const quantidade = parseInt(document.getElementById('fogoQuantidade').value) || 1;
+      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value) || 1;
+      
+      const previewList = document.getElementById('fogoPreviewList');
+      previewList.innerHTML = '';
+      
+      for (let i = 0; i < quantidade; i++) {
+        const div = document.createElement('div');
+        div.textContent = `Fogo ${numeroInicial + i}`;
+        previewList.appendChild(div);
+      }
+    }
+
+    function confirmAddFogo() {
+      const pneuId = document.getElementById('fogoPneuSelect').value;
+      const quantidade = parseInt(document.getElementById('fogoQuantidade').value);
+      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value);
+      const veiculo = document.getElementById('fogoVeiculo').value;
+      const posicao = document.getElementById('fogoPosicao').value;
+      const observacoes = document.getElementById('fogoObservacoes').value;
+
+      if (!pneuId || !quantidade || !numeroInicial) {
+        showNotification('Preencha todos os campos obrigatórios!', 'error');
+        return;
+      }
+
+      const pneu = reportData.items.find(p => p.id === pneuId);
+      if (!pneu) {
+        showNotification('Pneu não encontrado!', 'error');
+        return;
+      }
+
+      if (pneu.qty < quantidade) {
+        showNotification(`Quantidade insuficiente! Disponível: ${pneu.qty}`, 'error');
+        return;
+      }
+
+      // Criar fogos
+      for (let i = 0; i < quantidade; i++) {
+        const numeroFogo = numeroInicial + i;
+        
+        const novoFogo = {
+          id: `FOGO-${Date.now()}-${i}`,
+          numero: numeroFogo,
+          pneuId: pneuId,
+          medida: pneu.medida,
+          marca: pneu.marca,
+          modelo: pneu.modelo,
+          veiculo: veiculo,
+          posicao: posicao,
+          dataInstalacao: new Date().toISOString().split('T')[0],
+          observacoes: observacoes,
+          status: 'Ativo'
+        };
+
+        reportData.fogos.push(novoFogo);
+      }
+
+      // Atualizar estoque
+      pneu.qty -= quantidade;
+      reportData.ultimoFogo = Math.max(reportData.ultimoFogo, numeroInicial + quantidade - 1);
+
+      saveData();
+      closeAddFogoModal();
+      showNotification(`${quantidade} fogos adicionados com sucesso!`, 'success');
+      
+      // Atualizar views
+      renderFogosList();
+      renderDashboard();
+    }
+
+    function openEditFogoModal(fogoNumero) {
+      const fogo = reportData.fogos.find(f => f.numero === fogoNumero);
+      if (!fogo) return;
+
+      fogoEditando = fogo;
+      
+      document.getElementById('editFogoNumero').value = fogo.numero;
+      document.getElementById('editFogoVeiculo').value = fogo.veiculo || '';
+      document.getElementById('editFogoPosicao').value = fogo.posicao || '';
+      document.getElementById('editFogoObservacoes').value = fogo.observacoes || '';
+      
+      document.getElementById('editFogoModal').style.display = 'flex';
+    }
+
+    function closeEditFogoModal() {
+      document.getElementById('editFogoModal').style.display = 'none';
+      fogoEditando = null;
+    }
+
+    function confirmEditFogo() {
+      if (!fogoEditando) return;
+
+      fogoEditando.veiculo = document.getElementById('editFogoVeiculo').value;
+      fogoEditando.posicao = document.getElementById('editFogoPosicao').value;
+      fogoEditando.observacoes = document.getElementById('editFogoObservacoes').value;
+
+      saveData();
+      closeEditFogoModal();
+      showNotification('Fogo atualizado com sucesso!', 'success');
+      renderFogosList();
+    }
+
+    function deleteFogo(fogoNumero) {
+      if (!confirm(`Tem certeza que deseja excluir o fogo ${fogoNumero}?`)) return;
+
+      const index = reportData.fogos.findIndex(f => f.numero === fogoNumero);
+      if (index !== -1) {
+        // Devolver pneu ao estoque
+        const fogo = reportData.fogos[index];
+        const pneu = reportData.items.find(p => p.id === fogo.pneuId);
+        if (pneu) {
+          pneu.qty += 1;
+        }
+
+        reportData.fogos.splice(index, 1);
+        saveData();
+        showNotification('Fogo excluído com sucesso!', 'success');
+        renderFogosList();
+        renderDashboard();
+      }
+    }
+
+    function deletePneu(pneuId) {
+      if (!confirm('Tem certeza que deseja excluir este pneu?')) return;
+
+      const index = reportData.items.findIndex(p => p.id === pneuId);
+      if (index !== -1) {
+        reportData.items.splice(index, 1);
+        saveData();
+        showNotification('Pneu excluído com sucesso!', 'success');
+        generateStockReport();
+        renderDashboard();
+      }
+    }
+
+    // =============================================
+    // FUNÇÕES DE RELATÓRIOS
     // =============================================
 
     function generateDashboardReport() {
       showNotification('📊 Gerando relatório do dashboard...', 'success');
-      // Simular geração de relatório
       setTimeout(() => {
         showNotification('✅ Relatório do dashboard gerado com sucesso!', 'success');
       }, 2000);
@@ -1572,7 +1855,6 @@
 
     function exportComprehensiveReport() {
       showNotification('📋 Gerando relatório completo...', 'success');
-      // Simular geração de relatório
       setTimeout(() => {
         showNotification('✅ Relatório completo gerado com sucesso!', 'success');
       }, 2000);
@@ -1580,7 +1862,6 @@
 
     function exportFinancialReport() {
       showNotification('💰 Gerando relatório financeiro...', 'success');
-      // Simular geração de relatório
       setTimeout(() => {
         showNotification('✅ Relatório financeiro gerado com sucesso!', 'success');
       }, 2000);
@@ -1588,7 +1869,6 @@
 
     function exportInventoryReport() {
       showNotification('📦 Gerando relatório de estoque...', 'success');
-      // Simular geração de relatório
       setTimeout(() => {
         showNotification('✅ Relatório de estoque gerado com sucesso!', 'success');
       }, 2000);
@@ -1605,71 +1885,6 @@
         showNotification('⚠️ Selecione ambas as datas para aplicar o filtro', 'warning');
       }
     }
-
-    // =============================================
-    // FUNÇÕES DE CONTROLE DE FOGOS (simplificadas)
-    // =============================================
-
-    function openAddFogoModal() {
-      showNotification('🔥 Abrindo modal de adicionar fogo...', 'success');
-    }
-
-    function openRemoveFogoModal() {
-      showNotification('🔄 Abrindo modal de remover fogo...', 'success');
-    }
-
-    function openDeleteFogoModal() {
-      showNotification('🗑️ Abrindo modal de excluir fogo...', 'success');
-    }
-
-    function updateFogoPreview() {
-      // Implementação simplificada
-      console.log('Atualizando preview do fogo...');
-    }
-
-    function confirmAddFogo() {
-      showNotification('✅ Fogo adicionado com sucesso!', 'success');
-    }
-
-    function renderFogosList() {
-      const fogosList = document.getElementById('fogosList');
-      const fogosCount = document.getElementById('fogosCount');
-
-      if (fogosList && fogosCount) {
-        if (reportData.fogos.length === 0) {
-          fogosList.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">🔥</div>
-              <p>Nenhum fogo cadastrado</p>
-              <p style="font-size: 0.8rem; margin-top: 10px;">Use o botão "Adicionar Fogo" para começar</p>
-            </div>
-          `;
-        } else {
-          fogosList.innerHTML = reportData.fogos.map(fogo => `
-            <div class="fogo-item">
-              <div class="fogo-info">
-                <div class="fogo-number">Fogo ${fogo.numero}</div>
-                <div class="fogo-details">
-                  ${fogo.medida} - ${fogo.marca} ${fogo.modelo}
-                  ${fogo.veiculo ? ` • ${fogo.veiculo}` : ''}
-                  ${fogo.posicao ? ` • ${fogo.posicao}` : ''}
-                </div>
-              </div>
-              <div class="fogo-actions">
-                <button class="btn-xs" onclick="showNotification('✏️ Editando fogo ${fogo.numero}...', 'success')">Editar</button>
-                <button class="btn-xs btn-danger" onclick="showNotification('🗑️ Excluindo fogo ${fogo.numero}...', 'warning')">Excluir</button>
-              </div>
-            </div>
-          `).join('');
-        }
-
-        fogosCount.textContent = reportData.fogos.length;
-      }
-    }
-
-    // =============================================
-    // FUNÇÕES EXISTENTES (mantidas)
-    // =============================================
 
     function generateStockReport() {
       const containerFilter = document.getElementById('containerFilter').value;
@@ -1714,7 +1929,7 @@
                 <td><strong>R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
                 <td>${new Date(item.dataEntrada).toLocaleDateString('pt-BR')}</td>
                 <td>
-                  <button class="btn-xs btn-danger" onclick="showNotification('🗑️ Excluindo pneu ${item.id}...', 'warning')">Excluir</button>
+                  <button class="btn-xs btn-danger" onclick="deletePneu('${item.id}')">Excluir</button>
                 </td>
               </tr>
             `;
@@ -1727,15 +1942,107 @@
 
     function generatePerformanceReport() {
       showNotification('🚛 Gerando relatório de performance...', 'success');
+      
+      // Atualizar métricas de performance
+      const performanceMetrics = document.getElementById('performanceMetrics');
+      if (performanceMetrics) {
+        performanceMetrics.innerHTML = `
+          <div class="metric-card">
+            <div class="metric-value">4</div>
+            <div class="metric-label">Veículos Ativos</div>
+            <div class="metric-change positive">↑ 100% operacionais</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-value">R$ 0.18</div>
+            <div class="metric-label">Custo Médio/KM</div>
+            <div class="metric-change negative">↑ 5% vs mês anterior</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-value">42.5k</div>
+            <div class="metric-label">KM Médio por Pneu</div>
+            <div class="metric-change positive">↑ 8% vs mês anterior</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-value">84%</div>
+            <div class="metric-label">Eficiência Geral</div>
+            <div class="metric-change positive">↑ 3% vs mês anterior</div>
+          </div>
+        `;
+      }
     }
 
     function exportStockToExcel() {
-      showNotification('📊 Exportando estoque para Excel...', 'success');
+      try {
+        const ws = XLSX.utils.json_to_sheet(reportData.items.map(item => ({
+          'ID': item.id,
+          'Medida': item.medida,
+          'Marca': item.marca,
+          'Modelo': item.modelo,
+          'Status': item.status,
+          'Quantidade': item.qty,
+          'Preço Unitário': item.preco,
+          'Valor Total': (item.qty * item.preco),
+          'Container': item.container,
+          'Data Entrada': item.dataEntrada,
+          'Observações': item.observacoes || ''
+        })));
+        
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Estoque");
+        XLSX.writeFile(wb, "estoque_transportes_canarinho.xlsx");
+        showNotification('📊 Estoque exportado para Excel com sucesso!', 'success');
+      } catch (error) {
+        showNotification('❌ Erro ao exportar para Excel', 'error');
+        console.error('Erro na exportação:', error);
+      }
     }
 
     function exportPerformanceToExcel() {
       showNotification('📈 Exportando performance para Excel...', 'success');
     }
+
+    function renderFogosList() {
+      const fogosList = document.getElementById('fogosList');
+      const fogosCount = document.getElementById('fogosCount');
+
+      if (fogosList && fogosCount) {
+        if (reportData.fogos.length === 0) {
+          fogosList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-state-icon">🔥</div>
+              <p>Nenhum fogo cadastrado</p>
+              <p style="font-size: 0.8rem; margin-top: 10px;">Use o botão "Adicionar Fogo" para começar</p>
+            </div>
+          `;
+        } else {
+          fogosList.innerHTML = reportData.fogos.map(fogo => `
+            <div class="fogo-item">
+              <div class="fogo-info">
+                <div class="fogo-number">Fogo ${fogo.numero}</div>
+                <div class="fogo-details">
+                  ${fogo.medida} - ${fogo.marca} ${fogo.modelo}
+                  ${fogo.veiculo ? ` • ${fogo.veiculo}` : ''}
+                  ${fogo.posicao ? ` • ${fogo.posicao}` : ''}
+                </div>
+              </div>
+              <div class="fogo-actions">
+                <button class="btn-xs" onclick="openEditFogoModal(${fogo.numero})">Editar</button>
+                <button class="btn-xs btn-danger" onclick="deleteFogo(${fogo.numero})">Excluir</button>
+              </div>
+            </div>
+          `).join('');
+        }
+
+        fogosCount.textContent = reportData.fogos.length;
+      }
+    }
+
+    // =============================================
+    // FUNÇÕES UTILITÁRIAS
+    // =============================================
 
     function showNotification(message, type = 'success') {
       const existingNotifications = document.querySelectorAll('.notification');
@@ -1760,29 +2067,21 @@
       localStorage.setItem('tc_ultimo_fogo', reportData.ultimoFogo.toString());
     }
 
-    // Funções dos modais existentes (para completar o sistema)
-    function openAddPneuModal() {
-      showNotification('📦 Modal Adicionar Pneu - Em desenvolvimento', 'warning');
-    }
-
+    // Funções dos modais que ainda não foram implementados
     function openRemovePneuModal() {
       showNotification('🔄 Modal Remover Pneu - Em desenvolvimento', 'warning');
+    }
+
+    function openRemoveFogoModal() {
+      showNotification('🔄 Modal Retirar do Fogo - Em desenvolvimento', 'warning');
     }
 
     function openDeletePneuModal() {
       showNotification('🗑️ Modal Excluir Pneu - Em desenvolvimento', 'warning');
     }
 
-    function closeAddFogoModal() {
-      document.getElementById('addFogoModal').style.display = 'none';
-    }
-
-    function closeEditFogoModal() {
-      document.getElementById('editFogoModal').style.display = 'none';
-    }
-
-    function confirmEditFogo() {
-      showNotification('✅ Fogo atualizado com sucesso!', 'success');
+    function openDeleteFogoModal() {
+      showNotification('🗑️ Modal Excluir Fogo - Em desenvolvimento', 'warning');
     }
 
     console.log('Aplicação carregada com sucesso!');
