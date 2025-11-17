@@ -489,6 +489,57 @@
       from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
       to { transform: translateX(-50%) translateY(0); opacity: 1; }
     }
+
+    /* Modais */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(2, 6, 23, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 15px;
+    }
+    .modal {
+      background: var(--bg);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: var(--radius);
+      padding: 20px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.3rem;
+    }
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+      margin-top: 15px;
+    }
+    .field-row {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
     
     /* Responsividade */
     @media (max-width: 768px) {
@@ -550,6 +601,19 @@
               📊 Gerar Relatório
             </button>
           </div>
+        </div>
+
+        <!-- Botões de Ação Rápidos -->
+        <div class="controls-row" style="margin-bottom: 25px;">
+          <button onclick="openAddPneuModal()" style="background: linear-gradient(135deg, var(--success), #059669);">
+            ➕ Adicionar Pneu
+          </button>
+          <button onclick="openRemovePneuModal()" style="background: linear-gradient(135deg, var(--warn), #ea580c);">
+            📤 Retirar do Estoque
+          </button>
+          <button onclick="openRemoveFogoModal()" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
+            🔥 Retirar do Fogo
+          </button>
         </div>
 
         <!-- Métricas Principais -->
@@ -667,6 +731,16 @@
               📊 Exportar Excel
             </button>
           </div>
+        </div>
+
+        <!-- Botões de Ação para Estoque -->
+        <div class="controls-row" style="margin-bottom: 25px;">
+          <button onclick="openAddPneuModal()" style="background: linear-gradient(135deg, var(--success), #059669);">
+            ➕ Adicionar Pneu ao Estoque
+          </button>
+          <button onclick="openRemovePneuModal()" style="background: linear-gradient(135deg, var(--warn), #ea580c);">
+            📤 Retirar do Estoque
+          </button>
         </div>
 
         <div class="table-card">
@@ -840,10 +914,15 @@
       <div class="reports-container">
         <div class="report-header">
           <h2 class="report-title">Controle de Fogos</h2>
+          <div class="controls-row" style="margin-bottom: 25px;">
+            <button onclick="openRemoveFogoModal()" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
+              🔥 Retirar do Fogo
+            </button>
+          </div>
           <div class="empty-state">
             <div class="empty-state-icon">🔥</div>
             <p>Módulo em Desenvolvimento</p>
-            <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
+            <p style="font-size: 0.8rem; margin-top: 10px;">Use o botão acima para retirar fogos</p>
           </div>
         </div>
       </div>
@@ -876,6 +955,168 @@
       <span class="nav-icon">🔥</span>
       <span>Fogos</span>
     </button>
+  </div>
+
+  <!-- Modal Adicionar Pneu -->
+  <div class="modal-backdrop" id="addPneuModal">
+    <div class="modal">
+      <h2>➕ Adicionar Pneu ao Estoque</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-group">
+          <label for="addMedida">Medida *</label>
+          <input type="text" id="addMedida" class="input" placeholder="295/80 R22.5">
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="addMarca">Marca *</label>
+            <input type="text" id="addMarca" class="input" placeholder="Michelin">
+          </div>
+          <div class="field-group">
+            <label for="addModelo">Modelo *</label>
+            <input type="text" id="addModelo" class="input" placeholder="X Line Energy">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="addDataEntrada">Data de Entrada *</label>
+            <input type="date" id="addDataEntrada" class="input">
+          </div>
+          <div class="field-group">
+            <label for="addQty">Quantidade *</label>
+            <input type="number" id="addQty" class="input" min="1" value="1">
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="addStatus">Status</label>
+            <select id="addStatus" class="input">
+              <option value="Novo">Novo</option>
+              <option value="Usado">Usado</option>
+              <option value="Reformado">Reformado</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="addContainer">Container</label>
+            <select id="addContainer" class="input">
+              <option value="container1">Container 1</option>
+              <option value="container2">Container 2</option>
+              <option value="container3">Container 3</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="addPreco">Preço (R$)</label>
+          <input type="number" id="addPreco" class="input" step="0.01" min="0" placeholder="0.00">
+        </div>
+
+        <div class="field-group">
+          <label for="addObservacoes">Observações</label>
+          <textarea id="addObservacoes" class="input" placeholder="Observações..." style="width: 100%; height: 60px;"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeAddPneuModal()">Cancelar</button>
+        <button onclick="confirmAddPneu()" style="background: linear-gradient(135deg, var(--success), #059669);">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Retirar do Estoque -->
+  <div class="modal-backdrop" id="removePneuModal">
+    <div class="modal">
+      <h2>📤 Retirar Pneu do Estoque</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-group">
+          <label for="removePneuSelect">Selecionar Pneu</label>
+          <select id="removePneuSelect" class="input">
+            <option value="">Selecione um pneu...</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="removeData">Data de Saída *</label>
+            <input type="date" id="removeData" class="input">
+          </div>
+          <div class="field-group">
+            <label for="removeQty">Quantidade *</label>
+            <input type="number" id="removeQty" class="input" min="1" value="1">
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="removeMotivo">Motivo da Saída</label>
+          <select id="removeMotivo" class="input">
+            <option value="venda">Venda</option>
+            <option value="uso">Uso em Veículo</option>
+            <option value="descarte">Descarte</option>
+            <option value="danificado">Danificado</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="removeObservacoes">Observações</label>
+          <textarea id="removeObservacoes" class="input" placeholder="Observações..." style="width: 100%; height: 60px;"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeRemovePneuModal()">Cancelar</button>
+        <button onclick="confirmRemovePneu()" style="background: linear-gradient(135deg, var(--warn), #ea580c);">Confirmar Retirada</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Retirar do Fogo -->
+  <div class="modal-backdrop" id="removeFogoModal">
+    <div class="modal">
+      <h2>🔥 Retirar Pneu do Fogo</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-group">
+          <label for="removeFogoSelect">Selecionar Fogo</label>
+          <select id="removeFogoSelect" class="input">
+            <option value="">Selecione um fogo...</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="removeFogoData">Data de Saída *</label>
+            <input type="date" id="removeFogoData" class="input">
+          </div>
+          <div class="field-group">
+            <label for="removeFogoMotivo">Motivo da Saída</label>
+            <select id="removeFogoMotivo" class="input">
+              <option value="venda">Venda</option>
+              <option value="uso">Uso em Veículo</option>
+              <option value="descarte">Descarte</option>
+              <option value="danificado">Danificado</option>
+              <option value="reforma">Enviado para Reforma</option>
+              <option value="outro">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="removeFogoObservacoes">Observações</label>
+          <textarea id="removeFogoObservacoes" class="input" placeholder="Observações..." style="width: 100%; height: 60px;"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeRemoveFogoModal()">Cancelar</button>
+        <button onclick="confirmRemoveFogo()" style="background: linear-gradient(135deg, var(--danger), #dc2626);">Confirmar Retirada</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -933,6 +1174,18 @@
           const tabName = this.dataset.tab;
           document.querySelector(`.tab-btn[data-tab="${tabName}"]`).click();
         });
+      });
+
+      // Atualizar quantidade máxima quando selecionar pneu para remover
+      document.getElementById('removePneuSelect').addEventListener('change', function() {
+        const selectedId = this.value;
+        if (selectedId) {
+          const item = reportData.items.find(item => item.id === selectedId);
+          if (item) {
+            document.getElementById('removeQty').max = item.qty;
+            document.getElementById('removeQty').value = 1;
+          }
+        }
       });
     }
 
@@ -1028,24 +1281,250 @@
       return performance;
     }
 
-    function generateMovementData() {
-      const movements = [];
-      const types = ['ENTRADA', 'SAIDA', 'TRANSFERENCIA'];
-      const months = ['2024-01', '2024-02', '2024-03', '2024-04'];
-      
-      months.forEach(month => {
-        types.forEach(type => {
-          movements.push({
-            mes: month,
-            tipo: type,
-            quantidade: Math.floor(Math.random() * 20) + 5,
-            valor: Math.floor(Math.random() * 10000) + 5000
-          });
-        });
-      });
-      
-      return movements;
+    // =============================================
+    // FUNÇÕES DOS NOVOS MODAIS
+    // =============================================
+
+    function openAddPneuModal() {
+      const dataAtual = new Date().toISOString().split('T')[0];
+      document.getElementById('addDataEntrada').value = dataAtual;
+      document.getElementById('addPneuModal').style.display = 'flex';
     }
+
+    function closeAddPneuModal() {
+      document.getElementById('addPneuModal').style.display = 'none';
+      // Limpar campos
+      document.getElementById('addMedida').value = '';
+      document.getElementById('addMarca').value = '';
+      document.getElementById('addModelo').value = '';
+      document.getElementById('addQty').value = '1';
+      document.getElementById('addPreco').value = '';
+      document.getElementById('addObservacoes').value = '';
+    }
+
+    function confirmAddPneu() {
+      const medida = document.getElementById('addMedida').value.trim();
+      const marca = document.getElementById('addMarca').value.trim();
+      const modelo = document.getElementById('addModelo').value.trim();
+      const dataEntrada = document.getElementById('addDataEntrada').value;
+      const qty = parseInt(document.getElementById('addQty').value) || 0;
+      const status = document.getElementById('addStatus').value;
+      const container = document.getElementById('addContainer').value;
+      const preco = parseFloat(document.getElementById('addPreco').value) || 0;
+      const observacoes = document.getElementById('addObservacoes').value.trim();
+
+      if (!medida || !marca || !modelo || !dataEntrada || qty <= 0) {
+        showNotification('Preencha todos os campos obrigatórios!', 'error');
+        return;
+      }
+
+      // Verificar se já existe um pneu igual
+      const existingItem = reportData.items.find(item => 
+        item.medida === medida && 
+        item.marca === marca && 
+        item.modelo === modelo && 
+        item.status === status &&
+        item.container === container
+      );
+
+      if (existingItem) {
+        // Atualizar quantidade do item existente
+        existingItem.qty += qty;
+        if (preco > 0) {
+          existingItem.preco = preco;
+        }
+        if (observacoes) {
+          existingItem.observacoes = observacoes;
+        }
+        showNotification(`Quantidade atualizada! Total: ${existingItem.qty} unidades`, 'success');
+      } else {
+        // Criar novo item
+        const newId = `PNEU-${Date.now()}`;
+        const newItem = {
+          id: newId,
+          medida: medida,
+          marca: marca,
+          modelo: modelo,
+          dataEntrada: dataEntrada,
+          status: status,
+          qty: qty,
+          container: container,
+          preco: preco,
+          observacoes: observacoes
+        };
+        reportData.items.push(newItem);
+        showNotification('Pneu adicionado com sucesso!', 'success');
+      }
+
+      // Salvar e atualizar
+      saveData();
+      renderDashboard();
+      generateStockReport();
+      closeAddPneuModal();
+    }
+
+    function openRemovePneuModal() {
+      // Preencher select com pneus disponíveis
+      const select = document.getElementById('removePneuSelect');
+      select.innerHTML = '<option value="">Selecione um pneu...</option>';
+      
+      reportData.items.forEach(item => {
+        if (item.qty > 0) {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = `${item.medida} - ${item.marca} ${item.modelo} (${item.qty} disponíveis)`;
+          select.appendChild(option);
+        }
+      });
+
+      const dataAtual = new Date().toISOString().split('T')[0];
+      document.getElementById('removeData').value = dataAtual;
+      document.getElementById('removePneuModal').style.display = 'flex';
+    }
+
+    function closeRemovePneuModal() {
+      document.getElementById('removePneuModal').style.display = 'none';
+      // Limpar campos
+      document.getElementById('removePneuSelect').value = '';
+      document.getElementById('removeQty').value = '1';
+      document.getElementById('removeObservacoes').value = '';
+    }
+
+    function confirmRemovePneu() {
+      const selectedId = document.getElementById('removePneuSelect').value;
+      const qty = parseInt(document.getElementById('removeQty').value) || 0;
+      const dataSaida = document.getElementById('removeData').value;
+      const motivo = document.getElementById('removeMotivo').value;
+      const observacoes = document.getElementById('removeObservacoes').value.trim();
+
+      if (!selectedId || !dataSaida || qty <= 0) {
+        showNotification('Preencha todos os campos obrigatórios!', 'error');
+        return;
+      }
+
+      const item = reportData.items.find(item => item.id === selectedId);
+      if (!item) {
+        showNotification('Pneu não encontrado!', 'error');
+        return;
+      }
+
+      if (qty > item.qty) {
+        showNotification(`Quantidade solicitada maior que o estoque disponível (${item.qty})!`, 'error');
+        return;
+      }
+
+      // Registrar movimento
+      const movimento = {
+        id: `MOV-${Date.now()}`,
+        tipo: 'SAIDA',
+        pneuId: item.id,
+        medida: item.medida,
+        marca: item.marca,
+        modelo: item.modelo,
+        quantidade: qty,
+        data: dataSaida,
+        motivo: motivo,
+        observacoes: observacoes,
+        valor: item.preco * qty
+      };
+
+      if (!reportData.movements) reportData.movements = [];
+      reportData.movements.push(movimento);
+
+      // Atualizar estoque
+      item.qty -= qty;
+
+      // Se quantidade chegar a zero, remover do estoque
+      if (item.qty <= 0) {
+        reportData.items = reportData.items.filter(i => i.id !== item.id);
+      }
+
+      // Salvar e atualizar
+      saveData();
+      renderDashboard();
+      generateStockReport();
+      closeRemovePneuModal();
+      
+      showNotification(`${qty} pneu(s) retirado(s) do estoque com sucesso!`, 'success');
+    }
+
+    function openRemoveFogoModal() {
+      // Preencher select com fogos disponíveis
+      const select = document.getElementById('removeFogoSelect');
+      select.innerHTML = '<option value="">Selecione um fogo...</option>';
+      
+      reportData.fogos.forEach(fogo => {
+        const option = document.createElement('option');
+        option.value = fogo.id;
+        option.textContent = `Fogo ${fogo.fogo} - ${fogo.medida} ${fogo.marca}`;
+        select.appendChild(option);
+      });
+
+      const dataAtual = new Date().toISOString().split('T')[0];
+      document.getElementById('removeFogoData').value = dataAtual;
+      document.getElementById('removeFogoModal').style.display = 'flex';
+    }
+
+    function closeRemoveFogoModal() {
+      document.getElementById('removeFogoModal').style.display = 'none';
+      // Limpar campos
+      document.getElementById('removeFogoSelect').value = '';
+      document.getElementById('removeFogoObservacoes').value = '';
+    }
+
+    function confirmRemoveFogo() {
+      const selectedId = document.getElementById('removeFogoSelect').value;
+      const dataSaida = document.getElementById('removeFogoData').value;
+      const motivo = document.getElementById('removeFogoMotivo').value;
+      const observacoes = document.getElementById('removeFogoObservacoes').value.trim();
+
+      if (!selectedId || !dataSaida) {
+        showNotification('Preencha todos os campos obrigatórios!', 'error');
+        return;
+      }
+
+      const fogo = reportData.fogos.find(f => f.id === selectedId);
+      if (!fogo) {
+        showNotification('Fogo não encontrado!', 'error');
+        return;
+      }
+
+      // Registrar movimento
+      const movimento = {
+        id: `MOV-${Date.now()}`,
+        tipo: 'SAIDA_FOGO',
+        fogoId: fogo.id,
+        fogo: fogo.fogo,
+        medida: fogo.medida,
+        marca: fogo.marca,
+        modelo: fogo.modelo,
+        data: dataSaida,
+        motivo: motivo,
+        observacoes: observacoes
+      };
+
+      if (!reportData.movements) reportData.movements = [];
+      reportData.movements.push(movimento);
+
+      // Remover do controle de fogos
+      reportData.fogos = reportData.fogos.filter(f => f.id !== fogo.id);
+
+      // Salvar e atualizar
+      saveData();
+      renderDashboard();
+      closeRemoveFogoModal();
+      
+      showNotification(`Fogo ${fogo.fogo} retirado com sucesso!`, 'success');
+    }
+
+    function saveData() {
+      localStorage.setItem('tc_pneus', JSON.stringify(reportData.items));
+      localStorage.setItem('tc_fogos', JSON.stringify(reportData.fogos));
+    }
+
+    // =============================================
+    // FUNÇÕES EXISTENTES (mantidas do código anterior)
+    // =============================================
 
     function initializeCharts() {
       const statusCtx = document.getElementById('statusChart').getContext('2d');
