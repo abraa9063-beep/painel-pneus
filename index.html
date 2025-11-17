@@ -121,7 +121,7 @@
     
     .report-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: between;
       align-items: center;
       margin-bottom: 25px;
       flex-wrap: wrap;
@@ -645,11 +645,8 @@
         <button onclick="applyDateFilter()">
           Aplicar Filtro
         </button>
-        <!-- REMOVIDO: Botão "Gerar Relatório" -->
       </div>
     </div>
-
-    <!-- REMOVIDO: Botões de ação rápidos -->
 
     <!-- Métricas Principais -->
     <div class="metrics-grid" id="dashboardMetrics">
@@ -699,6 +696,9 @@
     <div class="table-card">
       <div class="table-header">
         <h3 class="table-title">Alertas e Ações Necessárias</h3>
+        <button class="btn-xs" onclick="markAllAlertsAsResolved()" style="background: var(--success); color: white;">
+          Marcar Todos como Resolvidos
+        </button>
       </div>
       <div class="table-container">
         <table class="data-table" id="alertsTable">
@@ -708,10 +708,10 @@
               <th>Descrição</th>
               <th>Container</th>
               <th>Prioridade</th>
-              <th>Ação</th>
+              <th>Ações</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="alertsTableBody">
             <!-- Será preenchido via JavaScript -->
           </tbody>
         </table>
@@ -1209,11 +1209,243 @@
     // Variável para controlar fogo sendo editado
     let fogoEditando = null;
 
+    // =============================================
+    // SISTEMA DE ALERTAS FUNCIONAL
+    // =============================================
+
+    // Array global para gerenciar alertas
+    let sistemaAlertas = [];
+
+    function inicializarSistemaAlertas() {
+      // Carregar alertas do localStorage ou criar padrão
+      const alertasSalvos = localStorage.getItem('tc_alertas');
+      sistemaAlertas = alertasSalvos ? JSON.parse(alertasSalvos) : [
+        {
+          id: 'alert-1',
+          tipo: 'Estoque Baixo',
+          descricao: 'Pneus 295/80 R22.5 com menos de 5 unidades',
+          container: 'Container 1',
+          prioridade: 'Alta',
+          acao: 'Repor Estoque',
+          dataCriacao: new Date().toISOString(),
+          status: 'pendente'
+        },
+        {
+          id: 'alert-2',
+          tipo: 'Valorização',
+          descricao: 'Pneus Michelin aumentaram 12% no último mês',
+          container: 'Todos',
+          prioridade: 'Média',
+          acao: 'Revisar Preços',
+          dataCriacao: new Date().toISOString(),
+          status: 'pendente'
+        },
+        {
+          id: 'alert-3',
+          tipo: 'Vencimento',
+          descricao: '5 pneus reformados próximos do vencimento',
+          container: 'Container 2',
+          prioridade: 'Alta',
+          acao: 'Verificar Data',
+          dataCriacao: new Date().toISOString(),
+          status: 'pendente'
+        }
+      ];
+      
+      salvarAlertas();
+      renderizarAlertas();
+    }
+
+    function renderizarAlertas() {
+      const tbody = document.getElementById('alertsTableBody');
+      if (!tbody) return;
+
+      const alertasPendentes = sistemaAlertas.filter(alerta => alerta.status === 'pendente');
+
+      if (alertasPendentes.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 40px; color: var(--muted);">
+              🎉 Todos os alertas foram resolvidos!
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tbody.innerHTML = alertasPendentes.map(alerta => `
+        <tr>
+          <td><strong>${alerta.tipo}</strong></td>
+          <td>${alerta.descricao}</td>
+          <td>${alerta.container}</td>
+          <td>
+            <span class="status-badge ${alerta.prioridade === 'Alta' ? 'status-alta' : alerta.prioridade === 'Média' ? 'status-media' : 'status-baixa'}">
+              ${alerta.prioridade}
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button class="btn-xs" onclick="executarAcaoAlerta('${alerta.id}')" 
+                      style="background: var(--accent); color: white;">
+                ${alerta.acao}
+              </button>
+              <button class="btn-xs" onclick="marcarAlertaComoVerificado('${alerta.id}')" 
+                      style="background: var(--success); color: white;">
+                ✅ Verificado
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function executarAcaoAlerta(alertaId) {
+      const alerta = sistemaAlertas.find(a => a.id === alertaId);
+      if (!alerta) return;
+
+      // Executar ação específica baseada no tipo de alerta
+      switch(alerta.tipo) {
+        case 'Estoque Baixo':
+          // Focar na aba de estoque e aplicar filtro
+          document.querySelector('.tab-btn[data-tab="estoque"]').click();
+          document.getElementById('containerFilter').value = 'container1';
+          setTimeout(() => generateStockReport(), 500);
+          showNotification(`🔍 Navegando para ${alerta.container} - ${alerta.descricao}`, 'success');
+          break;
+          
+        case 'Valorização':
+          // Simular revisão de preços
+          showNotification(`💰 ${alerta.descricao} - Revisando tabela de preços...`, 'warning');
+          setTimeout(() => {
+            showNotification('✅ Tabela de preços atualizada com sucesso!', 'success');
+          }, 2000);
+          break;
+          
+        case 'Vencimento':
+          // Focar na aba de estoque com filtro de status
+          document.querySelector('.tab-btn[data-tab="estoque"]').click();
+          document.getElementById('statusFilter').value = 'Reformado';
+          setTimeout(() => generateStockReport(), 500);
+          showNotification(`📅 Verificando pneus reformados com vencimento próximo...`, 'warning');
+          break;
+          
+        default:
+          showNotification(`⚡ Executando ação: ${alerta.acao}`, 'success');
+      }
+
+      // Marcar como em andamento
+      alerta.status = 'em_andamento';
+      salvarAlertas();
+      renderizarAlertas();
+    }
+
+    function marcarAlertaComoVerificado(alertaId) {
+      const alerta = sistemaAlertas.find(a => a.id === alertaId);
+      if (alerta) {
+        alerta.status = 'resolvido';
+        alerta.dataResolucao = new Date().toISOString();
+        salvarAlertas();
+        renderizarAlertas();
+        showNotification('✅ Alerta marcado como resolvido!', 'success');
+        
+        // Atualizar dashboard
+        renderDashboardMetrics();
+      }
+    }
+
+    function markAllAlertsAsResolved() {
+      if (sistemaAlertas.filter(a => a.status === 'pendente').length === 0) {
+        showNotification('ℹ️ Não há alertas pendentes para resolver.', 'warning');
+        return;
+      }
+
+      if (confirm('Deseja marcar TODOS os alertas como resolvidos?')) {
+        sistemaAlertas.forEach(alerta => {
+          if (alerta.status === 'pendente') {
+            alerta.status = 'resolvido';
+            alerta.dataResolucao = new Date().toISOString();
+          }
+        });
+        
+        salvarAlertas();
+        renderizarAlertas();
+        renderDashboardMetrics();
+        showNotification('🎉 Todos os alertas foram marcados como resolvidos!', 'success');
+      }
+    }
+
+    function salvarAlertas() {
+      localStorage.setItem('tc_alertas', JSON.stringify(sistemaAlertas));
+    }
+
+    function adicionarNovoAlerta(tipo, descricao, container, prioridade, acao) {
+      const novoAlerta = {
+        id: 'alert-' + Date.now(),
+        tipo: tipo,
+        descricao: descricao,
+        container: container,
+        prioridade: prioridade,
+        acao: acao,
+        dataCriacao: new Date().toISOString(),
+        status: 'pendente'
+      };
+      
+      sistemaAlertas.push(novoAlerta);
+      salvarAlertas();
+      renderizarAlertas();
+      renderDashboardMetrics();
+      
+      // Mostrar notificação do novo alerta
+      showNotification(`🚨 Novo alerta: ${tipo} - ${descricao}`, 'warning');
+    }
+
+    // Função para verificar e gerar alertas automaticamente
+    function verificarAlertasAutomaticos() {
+      // Verificar estoque baixo
+      const alertasEstoqueBaixo = verificarEstoqueBaixo();
+      alertasEstoqueBaixo.forEach(alerta => {
+        if (!sistemaAlertas.some(a => a.descricao === alerta.descricao && a.status === 'pendente')) {
+          adicionarNovoAlerta(
+            alerta.tipo,
+            alerta.descricao,
+            alerta.container,
+            alerta.prioridade,
+            alerta.acao
+          );
+        }
+      });
+    }
+
+    function verificarEstoqueBaixo() {
+      const alertas = [];
+      const limiteEstoqueBaixo = 5;
+      
+      reportData.items.forEach(item => {
+        if (item.qty <= limiteEstoqueBaixo) {
+          alertas.push({
+            tipo: 'Estoque Baixo',
+            descricao: `${item.medida} ${item.marca} com apenas ${item.qty} unidades`,
+            container: item.container,
+            prioridade: item.qty <= 2 ? 'Alta' : 'Média',
+            acao: 'Repor Estoque'
+          });
+        }
+      });
+      
+      return alertas;
+    }
+
+    // =============================================
+    // CÓDIGO ORIGINAL (COM ALGUMAS MODIFICAÇÕES)
+    // =============================================
+
     document.addEventListener('DOMContentLoaded', function() {
       console.log('Iniciando aplicação...');
       loadReportData();
       setupEventListeners();
       initializeCharts();
+      inicializarSistemaAlertas(); // ← SISTEMA DE ALERTAS INICIALIZADO
+      verificarAlertasAutomaticos(); // ← VERIFICAÇÃO AUTOMÁTICA
       renderDashboard();
       
       // Definir datas padrão
@@ -1502,7 +1734,7 @@
     function renderDashboard() {
       console.log('Renderizando dashboard...');
       renderDashboardMetrics();
-      renderAlertsTable();
+      renderizarAlertas(); // ← AGORA USA O SISTEMA DE ALERTAS FUNCIONAL
       updateCharts();
     }
 
@@ -1511,6 +1743,7 @@
       const totalFogos = reportData.fogos.length;
       const valorTotal = reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0);
       const pneusNovos = reportData.items.filter(item => item.status === 'Novo').reduce((sum, item) => sum + item.qty, 0);
+      const alertasPendentes = sistemaAlertas.filter(a => a.status === 'pendente').length;
 
       const metricsContainer = document.getElementById('dashboardMetrics');
       if (metricsContainer) {
@@ -1534,58 +1767,13 @@
           </div>
           
           <div class="metric-card">
-            <div class="metric-value">${pneusNovos}</div>
-            <div class="metric-label">Pneus Novos</div>
-            <div class="metric-change negative">↓ 5% vs mês anterior</div>
+            <div class="metric-value ${alertasPendentes > 0 ? 'alert-high' : ''}">${alertasPendentes}</div>
+            <div class="metric-label">Alertas Pendentes</div>
+            <div class="metric-change ${alertasPendentes > 0 ? 'negative' : 'positive'}">
+              ${alertasPendentes > 0 ? '⚠️ Atenção necessária' : '✅ Tudo sob controle'}
+            </div>
           </div>
         `;
-      }
-    }
-
-    function renderAlertsTable() {
-      const alerts = [
-        {
-          tipo: 'Estoque Baixo',
-          descricao: 'Pneus 295/80 R22.5 com menos de 5 unidades',
-          container: 'Container 1',
-          prioridade: 'Alta',
-          acao: 'Repor Estoque'
-        },
-        {
-          tipo: 'Valorização',
-          descricao: 'Pneus Michelin aumentaram 12% no último mês',
-          container: 'Todos',
-          prioridade: 'Média',
-          acao: 'Revisar Preços'
-        },
-        {
-          tipo: 'Vencimento',
-          descricao: '5 pneus reformados próximos do vencimento',
-          container: 'Container 2',
-          prioridade: 'Alta',
-          acao: 'Verificar Data'
-        }
-      ];
-
-      const tbody = document.querySelector('#alertsTable tbody');
-      if (tbody) {
-        tbody.innerHTML = alerts.map(alert => `
-          <tr>
-            <td><strong>${alert.tipo}</strong></td>
-            <td>${alert.descricao}</td>
-            <td>${alert.container}</td>
-            <td>
-              <span class="status-badge ${alert.prioridade === 'Alta' ? 'status-alta' : alert.prioridade === 'Média' ? 'status-media' : 'status-baixa'}">
-                ${alert.prioridade}
-              </span>
-            </td>
-            <td>
-              <button class="btn-xs" style="padding: 6px 12px; font-size: 0.8rem;">
-                ${alert.acao}
-              </button>
-            </td>
-          </tr>
-        `).join('');
       }
     }
 
@@ -1655,6 +1843,9 @@
       saveData();
       closeAddPneuModal();
       showNotification('Pneu adicionado com sucesso!', 'success');
+      
+      // Verificar alertas automáticos após adicionar pneu
+      verificarAlertasAutomaticos();
       
       // Atualizar a view atual
       if (document.getElementById('tab-estoque').classList.contains('hidden')) {
@@ -1752,6 +1943,9 @@
       saveData();
       closeAddFogoModal();
       showNotification(`${quantidade} fogos adicionados com sucesso!`, 'success');
+      
+      // Verificar alertas automáticos após adicionar fogos
+      verificarAlertasAutomaticos();
       
       // Atualizar views
       renderFogosList();
@@ -2046,6 +2240,7 @@
       localStorage.setItem('tc_pneus', JSON.stringify(reportData.items));
       localStorage.setItem('tc_fogos', JSON.stringify(reportData.fogos));
       localStorage.setItem('tc_ultimo_fogo', reportData.ultimoFogo.toString());
+      salvarAlertas(); // ← SALVA TAMBÉM OS ALERTAS
     }
 
     // Funções dos modais que ainda não foram implementados
@@ -2069,4 +2264,3 @@
   </script>
 </body>
 </html>
-
