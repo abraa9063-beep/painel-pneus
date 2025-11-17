@@ -632,130 +632,111 @@
 
   <main>
     <!-- DASHBOARD PRINCIPAL -->
-    <div id="tab-dashboard" class="tab-content">
-      <div class="reports-container">
-        <div class="report-header">
-          <h2 class="report-title">Dashboard Geral</h2>
-          <div class="controls-row">
-            <div class="date-range">
-              <input type="date" id="startDate" class="input">
-              <span>até</span>
-              <input type="date" id="endDate" class="input">
-            </div>
-            <button onclick="applyDateFilter()">
-              Aplicar Filtro
-            </button>
-            <button onclick="generateDashboardReport()" class="btn-success">
-              Gerar Relatório
-            </button>
-          </div>
+<div id="tab-dashboard" class="tab-content">
+  <div class="reports-container">
+    <div class="report-header">
+      <h2 class="report-title">Dashboard Geral</h2>
+      <div class="controls-row">
+        <div class="date-range">
+          <input type="date" id="startDate" class="input">
+          <span>até</span>
+          <input type="date" id="endDate" class="input">
         </div>
+        <button onclick="applyDateFilter()">
+          Aplicar Filtro
+        </button>
+        <!-- REMOVIDO: Botão "Gerar Relatório" -->
+      </div>
+    </div>
 
-        <!-- Botões de Ação Rápidos -->
-        <div class="controls-row" style="margin-bottom: 25px;">
-          <button onclick="openAddPneuModal()" class="btn-success">
-            Adicionar Pneu
-          </button>
-          <button onclick="openRemovePneuModal()" class="btn-warning">
-            Retirar do Estoque
-          </button>
-          <button onclick="openRemoveFogoModal()" class="btn-danger">
-            Retirar do Fogo
-          </button>
-          <button onclick="openDeletePneuModal()" class="btn-danger">
-            Excluir Pneu
-          </button>
-          <button onclick="openDeleteFogoModal()" class="btn-danger">
-            Excluir Fogo
-          </button>
+    <!-- REMOVIDO: Botões de ação rápidos -->
+
+    <!-- Métricas Principais -->
+    <div class="metrics-grid" id="dashboardMetrics">
+      <!-- Será preenchido via JavaScript -->
+    </div>
+
+    <!-- Gráficos -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Estoque por Status</h3>
         </div>
-
-        <!-- Métricas Principais -->
-        <div class="metrics-grid" id="dashboardMetrics">
-          <!-- Será preenchido via JavaScript -->
+        <div class="chart-container">
+          <canvas id="statusChart"></canvas>
         </div>
-
-        <!-- Gráficos -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Estoque por Status</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="statusChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Distribuição por Container</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="containerChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Movimentação Mensal</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="movementChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Top Marcas</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="brandsChart"></canvas>
-            </div>
-          </div>
+      </div>
+      
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Distribuição por Container</h3>
         </div>
-
-        <!-- Tabela de Alertas -->
-        <div class="table-card">
-          <div class="table-header">
-            <h3 class="table-title">Alertas e Ações Necessárias</h3>
-          </div>
-          <div class="table-container">
-            <table class="data-table" id="alertsTable">
-              <thead>
-                <tr>
-                  <th>Tipo</th>
-                  <th>Descrição</th>
-                  <th>Container</th>
-                  <th>Prioridade</th>
-                  <th>Ação</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Será preenchido via JavaScript -->
-              </tbody>
-            </table>
-          </div>
+        <div class="chart-container">
+          <canvas id="containerChart"></canvas>
         </div>
-
-        <!-- Cards de Exportação -->
-        <div class="export-cards">
-          <div class="export-card" onclick="exportComprehensiveReport()">
-            <div class="export-title">Relatório Completo</div>
-            <div class="export-desc">Exporte todos os dados do sistema em um relatório detalhado em PDF</div>
-          </div>
-          
-          <div class="export-card" onclick="exportFinancialReport()">
-            <div class="export-title">Relatório Financeiro</div>
-            <div class="export-desc">Análise financeira completa com custos, valores e projeções</div>
-          </div>
-          
-          <div class="export-card" onclick="exportInventoryReport()">
-            <div class="export-title">Relatório de Estoque</div>
-            <div class="export-desc">Inventário completo com valores e status de todos os pneus</div>
-          </div>
+      </div>
+      
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Movimentação Mensal</h3>
+        </div>
+        <div class="chart-container">
+          <canvas id="movementChart"></canvas>
+        </div>
+      </div>
+      
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Top Marcas</h3>
+        </div>
+        <div class="chart-container">
+          <canvas id="brandsChart"></canvas>
         </div>
       </div>
     </div>
+
+    <!-- Tabela de Alertas -->
+    <div class="table-card">
+      <div class="table-header">
+        <h3 class="table-title">Alertas e Ações Necessárias</h3>
+      </div>
+      <div class="table-container">
+        <table class="data-table" id="alertsTable">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Descrição</th>
+              <th>Container</th>
+              <th>Prioridade</th>
+              <th>Ação</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Será preenchido via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Cards de Exportação -->
+    <div class="export-cards">
+      <div class="export-card" onclick="exportComprehensiveReport()">
+        <div class="export-title">Relatório Completo</div>
+        <div class="export-desc">Exporte todos os dados do sistema em um relatório detalhado em PDF</div>
+      </div>
+      
+      <div class="export-card" onclick="exportFinancialReport()">
+        <div class="export-title">Relatório Financeiro</div>
+        <div class="export-desc">Análise financeira completa com custos, valores e projeções</div>
+      </div>
+      
+      <div class="export-card" onclick="exportInventoryReport()">
+        <div class="export-title">Relatório de Estoque</div>
+        <div class="export-desc">Inventário completo com valores e status de todos os pneus</div>
+      </div>
+    </div>
+  </div>
+</div>
 
     <!-- RELATÓRIO DE ESTOQUE -->
     <div id="tab-estoque" class="tab-content hidden">
@@ -2088,3 +2069,4 @@
   </script>
 </body>
 </html>
+
