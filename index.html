@@ -186,6 +186,22 @@
       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
     }
     
+    .btn-success {
+      background: linear-gradient(135deg, var(--success), #059669);
+    }
+    
+    .btn-warning {
+      background: linear-gradient(135deg, var(--warn), #ea580c);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, var(--danger), #dc2626);
+    }
+    
+    .btn-purple {
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+    }
+    
     .btn-xs {
       padding: 8px 12px;
       font-size: 0.8rem;
@@ -568,7 +584,7 @@
 </head>
 <body>
   <header>
-    <h1>📊 Transportes Canarinho - Relatórios</h1>
+    <h1>Transportes Canarinho - Relatórios</h1>
   </header>
   
   <div class="tabs-container">
@@ -595,24 +611,30 @@
               <input type="date" id="endDate" class="input">
             </div>
             <button onclick="applyDateFilter()">
-              📅 Aplicar Filtro
+              Aplicar Filtro
             </button>
-            <button onclick="generateDashboardReport()" style="background: linear-gradient(135deg, var(--success), #059669);">
-              📊 Gerar Relatório
+            <button onclick="generateDashboardReport()" class="btn-success">
+              Gerar Relatório
             </button>
           </div>
         </div>
 
         <!-- Botões de Ação Rápidos -->
         <div class="controls-row" style="margin-bottom: 25px;">
-          <button onclick="openAddPneuModal()" style="background: linear-gradient(135deg, var(--success), #059669);">
-            ➕ Adicionar Pneu
+          <button onclick="openAddPneuModal()" class="btn-success">
+            Adicionar Pneu
           </button>
-          <button onclick="openRemovePneuModal()" style="background: linear-gradient(135deg, var(--warn), #ea580c);">
-            📤 Retirar do Estoque
+          <button onclick="openRemovePneuModal()" class="btn-warning">
+            Retirar do Estoque
           </button>
-          <button onclick="openRemoveFogoModal()" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
-            🔥 Retirar do Fogo
+          <button onclick="openRemoveFogoModal()" class="btn-danger">
+            Retirar do Fogo
+          </button>
+          <button onclick="openDeletePneuModal()" class="btn-danger">
+            Excluir Pneu
+          </button>
+          <button onclick="openDeleteFogoModal()" class="btn-danger">
+            Excluir Fogo
           </button>
         </div>
 
@@ -686,19 +708,16 @@
         <!-- Cards de Exportação -->
         <div class="export-cards">
           <div class="export-card" onclick="exportComprehensiveReport()">
-            <div class="export-icon">📑</div>
             <div class="export-title">Relatório Completo</div>
             <div class="export-desc">Exporte todos os dados do sistema em um relatório detalhado em PDF</div>
           </div>
           
           <div class="export-card" onclick="exportFinancialReport()">
-            <div class="export-icon">💵</div>
             <div class="export-title">Relatório Financeiro</div>
             <div class="export-desc">Análise financeira completa com custos, valores e projeções</div>
           </div>
           
           <div class="export-card" onclick="exportInventoryReport()">
-            <div class="export-icon">📦</div>
             <div class="export-title">Relatório de Estoque</div>
             <div class="export-desc">Inventário completo com valores e status de todos os pneus</div>
           </div>
@@ -725,21 +744,24 @@
               <option value="Reformado">Reformado</option>
             </select>
             <button onclick="generateStockReport()">
-              📋 Gerar Relatório
+              Gerar Relatório
             </button>
-            <button onclick="exportStockToExcel()" style="background: linear-gradient(135deg, #10b981, #059669);">
-              📊 Exportar Excel
+            <button onclick="exportStockToExcel()" class="btn-success">
+              Exportar Excel
             </button>
           </div>
         </div>
 
         <!-- Botões de Ação para Estoque -->
         <div class="controls-row" style="margin-bottom: 25px;">
-          <button onclick="openAddPneuModal()" style="background: linear-gradient(135deg, var(--success), #059669);">
-            ➕ Adicionar Pneu ao Estoque
+          <button onclick="openAddPneuModal()" class="btn-success">
+            Adicionar Pneu ao Estoque
           </button>
-          <button onclick="openRemovePneuModal()" style="background: linear-gradient(135deg, var(--warn), #ea580c);">
-            📤 Retirar do Estoque
+          <button onclick="openRemovePneuModal()" class="btn-warning">
+            Retirar do Estoque
+          </button>
+          <button onclick="openDeletePneuModal()" class="btn-danger">
+            Excluir Pneu
           </button>
         </div>
 
@@ -763,6 +785,7 @@
                   <th>Valor Unit.</th>
                   <th>Valor Total</th>
                   <th>Entrada</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -794,10 +817,10 @@
               <option value="365">Último ano</option>
             </select>
             <button onclick="generatePerformanceReport()">
-              📈 Gerar Relatório
+              Gerar Relatório
             </button>
-            <button onclick="exportPerformanceToExcel()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
-              📊 Exportar Excel
+            <button onclick="exportPerformanceToExcel()" class="btn-purple">
+              Exportar Excel
             </button>
           </div>
         </div>
@@ -889,7 +912,7 @@
         <div class="report-header">
           <h2 class="report-title">Relatório de Movimentação</h2>
           <div class="empty-state">
-            <div class="empty-state-icon">🔄</div>
+            <div class="empty-state-icon">Movimentação</div>
             <p>Módulo em Desenvolvimento</p>
             <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
           </div>
@@ -902,7 +925,7 @@
         <div class="report-header">
           <h2 class="report-title">Relatório Financeiro</h2>
           <div class="empty-state">
-            <div class="empty-state-icon">💵</div>
+            <div class="empty-state-icon">Financeiro</div>
             <p>Módulo em Desenvolvimento</p>
             <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
           </div>
@@ -915,14 +938,17 @@
         <div class="report-header">
           <h2 class="report-title">Controle de Fogos</h2>
           <div class="controls-row" style="margin-bottom: 25px;">
-            <button onclick="openRemoveFogoModal()" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
-              🔥 Retirar do Fogo
+            <button onclick="openRemoveFogoModal()" class="btn-warning">
+              Retirar do Fogo
+            </button>
+            <button onclick="openDeleteFogoModal()" class="btn-danger">
+              Excluir Fogo
             </button>
           </div>
           <div class="empty-state">
-            <div class="empty-state-icon">🔥</div>
+            <div class="empty-state-icon">Fogos</div>
             <p>Módulo em Desenvolvimento</p>
-            <p style="font-size: 0.8rem; margin-top: 10px;">Use o botão acima para retirar fogos</p>
+            <p style="font-size: 0.8rem; margin-top: 10px;">Use os botões acima para gerenciar fogos</p>
           </div>
         </div>
       </div>
@@ -960,7 +986,7 @@
   <!-- Modal Adicionar Pneu -->
   <div class="modal-backdrop" id="addPneuModal">
     <div class="modal">
-      <h2>➕ Adicionar Pneu ao Estoque</h2>
+      <h2>Adicionar Pneu ao Estoque</h2>
       
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <div class="field-group">
@@ -1022,7 +1048,7 @@
 
       <div class="modal-actions">
         <button class="btn-xs" onclick="closeAddPneuModal()">Cancelar</button>
-        <button onclick="confirmAddPneu()" style="background: linear-gradient(135deg, var(--success), #059669);">Adicionar</button>
+        <button onclick="confirmAddPneu()" class="btn-success">Adicionar</button>
       </div>
     </div>
   </div>
@@ -1030,7 +1056,7 @@
   <!-- Modal Retirar do Estoque -->
   <div class="modal-backdrop" id="removePneuModal">
     <div class="modal">
-      <h2>📤 Retirar Pneu do Estoque</h2>
+      <h2>Retirar Pneu do Estoque</h2>
       
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <div class="field-group">
@@ -1070,7 +1096,7 @@
 
       <div class="modal-actions">
         <button class="btn-xs" onclick="closeRemovePneuModal()">Cancelar</button>
-        <button onclick="confirmRemovePneu()" style="background: linear-gradient(135deg, var(--warn), #ea580c);">Confirmar Retirada</button>
+        <button onclick="confirmRemovePneu()" class="btn-warning">Confirmar Retirada</button>
       </div>
     </div>
   </div>
@@ -1078,7 +1104,7 @@
   <!-- Modal Retirar do Fogo -->
   <div class="modal-backdrop" id="removeFogoModal">
     <div class="modal">
-      <h2>🔥 Retirar Pneu do Fogo</h2>
+      <h2>Retirar Pneu do Fogo</h2>
       
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <div class="field-group">
@@ -1114,7 +1140,87 @@
 
       <div class="modal-actions">
         <button class="btn-xs" onclick="closeRemoveFogoModal()">Cancelar</button>
-        <button onclick="confirmRemoveFogo()" style="background: linear-gradient(135deg, var(--danger), #dc2626);">Confirmar Retirada</button>
+        <button onclick="confirmRemoveFogo()" class="btn-warning">Confirmar Retirada</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Excluir Pneu -->
+  <div class="modal-backdrop" id="deletePneuModal">
+    <div class="modal">
+      <h2>Excluir Pneu do Estoque</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-group">
+          <label for="deletePneuSelect">Selecionar Pneu para Excluir</label>
+          <select id="deletePneuSelect" class="input">
+            <option value="">Selecione um pneu...</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="deletePneuMotivo">Motivo da Exclusão</label>
+          <select id="deletePneuMotivo" class="input">
+            <option value="cadastro_errado">Cadastro Errado</option>
+            <option value="duplicidade">Duplicidade</option>
+            <option value="dados_incorretos">Dados Incorretos</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="deletePneuObservacoes">Observações</label>
+          <textarea id="deletePneuObservacoes" class="input" placeholder="Descreva o motivo da exclusão..." style="width: 100%; height: 80px;"></textarea>
+        </div>
+
+        <div style="background: rgba(244, 63, 94, 0.1); padding: 15px; border-radius: var(--radius); border: 1px solid rgba(244, 63, 94, 0.3);">
+          <strong style="color: var(--danger);">Atenção:</strong> Esta ação é irreversível. O pneu será permanentemente removido do sistema.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeDeletePneuModal()">Cancelar</button>
+        <button onclick="confirmDeletePneu()" class="btn-danger">Excluir Permanentemente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Excluir Fogo -->
+  <div class="modal-backdrop" id="deleteFogoModal">
+    <div class="modal">
+      <h2>Excluir Fogo</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-group">
+          <label for="deleteFogoSelect">Selecionar Fogo para Excluir</label>
+          <select id="deleteFogoSelect" class="input">
+            <option value="">Selecione um fogo...</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="deleteFogoMotivo">Motivo da Exclusão</label>
+          <select id="deleteFogoMotivo" class="input">
+            <option value="cadastro_errado">Cadastro Errado</option>
+            <option value="duplicidade">Duplicidade</option>
+            <option value="dados_incorretos">Dados Incorretos</option>
+            <option value="outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="deleteFogoObservacoes">Observações</label>
+          <textarea id="deleteFogoObservacoes" class="input" placeholder="Descreva o motivo da exclusão..." style="width: 100%; height: 80px;"></textarea>
+        </div>
+
+        <div style="background: rgba(244, 63, 94, 0.1); padding: 15px; border-radius: var(--radius); border: 1px solid rgba(244, 63, 94, 0.3);">
+          <strong style="color: var(--danger);">Atenção:</strong> Esta ação é irreversível. O fogo será permanentemente removido do sistema.
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeDeleteFogoModal()">Cancelar</button>
+        <button onclick="confirmDeleteFogo()" class="btn-danger">Excluir Permanentemente</button>
       </div>
     </div>
   </div>
@@ -1517,6 +1623,148 @@
       showNotification(`Fogo ${fogo.fogo} retirado com sucesso!`, 'success');
     }
 
+    function openDeletePneuModal() {
+      // Preencher select com todos os pneus
+      const select = document.getElementById('deletePneuSelect');
+      select.innerHTML = '<option value="">Selecione um pneu...</option>';
+      
+      reportData.items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = `${item.medida} - ${item.marca} ${item.modelo} (${item.qty} unidades)`;
+        select.appendChild(option);
+      });
+
+      document.getElementById('deletePneuModal').style.display = 'flex';
+    }
+
+    function closeDeletePneuModal() {
+      document.getElementById('deletePneuModal').style.display = 'none';
+      // Limpar campos
+      document.getElementById('deletePneuSelect').value = '';
+      document.getElementById('deletePneuObservacoes').value = '';
+    }
+
+    function confirmDeletePneu() {
+      const selectedId = document.getElementById('deletePneuSelect').value;
+      const motivo = document.getElementById('deletePneuMotivo').value;
+      const observacoes = document.getElementById('deletePneuObservacoes').value.trim();
+
+      if (!selectedId) {
+        showNotification('Selecione um pneu para excluir!', 'error');
+        return;
+      }
+
+      const item = reportData.items.find(item => item.id === selectedId);
+      if (!item) {
+        showNotification('Pneu não encontrado!', 'error');
+        return;
+      }
+
+      if (!confirm(`Tem certeza que deseja excluir permanentemente o pneu:\n\n${item.medida} - ${item.marca} ${item.modelo}\n${item.qty} unidades\n\nEsta ação não pode ser desfeita!`)) {
+        return;
+      }
+
+      // Registrar movimento de exclusão
+      const movimento = {
+        id: `MOV-${Date.now()}`,
+        tipo: 'EXCLUSAO',
+        pneuId: item.id,
+        medida: item.medida,
+        marca: item.marca,
+        modelo: item.modelo,
+        quantidade: item.qty,
+        data: new Date().toISOString().split('T')[0],
+        motivo: motivo,
+        observacoes: observacoes,
+        valor: item.preco * item.qty
+      };
+
+      if (!reportData.movements) reportData.movements = [];
+      reportData.movements.push(movimento);
+
+      // Remover permanentemente do estoque
+      reportData.items = reportData.items.filter(i => i.id !== item.id);
+
+      // Salvar e atualizar
+      saveData();
+      renderDashboard();
+      generateStockReport();
+      closeDeletePneuModal();
+      
+      showNotification('Pneu excluído permanentemente do sistema!', 'success');
+    }
+
+    function openDeleteFogoModal() {
+      // Preencher select com todos os fogos
+      const select = document.getElementById('deleteFogoSelect');
+      select.innerHTML = '<option value="">Selecione um fogo...</option>';
+      
+      reportData.fogos.forEach(fogo => {
+        const option = document.createElement('option');
+        option.value = fogo.id;
+        option.textContent = `Fogo ${fogo.fogo} - ${fogo.medida} ${fogo.marca}`;
+        select.appendChild(option);
+      });
+
+      document.getElementById('deleteFogoModal').style.display = 'flex';
+    }
+
+    function closeDeleteFogoModal() {
+      document.getElementById('deleteFogoModal').style.display = 'none';
+      // Limpar campos
+      document.getElementById('deleteFogoSelect').value = '';
+      document.getElementById('deleteFogoObservacoes').value = '';
+    }
+
+    function confirmDeleteFogo() {
+      const selectedId = document.getElementById('deleteFogoSelect').value;
+      const motivo = document.getElementById('deleteFogoMotivo').value;
+      const observacoes = document.getElementById('deleteFogoObservacoes').value.trim();
+
+      if (!selectedId) {
+        showNotification('Selecione um fogo para excluir!', 'error');
+        return;
+      }
+
+      const fogo = reportData.fogos.find(f => f.id === selectedId);
+      if (!fogo) {
+        showNotification('Fogo não encontrado!', 'error');
+        return;
+      }
+
+      if (!confirm(`Tem certeza que deseja excluir permanentemente o fogo:\n\nFogo ${fogo.fogo}\n${fogo.medida} - ${fogo.marca}\n\nEsta ação não pode ser desfeita!`)) {
+        return;
+      }
+
+      // Registrar movimento de exclusão
+      const movimento = {
+        id: `MOV-${Date.now()}`,
+        tipo: 'EXCLUSAO_FOGO',
+        fogoId: fogo.id,
+        fogo: fogo.fogo,
+        medida: fogo.medida,
+        marca: fogo.marca,
+        modelo: fogo.modelo,
+        data: new Date().toISOString().split('T')[0],
+        motivo: motivo,
+        observacoes: observacoes
+      };
+
+      if (!reportData.movements) reportData.movements = [];
+      reportData.movements.push(movimento);
+
+      // Remover permanentemente do controle de fogos
+      reportData.fogos = reportData.fogos.filter(f => f.id !== fogo.id);
+
+      // Salvar e atualizar
+      saveData();
+      renderDashboard();
+      closeDeleteFogoModal();
+      
+      showNotification('Fogo excluído permanentemente do sistema!', 'success');
+    }
+
     function saveData() {
       localStorage.setItem('tc_pneus', JSON.stringify(reportData.items));
       localStorage.setItem('tc_fogos', JSON.stringify(reportData.fogos));
@@ -1760,7 +2008,7 @@
       if (filteredItems.length === 0) {
         tbody.innerHTML = `
           <tr>
-            <td colspan="9" style="text-align: center; padding: 40px; color: var(--muted);">
+            <td colspan="10" style="text-align: center; padding: 40px; color: var(--muted);">
               Nenhum item encontrado com os filtros selecionados
             </td>
           </tr>
@@ -1785,12 +2033,53 @@
               <td>R$ ${valorUnitario.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
               <td><strong>R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
               <td>${new Date(item.dataEntrada).toLocaleDateString('pt-BR')}</td>
+              <td>
+                <button class="btn-xs btn-danger" onclick="deletePneuDirect('${item.id}')" style="font-size: 0.7rem; padding: 4px 8px;">
+                  Excluir
+                </button>
+              </td>
             </tr>
           `;
         }).join('');
       }
 
       totalCount.textContent = filteredItems.length;
+    }
+
+    function deletePneuDirect(itemId) {
+      const item = reportData.items.find(item => item.id === itemId);
+      if (!item) return;
+
+      if (!confirm(`Tem certeza que deseja excluir permanentemente:\n\n${item.medida} - ${item.marca} ${item.modelo}\n${item.qty} unidades\n\nEsta ação não pode ser desfeita!`)) {
+        return;
+      }
+
+      // Registrar movimento de exclusão
+      const movimento = {
+        id: `MOV-${Date.now()}`,
+        tipo: 'EXCLUSAO_DIRETA',
+        pneuId: item.id,
+        medida: item.medida,
+        marca: item.marca,
+        modelo: item.modelo,
+        quantidade: item.qty,
+        data: new Date().toISOString().split('T')[0],
+        motivo: 'Exclusão direta da tabela',
+        valor: item.preco * item.qty
+      };
+
+      if (!reportData.movements) reportData.movements = [];
+      reportData.movements.push(movimento);
+
+      // Remover permanentemente do estoque
+      reportData.items = reportData.items.filter(i => i.id !== itemId);
+
+      // Salvar e atualizar
+      saveData();
+      renderDashboard();
+      generateStockReport();
+      
+      showNotification('Pneu excluído permanentemente do sistema!', 'success');
     }
 
     function generatePerformanceReport() {
