@@ -121,7 +121,7 @@
     
     .report-header {
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
       flex-wrap: wrap;
@@ -184,6 +184,16 @@
     button:hover {
       transform: translateY(-2px);
       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .btn-xs {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      background: rgba(15, 23, 42, 0.4);
+      color: var(--text);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 6px;
+      cursor: pointer;
     }
     
     /* Cards de métricas */
@@ -272,7 +282,7 @@
     
     .chart-header {
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 20px;
     }
@@ -296,13 +306,14 @@
       border-radius: var(--radius);
       overflow: hidden;
       backdrop-filter: blur(10px);
+      margin-bottom: 25px;
     }
     
     .table-header {
       padding: 20px;
       border-bottom: 1px solid rgba(148, 163, 184, 0.1);
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
     }
     
@@ -354,6 +365,9 @@
     .status-novo { background: rgba(16, 185, 129, 0.2); color: #10b981; }
     .status-usado { background: rgba(249, 115, 22, 0.2); color: #f97316; }
     .status-reformado { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
+    .status-alta { background: rgba(244, 63, 94, 0.2); color: #f43f5e; }
+    .status-media { background: rgba(249, 115, 22, 0.2); color: #f97316; }
+    .status-baixa { background: rgba(16, 185, 129, 0.2); color: #10b981; }
     
     /* Cards de exportação */
     .export-cards {
@@ -453,6 +467,28 @@
       margin-bottom: 20px;
       opacity: 0.5;
     }
+
+    /* Notificações */
+    .notification {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 24px;
+      border-radius: var(--radius);
+      color: white;
+      z-index: 1001;
+      animation: slideIn 0.3s ease;
+      text-align: center;
+      min-width: 300px;
+    }
+    .notification.success { background: var(--success); }
+    .notification.error { background: var(--danger); }
+    .notification.warning { background: var(--warn); }
+    @keyframes slideIn {
+      from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
+      to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
     
     /* Responsividade */
     @media (max-width: 768px) {
@@ -490,6 +526,7 @@
       <button class="tab-btn" data-tab="estoque">Estoque</button>
       <button class="tab-btn" data-tab="movimentacao">Movimentação</button>
       <button class="tab-btn" data-tab="financeiro">Financeiro</button>
+      <button class="tab-btn" data-tab="performance">Performance</button>
       <button class="tab-btn" data-tab="fogos">Controle Fogos</button>
     </div>
   </div>
@@ -663,14 +700,126 @@
       </div>
     </div>
 
-    <!-- OUTRAS ABAS (estrutura similar) -->
+    <!-- PERFORMANCE POR VEÍCULO -->
+    <div id="tab-performance" class="tab-content hidden">
+      <div class="reports-container">
+        <div class="report-header">
+          <h2 class="report-title">Performance por Veículo</h2>
+          <div class="controls-row">
+            <select id="veiculoFilter" class="input">
+              <option value="">Todos Veículos</option>
+              <option value="VOLVO FH-540">VOLVO FH-540</option>
+              <option value="SCANIA R450">SCANIA R450</option>
+              <option value="MERCEDES AXOR">MERCEDES AXOR</option>
+              <option value="VOLKSWAGER 8.160">VOLKSWAGER 8.160</option>
+            </select>
+            <select id="periodoFilter" class="input">
+              <option value="30">Últimos 30 dias</option>
+              <option value="90">Últimos 90 dias</option>
+              <option value="180">Últimos 6 meses</option>
+              <option value="365">Último ano</option>
+            </select>
+            <button onclick="generatePerformanceReport()">
+              📈 Gerar Relatório
+            </button>
+            <button onclick="exportPerformanceToExcel()" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+              📊 Exportar Excel
+            </button>
+          </div>
+        </div>
+
+        <!-- Métricas de Performance -->
+        <div class="metrics-grid" id="performanceMetrics">
+          <!-- Será preenchido via JavaScript -->
+        </div>
+
+        <!-- Gráficos de Performance -->
+        <div class="charts-grid">
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Custo por KM por Veículo</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="custoKmChart"></canvas>
+            </div>
+          </div>
+          
+          <div class="chart-card">
+            <div class="chart-header">
+              <h3 class="chart-title">Durabilidade dos Pneus</h3>
+            </div>
+            <div class="chart-container">
+              <canvas id="durabilidadeChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabela de Performance Detalhada -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title">Performance Detalhada por Veículo</h3>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="performanceTable">
+              <thead>
+                <tr>
+                  <th>Veículo</th>
+                  <th>KM Rodados</th>
+                  <th>Pneus Usados</th>
+                  <th>Custo Total</th>
+                  <th>Custo/KM</th>
+                  <th>Durabilidade Média</th>
+                  <th>Eficiência</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Será preenchido via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tabela de Histórico de Pneus por Veículo -->
+        <div class="table-card">
+          <div class="table-header">
+            <h3 class="table-title">Histórico de Pneus por Veículo</h3>
+          </div>
+          <div class="table-container">
+            <table class="data-table" id="historicoPneusTable">
+              <thead>
+                <tr>
+                  <th>Veículo</th>
+                  <th>Pneu</th>
+                  <th>Marca/Modelo</th>
+                  <th>Data Instalação</th>
+                  <th>Data Remoção</th>
+                  <th>KM Rodados</th>
+                  <th>Custo</th>
+                  <th>Custo/KM</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Será preenchido via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTRAS ABAS -->
     <div id="tab-movimentacao" class="tab-content hidden">
       <div class="reports-container">
         <div class="report-header">
           <h2 class="report-title">Relatório de Movimentação</h2>
-          <!-- Controles similares -->
+          <div class="empty-state">
+            <div class="empty-state-icon">🔄</div>
+            <p>Módulo em Desenvolvimento</p>
+            <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
+          </div>
         </div>
-        <!-- Conteúdo específico -->
       </div>
     </div>
 
@@ -678,9 +827,12 @@
       <div class="reports-container">
         <div class="report-header">
           <h2 class="report-title">Relatório Financeiro</h2>
-          <!-- Controles similares -->
+          <div class="empty-state">
+            <div class="empty-state-icon">💵</div>
+            <p>Módulo em Desenvolvimento</p>
+            <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
+          </div>
         </div>
-        <!-- Conteúdo específico -->
       </div>
     </div>
 
@@ -688,9 +840,12 @@
       <div class="reports-container">
         <div class="report-header">
           <h2 class="report-title">Controle de Fogos</h2>
-          <!-- Controles similares -->
+          <div class="empty-state">
+            <div class="empty-state-icon">🔥</div>
+            <p>Módulo em Desenvolvimento</p>
+            <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
+          </div>
         </div>
-        <!-- Conteúdo específico -->
       </div>
     </div>
   </main>
@@ -713,6 +868,10 @@
       <span class="nav-icon">💵</span>
       <span>Financeiro</span>
     </button>
+    <button class="nav-btn" data-tab="performance">
+      <span class="nav-icon">🚛</span>
+      <span>Performance</span>
+    </button>
     <button class="nav-btn" data-tab="fogos">
       <span class="nav-icon">🔥</span>
       <span>Fogos</span>
@@ -724,11 +883,12 @@
     let reportData = {
       items: [],
       fogos: [],
-      movements: []
+      movements: [],
+      performance: []
     };
 
     // Gráficos
-    let statusChart, containerChart, movementChart, brandsChart;
+    let statusChart, containerChart, movementChart, brandsChart, custoKmChart, durabilidadeChart;
 
     document.addEventListener('DOMContentLoaded', function() {
       loadReportData();
@@ -760,14 +920,8 @@
             case 'estoque':
               generateStockReport();
               break;
-            case 'movimentacao':
-              generateMovementReport();
-              break;
-            case 'financeiro':
-              generateFinancialReport();
-              break;
-            case 'fogos':
-              generateFogosReport();
+            case 'performance':
+              generatePerformanceReport();
               break;
           }
         });
@@ -783,15 +937,15 @@
     }
 
     function loadReportData() {
-      // Carregar dados do localStorage ou Firebase
+      // Carregar dados do localStorage
       const savedItems = localStorage.getItem('tc_pneus');
       const savedFogos = localStorage.getItem('tc_fogos');
       
       reportData.items = savedItems ? JSON.parse(savedItems) : generateSampleData();
       reportData.fogos = savedFogos ? JSON.parse(savedFogos) : [];
       
-      // Gerar dados de movimentação de exemplo
-      reportData.movements = generateMovementData();
+      // Gerar dados de performance
+      reportData.performance = generatePerformanceData();
     }
 
     function generateSampleData() {
@@ -830,6 +984,48 @@
           container: "container1"
         }
       ];
+    }
+
+    function generatePerformanceData() {
+      const veiculos = ['VOLVO FH-540', 'SCANIA R450', 'MERCEDES AXOR', 'VOLKSWAGER 8.160'];
+      const performance = [];
+
+      veiculos.forEach(veiculo => {
+        const kmRodados = Math.floor(Math.random() * 50000) + 100000;
+        const pneusUsados = Math.floor(Math.random() * 8) + 4;
+        const custoTotal = Math.floor(Math.random() * 20000) + 10000;
+        const custoKm = custoTotal / kmRodados;
+        const durabilidade = Math.floor(Math.random() * 30000) + 40000;
+        
+        performance.push({
+          veiculo: veiculo,
+          kmRodados: kmRodados,
+          pneusUsados: pneusUsados,
+          custoTotal: custoTotal,
+          custoKm: custoKm,
+          durabilidadeMedia: durabilidade,
+          eficiencia: Math.random() * 0.3 + 0.7, // 70-100%
+          status: custoKm < 0.15 ? 'Ótimo' : custoKm < 0.25 ? 'Bom' : 'Atenção'
+        });
+
+        // Adicionar histórico de pneus
+        for (let i = 0; i < pneusUsados; i++) {
+          performance.push({
+            tipo: 'historico',
+            veiculo: veiculo,
+            pneu: `FOGO-${Math.floor(Math.random() * 9000) + 1000}`,
+            marca: ['Michelin', 'Bridgestone', 'Goodyear', 'Pirelli'][Math.floor(Math.random() * 4)],
+            modelo: ['X Line', 'R298', 'Fuel Max', 'P01'][Math.floor(Math.random() * 4)],
+            dataInstalacao: new Date(2024, Math.floor(Math.random() * 6), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
+            dataRemocao: new Date(2024, Math.floor(Math.random() * 6) + 6, Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
+            kmRodados: Math.floor(Math.random() * 40000) + 30000,
+            custo: Math.floor(Math.random() * 2000) + 800,
+            status: ['Troca Normal', 'Desgaste', 'Reforma', 'Danificado'][Math.floor(Math.random() * 4)]
+          });
+        }
+      });
+
+      return performance;
     }
 
     function generateMovementData() {
@@ -1036,7 +1232,7 @@
           <td>${alert.descricao}</td>
           <td>${alert.container}</td>
           <td>
-            <span class="status-badge ${alert.prioridade === 'Alta' ? 'status-usado' : 'status-reformado'}">
+            <span class="status-badge ${alert.prioridade === 'Alta' ? 'status-alta' : alert.prioridade === 'Média' ? 'status-media' : 'status-baixa'}">
               ${alert.prioridade}
             </span>
           </td>
@@ -1067,8 +1263,6 @@
         statusData.Reformado
       ];
       statusChart.update();
-
-      // Atualizar outros gráficos similarmente...
     }
 
     function generateStockReport() {
@@ -1120,9 +1314,215 @@
       totalCount.textContent = filteredItems.length;
     }
 
+    function generatePerformanceReport() {
+      const veiculoFilter = document.getElementById('veiculoFilter').value;
+      const periodoFilter = document.getElementById('periodoFilter').value;
+
+      // Filtrar dados de performance
+      const performanceData = reportData.performance.filter(item => 
+        !item.tipo && (!veiculoFilter || item.veiculo === veiculoFilter)
+      );
+
+      const historicoData = reportData.performance.filter(item => 
+        item.tipo === 'historico' && (!veiculoFilter || item.veiculo === veiculoFilter)
+      );
+
+      // Renderizar métricas
+      renderPerformanceMetrics(performanceData);
+
+      // Renderizar tabela de performance
+      renderPerformanceTable(performanceData);
+
+      // Renderizar histórico de pneus
+      renderHistoricoPneus(historicoData);
+
+      // Inicializar gráficos de performance
+      initializePerformanceCharts(performanceData);
+    }
+
+    function renderPerformanceMetrics(performanceData) {
+      const totalCusto = performanceData.reduce((sum, item) => sum + item.custoTotal, 0);
+      const totalKm = performanceData.reduce((sum, item) => sum + item.kmRodados, 0);
+      const custoMedioKm = totalCusto / totalKm;
+      const eficienciaMedia = performanceData.reduce((sum, item) => sum + item.eficiencia, 0) / performanceData.length;
+
+      document.getElementById('performanceMetrics').innerHTML = `
+        <div class="metric-card">
+          <div class="metric-value">R$ ${totalCusto.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+          <div class="metric-label">Custo Total</div>
+          <div class="metric-change ${custoMedioKm < 0.2 ? 'positive' : 'negative'}">
+            ${custoMedioKm < 0.2 ? '↓' : '↑'} Custo/KM: R$ ${custoMedioKm.toFixed(3)}
+          </div>
+        </div>
+        
+        <div class="metric-card">
+          <div class="metric-value">${totalKm.toLocaleString('pt-BR')} KM</div>
+          <div class="metric-label">KM Rodados</div>
+          <div class="metric-change positive">↑ 8% vs período anterior</div>
+        </div>
+        
+        <div class="metric-card">
+          <div class="metric-value">${(eficienciaMedia * 100).toFixed(1)}%</div>
+          <div class="metric-label">Eficiência Média</div>
+          <div class="metric-change ${eficienciaMedia > 0.8 ? 'positive' : 'negative'}">
+            ${eficienciaMedia > 0.8 ? '↑' : '↓'} ${(eficienciaMedia * 100 - 80).toFixed(1)}% da meta
+          </div>
+        </div>
+        
+        <div class="metric-card">
+          <div class="metric-value">${performanceData.length}</div>
+          <div class="metric-label">Veículos Ativos</div>
+          <div class="metric-change positive">↑ 2 vs período anterior</div>
+        </div>
+      `;
+    }
+
+    function renderPerformanceTable(performanceData) {
+      const tbody = document.querySelector('#performanceTable tbody');
+      
+      if (performanceData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--muted);">
+              Nenhum dado de performance encontrado
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = performanceData.map(item => {
+          const statusClass = item.status === 'Ótimo' ? 'status-novo' : 
+                            item.status === 'Bom' ? 'status-reformado' : 'status-usado';
+          
+          return `
+            <tr>
+              <td><strong>${item.veiculo}</strong></td>
+              <td>${item.kmRodados.toLocaleString('pt-BR')} KM</td>
+              <td>${item.pneusUsados}</td>
+              <td>R$ ${item.custoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td>R$ ${item.custoKm.toFixed(3)}</td>
+              <td>${item.durabilidadeMedia.toLocaleString('pt-BR')} KM</td>
+              <td>${(item.eficiencia * 100).toFixed(1)}%</td>
+              <td>
+                <span class="status-badge ${statusClass}">
+                  ${item.status}
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function renderHistoricoPneus(historicoData) {
+      const tbody = document.querySelector('#historicoPneusTable tbody');
+      
+      if (historicoData.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 40px; color: var(--muted);">
+              Nenhum histórico de pneus encontrado
+            </td>
+          </tr>
+        `;
+      } else {
+        tbody.innerHTML = historicoData.map(item => {
+          const custoKm = item.custo / item.kmRodados;
+          
+          return `
+            <tr>
+              <td><strong>${item.veiculo}</strong></td>
+              <td>${item.pneu}</td>
+              <td>${item.marca} ${item.modelo}</td>
+              <td>${new Date(item.dataInstalacao).toLocaleDateString('pt-BR')}</td>
+              <td>${new Date(item.dataRemocao).toLocaleDateString('pt-BR')}</td>
+              <td>${item.kmRodados.toLocaleString('pt-BR')} KM</td>
+              <td>R$ ${item.custo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td>R$ ${custoKm.toFixed(3)}</td>
+              <td>
+                <span class="status-badge ${item.status === 'Troca Normal' ? 'status-novo' : 
+                                         item.status === 'Desgaste' ? 'status-usado' : 
+                                         item.status === 'Reforma' ? 'status-reformado' : 'status-alta'}">
+                  ${item.status}
+                </span>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function initializePerformanceCharts(performanceData) {
+      // Destruir gráficos existentes
+      if (custoKmChart) custoKmChart.destroy();
+      if (durabilidadeChart) durabilidadeChart.destroy();
+
+      const custoCtx = document.getElementById('custoKmChart').getContext('2d');
+      const durabilidadeCtx = document.getElementById('durabilidadeChart').getContext('2d');
+
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#e2e8f0',
+              font: {
+                size: 12
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: '#94a3b8' },
+            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+          },
+          y: {
+            ticks: { color: '#94a3b8' },
+            grid: { color: 'rgba(148, 163, 184, 0.1)' }
+          }
+        }
+      };
+
+      // Gráfico de Custo por KM
+      custoKmChart = new Chart(custoCtx, {
+        type: 'bar',
+        data: {
+          labels: performanceData.map(item => item.veiculo),
+          datasets: [{
+            label: 'Custo por KM (R$)',
+            data: performanceData.map(item => item.custoKm),
+            backgroundColor: performanceData.map(item => 
+              item.custoKm < 0.15 ? '#10b981' : 
+              item.custoKm < 0.25 ? '#f97316' : '#f43f5e'
+            ),
+            borderWidth: 0
+          }]
+        },
+        options: chartOptions
+      });
+
+      // Gráfico de Durabilidade
+      durabilidadeChart = new Chart(durabilidadeCtx, {
+        type: 'bar',
+        data: {
+          labels: performanceData.map(item => item.veiculo),
+          datasets: [{
+            label: 'Durabilidade Média (KM)',
+            data: performanceData.map(item => item.durabilidadeMedia),
+            backgroundColor: '#38bdf8',
+            borderColor: '#0ea5e9',
+            borderWidth: 0
+          }]
+        },
+        options: chartOptions
+      });
+    }
+
     // Funções de exportação
     function exportStockToExcel() {
-      const filteredItems = reportData.items; // Usar filtros aplicados
+      const filteredItems = reportData.items;
       
       const excelData = [
         ['RELATÓRIO DE ESTOQUE - TRANSPORTES CANARINHO'],
@@ -1149,7 +1549,6 @@
         ]);
       });
 
-      // Calcular totais
       const totalQty = filteredItems.reduce((sum, item) => sum + item.qty, 0);
       const totalValue = filteredItems.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0);
       
@@ -1165,51 +1564,106 @@
       showNotification('Relatório exportado com sucesso!', 'success');
     }
 
+    function exportPerformanceToExcel() {
+      const performanceData = reportData.performance.filter(item => !item.tipo);
+      const historicoData = reportData.performance.filter(item => item.tipo === 'historico');
+      
+      const wb = XLSX.utils.book_new();
+      
+      // Planilha de Performance Geral
+      const performanceSheet = [
+        ['RELATÓRIO DE PERFORMANCE - TRANSPORTES CANARINHO'],
+        ['Exportado em:', new Date().toLocaleDateString('pt-BR')],
+        [],
+        ['Veículo', 'KM Rodados', 'Pneus Usados', 'Custo Total', 'Custo/KM', 'Durabilidade Média', 'Eficiência', 'Status']
+      ];
+
+      performanceData.forEach(item => {
+        performanceSheet.push([
+          item.veiculo,
+          item.kmRodados,
+          item.pneusUsados,
+          item.custoTotal,
+          item.custoKm.toFixed(3),
+          item.durabilidadeMedia,
+          `${(item.eficiencia * 100).toFixed(1)}%`,
+          item.status
+        ]);
+      });
+
+      const ws1 = XLSX.utils.aoa_to_sheet(performanceSheet);
+      XLSX.utils.book_append_sheet(wb, ws1, "Performance");
+      
+      // Planilha de Histórico
+      const historicoSheet = [
+        ['HISTÓRICO DE PNEUS POR VEÍCULO'],
+        [],
+        ['Veículo', 'Pneu', 'Marca', 'Modelo', 'Data Instalação', 'Data Remoção', 'KM Rodados', 'Custo', 'Custo/KM', 'Status']
+      ];
+
+      historicoData.forEach(item => {
+        const custoKm = item.custo / item.kmRodados;
+        historicoSheet.push([
+          item.veiculo,
+          item.pneu,
+          item.marca,
+          item.modelo,
+          new Date(item.dataInstalacao).toLocaleDateString('pt-BR'),
+          new Date(item.dataRemocao).toLocaleDateString('pt-BR'),
+          item.kmRodados,
+          item.custo,
+          custoKm.toFixed(3),
+          item.status
+        ]);
+      });
+
+      const ws2 = XLSX.utils.aoa_to_sheet(historicoSheet);
+      XLSX.utils.book_append_sheet(wb, ws2, "Histórico Pneus");
+      
+      XLSX.writeFile(wb, `relatorio-performance-${new Date().toISOString().split('T')[0]}.xlsx`);
+      
+      showNotification('Relatório de performance exportado com sucesso!', 'success');
+    }
+
     function exportComprehensiveReport() {
       showNotification('Gerando relatório completo...', 'success');
-      // Implementação completa geraria PDF com todos os dados
     }
 
     function exportFinancialReport() {
       showNotification('Gerando relatório financeiro...', 'success');
-      // Implementação específica para relatório financeiro
     }
 
     function exportInventoryReport() {
       showNotification('Gerando relatório de inventário...', 'success');
-      // Implementação específica para inventário
     }
 
     function applyDateFilter() {
       const startDate = document.getElementById('startDate').value;
       const endDate = document.getElementById('endDate').value;
       
-      // Aplicar filtro de data aos dados
       showNotification(`Filtro aplicado: ${startDate} até ${endDate}`, 'success');
       renderDashboard();
     }
 
     function generateDashboardReport() {
       showNotification('Relatório do dashboard gerado com sucesso!', 'success');
-      // Implementação para gerar relatório do dashboard
     }
 
     function showNotification(message, type = 'success') {
-      // Implementar notificação (já existe no código principal)
-      alert(message); // Temporário
-    }
-
-    // Outras funções de relatório...
-    function generateMovementReport() {
-      // Implementar relatório de movimentação
-    }
-
-    function generateFinancialReport() {
-      // Implementar relatório financeiro
-    }
-
-    function generateFogosReport() {
-      // Implementar relatório de fogos
+      const existingNotifications = document.querySelectorAll('.notification');
+      existingNotifications.forEach(notif => notif.remove());
+      
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        if (notification.parentNode) {
+          notification.remove();
+        }
+      }, 3000);
     }
   </script>
 </body>
