@@ -556,6 +556,37 @@
       color: var(--muted);
       font-size: 0.9rem;
     }
+
+    /* Estilos para controles de quantidade */
+    .quantity-control {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+    }
+
+    .quantity-input {
+      width: 50px;
+      padding: 4px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      border-radius: 4px;
+      color: var(--text);
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .quantity-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.1);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 5px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
     
     /* Responsividade */
     @media (max-width: 768px) {
@@ -578,6 +609,19 @@
       
       .date-range {
         flex-direction: column;
+      }
+
+      .quantity-control {
+        flex-direction: column;
+      }
+      
+      .quantity-input {
+        width: 100%;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
       }
     }
 
@@ -765,17 +809,12 @@
           </div>
         </div>
 
-        <!-- Botões de Ação para Estoque -->
+        <!-- Botões de Ação para Estoque - MODIFICADO -->
         <div class="controls-row" style="margin-bottom: 25px;">
           <button onclick="openAddPneuModal()" class="btn-success">
             Adicionar Pneu ao Estoque
           </button>
-          <button onclick="openRemovePneuModal()" class="btn-warning">
-            Retirar do Estoque
-          </button>
-          <button onclick="openDeletePneuModal()" class="btn-danger">
-            Excluir Pneu
-          </button>
+          <!-- REMOVIDOS: Botões Retirar do Estoque e Excluir Pneu -->
         </div>
 
         <div class="table-card">
@@ -1208,6 +1247,68 @@
 
     // Variável para controlar fogo sendo editado
     let fogoEditando = null;
+
+    // =============================================
+    // FUNÇÕES PARA CONTROLE DE QUANTIDADE DE PNEUS
+    // =============================================
+
+    function openEditPneuModal(pneuId) {
+        const pneu = reportData.items.find(p => p.id === pneuId);
+        if (!pneu) return;
+
+        // Preencher modal de edição (você pode criar um modal específico para edição)
+        showNotification(`✏️ Editando pneu ${pneuId} - Em desenvolvimento`, 'warning');
+        
+        // Para implementação completa, crie um modal similar ao de adicionar
+        // mas preenchido com os dados atuais do pneu
+    }
+
+    function removePneuQuantity(pneuId, buttonElement) {
+        const pneu = reportData.items.find(p => p.id === pneuId);
+        if (!pneu) {
+            showNotification('Pneu não encontrado!', 'error');
+            return;
+        }
+
+        // Encontrar o input de quantidade na mesma linha
+        const row = buttonElement.closest('tr');
+        const quantityInput = row.querySelector('.quantity-input');
+        const quantidadeRemover = parseInt(quantityInput.value);
+
+        if (!quantidadeRemover || quantidadeRemover <= 0) {
+            showNotification('Informe uma quantidade válida!', 'error');
+            return;
+        }
+
+        if (quantidadeRemover > pneu.qty) {
+            showNotification(`Quantidade indisponível! Disponível: ${pneu.qty}`, 'error');
+            return;
+        }
+
+        if (confirm(`Remover ${quantidadeRemover} unidade(s) do pneu ${pneuId}?`)) {
+            // Atualizar quantidade
+            pneu.qty -= quantidadeRemover;
+            
+            // Se quantidade chegar a zero, remover o pneu
+            if (pneu.qty <= 0) {
+                const index = reportData.items.findIndex(p => p.id === pneuId);
+                if (index !== -1) {
+                    reportData.items.splice(index, 1);
+                    showNotification(`Pneu ${pneuId} removido do estoque!`, 'success');
+                }
+            } else {
+                showNotification(`${quantidadeRemover} unidade(s) removida(s) do pneu ${pneuId}`, 'success');
+            }
+
+            // Salvar e atualizar
+            saveData();
+            generateStockReport();
+            renderDashboard();
+            
+            // Verificar alertas automáticos
+            verificarAlertasAutomaticos();
+        }
+    }
 
     // =============================================
     // SISTEMA DE ALERTAS FUNCIONAL
@@ -2663,41 +2764,9 @@
       }
     }
 
-    function deletePneu(pneuId) {
-      if (!confirm('Tem certeza que deseja excluir este pneu?')) return;
-
-      const index = reportData.items.findIndex(p => p.id === pneuId);
-      if (index !== -1) {
-        reportData.items.splice(index, 1);
-        saveData();
-        showNotification('Pneu excluído com sucesso!', 'success');
-        generateStockReport();
-        renderDashboard();
-      }
-    }
-
     // =============================================
-    // FUNÇÕES DE RELATÓRIOS
+    // FUNÇÃO ATUALIZADA PARA GERAR RELATÓRIO DE ESTOQUE
     // =============================================
-
-    function generateDashboardReport() {
-      showNotification('📊 Gerando relatório do dashboard...', 'success');
-      setTimeout(() => {
-        showNotification('✅ Relatório do dashboard gerado com sucesso!', 'success');
-      }, 2000);
-    }
-
-    function applyDateFilter() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      
-      if (startDate && endDate) {
-        showNotification(`📅 Filtro aplicado: ${startDate} até ${endDate}`, 'success');
-        renderDashboard();
-      } else {
-        showNotification('⚠️ Selecione ambas as datas para aplicar o filtro', 'warning');
-      }
-    }
 
     function generateStockReport() {
       const containerFilter = document.getElementById('containerFilter').value;
@@ -2742,7 +2811,13 @@
                 <td><strong>R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
                 <td>${new Date(item.dataEntrada).toLocaleDateString('pt-BR')}</td>
                 <td>
-                  <button class="btn-xs btn-danger" onclick="deletePneu('${item.id}')">Excluir</button>
+                  <div class="action-buttons">
+                    <button class="btn-xs" onclick="openEditPneuModal('${item.id}')">Editar</button>
+                    <div class="quantity-control">
+                      <input type="number" class="quantity-input" value="1" min="1" max="${item.qty}">
+                      <button class="btn-xs btn-danger" onclick="removePneuQuantity('${item.id}', this)">Excluir Qtd</button>
+                    </div>
+                  </div>
                 </td>
               </tr>
             `;
@@ -2878,16 +2953,8 @@
     }
 
     // Funções dos modais que ainda não foram implementados
-    function openRemovePneuModal() {
-      showNotification('🔄 Modal Remover Pneu - Em desenvolvimento', 'warning');
-    }
-
     function openRemoveFogoModal() {
       showNotification('🔄 Modal Retirar do Fogo - Em desenvolvimento', 'warning');
-    }
-
-    function openDeletePneuModal() {
-      showNotification('🗑️ Modal Excluir Pneu - Em desenvolvimento', 'warning');
     }
 
     function openDeleteFogoModal() {
