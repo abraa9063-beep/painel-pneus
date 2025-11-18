@@ -1436,6 +1436,479 @@
     }
 
     // =============================================
+    // FUNÇÕES DE RELATÓRIOS REAIS
+    // =============================================
+
+    function exportComprehensiveReport() {
+        showNotification('📊 Gerando relatório completo...', 'success');
+        
+        setTimeout(() => {
+            // Criar dados para o relatório completo
+            const dadosRelatorio = {
+                titulo: "Relatório Completo - Transportes Canarinho",
+                dataGeracao: new Date().toLocaleString('pt-BR'),
+                resumo: {
+                    totalEstoque: reportData.items.reduce((sum, item) => sum + item.qty, 0),
+                    totalFogos: reportData.fogos.length,
+                    valorTotalEstoque: reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0),
+                    alertasPendentes: sistemaAlertas.filter(a => a.status === 'pendente').length
+                },
+                estoque: reportData.items,
+                fogos: reportData.fogos,
+                alertas: sistemaAlertas.filter(a => a.status === 'pendente'),
+                performance: reportData.performance.filter(p => !p.tipo)
+            };
+
+            // Gerar PDF
+            gerarPDFCompleto(dadosRelatorio);
+            showNotification('✅ Relatório completo gerado e baixado!', 'success');
+        }, 1500);
+    }
+
+    function exportFinancialReport() {
+        showNotification('💰 Gerando relatório financeiro...', 'success');
+        
+        setTimeout(() => {
+            // Calcular totais financeiros
+            const totalInvestido = reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0);
+            const custoFogosAtivos = reportData.fogos.reduce((sum, fogo) => {
+                const pneu = reportData.items.find(p => p.id === fogo.pneuId);
+                return sum + (pneu ? pneu.preco : 0);
+            }, 0);
+            
+            const dadosFinanceiros = {
+                titulo: "Relatório Financeiro - Transportes Canarinho",
+                dataGeracao: new Date().toLocaleString('pt-BR'),
+                totais: {
+                    investimentoTotal: totalInvestido,
+                    valorEmFogos: custoFogosAtivos,
+                    valorEmEstoque: totalInvestido - custoFogosAtivos
+                },
+                estoquePorStatus: calcularEstoquePorStatus(),
+                top5MaisCaros: reportData.items
+                    .sort((a, b) => (b.preco * b.qty) - (a.preco * a.qty))
+                    .slice(0, 5)
+            };
+
+            gerarPDFFinanceiro(dadosFinanceiros);
+            showNotification('✅ Relatório financeiro gerado e baixado!', 'success');
+        }, 1500);
+    }
+
+    function exportInventoryReport() {
+        showNotification('📦 Gerando relatório de estoque...', 'success');
+        
+        setTimeout(() => {
+            // Usar a mesma função de exportação para Excel, mas em PDF
+            const dadosEstoque = {
+                titulo: "Relatório de Estoque - Transportes Canarinho", 
+                dataGeracao: new Date().toLocaleString('pt-BR'),
+                itens: reportData.items,
+                totais: {
+                    porStatus: calcularEstoquePorStatus(),
+                    porContainer: calcularEstoquePorContainer(),
+                    porMarca: calcularEstoquePorMarca()
+                }
+            };
+
+            gerarPDFEstoque(dadosEstoque);
+            showNotification('✅ Relatório de estoque gerado e baixado!', 'success');
+        }, 1500);
+    }
+
+    // =============================================
+    // GERADORES DE PDF
+    // =============================================
+
+    function gerarPDFCompleto(dados) {
+        // Criar conteúdo HTML para o PDF
+        const conteudoHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>${dados.titulo}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+                    .section { margin-bottom: 30px; }
+                    .metricas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+                    .metrica { background: #f5f5f5; padding: 15px; border-radius: 5px; text-align: center; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .valor { text-align: right; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>${dados.titulo}</h1>
+                    <p>Gerado em: ${dados.dataGeracao}</p>
+                </div>
+                
+                <div class="section">
+                    <h2>📊 Resumo Geral</h2>
+                    <div class="metricas">
+                        <div class="metrica">
+                            <h3>Total em Estoque</h3>
+                            <p style="font-size: 24px; font-weight: bold;">${dados.resumo.totalEstoque}</p>
+                        </div>
+                        <div class="metrica">
+                            <h3>Pneus com Fogo</h3>
+                            <p style="font-size: 24px; font-weight: bold;">${dados.resumo.totalFogos}</p>
+                        </div>
+                        <div class="metrica">
+                            <h3>Valor Total</h3>
+                            <p style="font-size: 24px; font-weight: bold;">R$ ${dados.resumo.valorTotalEstoque.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        </div>
+                        <div class="metrica">
+                            <h3>Alertas Pendentes</h3>
+                            <p style="font-size: 24px; font-weight: bold;">${dados.resumo.alertasPendentes}</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section">
+                    <h2>📦 Estoque Detalhado</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Medida</th>
+                                <th>Marca/Modelo</th>
+                                <th>Status</th>
+                                <th>Qtd</th>
+                                <th>Valor Unit.</th>
+                                <th>Valor Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${dados.estoque.map(item => `
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.medida}</td>
+                                    <td>${item.marca} ${item.modelo}</td>
+                                    <td>${item.status}</td>
+                                    <td>${item.qty}</td>
+                                    <td class="valor">R$ ${(item.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                    <td class="valor">R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                
+                ${dados.alertas.length > 0 ? `
+                <div class="section">
+                    <h2>🚨 Alertas Pendentes</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Descrição</th>
+                                <th>Container</th>
+                                <th>Prioridade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${dados.alertas.map(alerta => `
+                                <tr>
+                                    <td>${alerta.tipo}</td>
+                                    <td>${alerta.descricao}</td>
+                                    <td>${alerta.container}</td>
+                                    <td>${alerta.prioridade}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                ` : ''}
+            </body>
+            </html>
+        `;
+
+        // Gerar e baixar o PDF
+        gerarPDF(conteudoHTML, 'relatorio_completo_transportes_canarinho.pdf');
+    }
+
+    function gerarPDFFinanceiro(dados) {
+        const conteudoHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>${dados.titulo}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+                    .metricas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+                    .metrica { background: #f5f5f5; padding: 15px; border-radius: 5px; text-align: center; }
+                    .valor { font-size: 24px; font-weight: bold; color: #2c5aa0; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>${dados.titulo}</h1>
+                    <p>Gerado em: ${dados.dataGeracao}</p>
+                </div>
+                
+                <div class="metricas">
+                    <div class="metrica">
+                        <h3>Investimento Total</h3>
+                        <div class="valor">R$ ${dados.totais.investimentoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    </div>
+                    <div class="metrica">
+                        <h3>Valor em Fogos</h3>
+                        <div class="valor">R$ ${dados.totais.valorEmFogos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    </div>
+                    <div class="metrica">
+                        <h3>Valor em Estoque</h3>
+                        <div class="valor">R$ ${dados.totais.valorEmEstoque.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    </div>
+                </div>
+                
+                <h2>📊 Distribuição por Status</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Quantidade</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${Object.entries(dados.estoquePorStatus).map(([status, info]) => `
+                            <tr>
+                                <td>${status}</td>
+                                <td>${info.quantidade}</td>
+                                <td>R$ ${info.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                
+                <h2>🏆 Top 5 Mais Valiosos</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Medida</th>
+                            <th>Marca/Modelo</th>
+                            <th>Quantidade</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dados.top5MaisCaros.map(item => `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.medida}</td>
+                                <td>${item.marca} ${item.modelo}</td>
+                                <td>${item.qty}</td>
+                                <td>R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        gerarPDF(conteudoHTML, 'relatorio_financeiro_transportes_canarinho.pdf');
+    }
+
+    function gerarPDFEstoque(dados) {
+        const conteudoHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>${dados.titulo}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
+                    .resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
+                    .card { background: #f5f5f5; padding: 15px; border-radius: 5px; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                    th { background-color: #f2f2f2; }
+                    .valor { text-align: right; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>${dados.titulo}</h1>
+                    <p>Gerado em: ${dados.dataGeracao}</p>
+                </div>
+                
+                <div class="resumo">
+                    <div class="card">
+                        <h3>Por Status</h3>
+                        ${Object.entries(dados.totais.porStatus).map(([status, info]) => `
+                            <p><strong>${status}:</strong> ${info.quantidade} unidades (R$ ${info.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
+                        `).join('')}
+                    </div>
+                    <div class="card">
+                        <h3>Por Container</h3>
+                        ${Object.entries(dados.totais.porContainer).map(([container, info]) => `
+                            <p><strong>${container}:</strong> ${info.quantidade} unidades</p>
+                        `).join('')}
+                    </div>
+                    <div class="card">
+                        <h3>Por Marca</h3>
+                        ${Object.entries(dados.totais.porMarca).map(([marca, quantidade]) => `
+                            <p><strong>${marca}:</strong> ${quantidade} unidades</p>
+                        `).join('')}
+                </div>
+                </div>
+                
+                <h2>📋 Estoque Completo</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Medida</th>
+                            <th>Marca/Modelo</th>
+                            <th>Status</th>
+                            <th>Qtd</th>
+                            <th>Container</th>
+                            <th>Valor Unit.</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dados.itens.map(item => `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.medida}</td>
+                                <td>${item.marca} ${item.modelo}</td>
+                                <td>${item.status}</td>
+                                <td>${item.qty}</td>
+                                <td>${item.container}</td>
+                                <td class="valor">R$ ${(item.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                <td class="valor">R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </body>
+            </html>
+        `;
+
+        gerarPDF(conteudoHTML, 'relatorio_estoque_transportes_canarinho.pdf');
+    }
+
+    // =============================================
+    // FUNÇÃO PRINCIPAL PARA GERAR PDF
+    // =============================================
+
+    function gerarPDF(conteudoHTML, nomeArquivo) {
+        // Criar um blob com o conteúdo HTML
+        const blob = new Blob([conteudoHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        
+        // Criar link para download
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = nomeArquivo;
+        link.style.display = 'none';
+        
+        // Adicionar ao documento e clicar
+        document.body.appendChild(link);
+        link.click();
+        
+        // Limpar
+        setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, 100);
+    }
+
+    // =============================================
+    // FUNÇÕES AUXILIARES PARA CÁLCULOS
+    // =============================================
+
+    function calcularEstoquePorStatus() {
+        const porStatus = {};
+        
+        reportData.items.forEach(item => {
+            if (!porStatus[item.status]) {
+                porStatus[item.status] = {
+                    quantidade: 0,
+                    valorTotal: 0
+                };
+            }
+            porStatus[item.status].quantidade += item.qty;
+            porStatus[item.status].valorTotal += item.qty * (item.preco || 0);
+        });
+        
+        return porStatus;
+    }
+
+    function calcularEstoquePorContainer() {
+        const porContainer = {};
+        
+        reportData.items.forEach(item => {
+            if (!porContainer[item.container]) {
+                porContainer[item.container] = {
+                    quantidade: 0,
+                    valorTotal: 0
+                };
+            }
+            porContainer[item.container].quantidade += item.qty;
+            porContainer[item.container].valorTotal += item.qty * (item.preco || 0);
+        });
+        
+        return porContainer;
+    }
+
+    function calcularEstoquePorMarca() {
+        const porMarca = {};
+        
+        reportData.items.forEach(item => {
+            if (!porMarca[item.marca]) {
+                porMarca[item.marca] = 0;
+            }
+            porMarca[item.marca] += item.qty;
+        });
+        
+        return porMarca;
+    }
+
+    // =============================================
+    // ATUALIZAR FUNÇÃO DE EXPORTAÇÃO DE PERFORMANCE
+    // =============================================
+
+    function exportPerformanceToExcel() {
+        try {
+            // Filtrar apenas dados de performance (não histórico)
+            const dadosPerformance = reportData.performance.filter(p => !p.tipo);
+            
+            const ws = XLSX.utils.json_to_sheet(dadosPerformance.map(item => ({
+                'Veículo': item.veiculo,
+                'KM Rodados': item.kmRodados,
+                'Pneus Usados': item.pneusUsados,
+                'Custo Total': item.custoTotal,
+                'Custo/KM': item.custoKm.toFixed(4),
+                'Durabilidade Média': item.durabilidadeMedia,
+                'Eficiência': (item.eficiencia * 100).toFixed(1) + '%',
+                'Status': item.status
+            })));
+            
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Performance");
+            XLSX.writeFile(wb, "performance_veiculos_canarinho.xlsx");
+            showNotification('📈 Performance exportada para Excel com sucesso!', 'success');
+        } catch (error) {
+            showNotification('❌ Erro ao exportar performance para Excel', 'error');
+            console.error('Erro na exportação:', error);
+        }
+    }
+
+    // =============================================
     // CÓDIGO ORIGINAL (COM ALGUMAS MODIFICAÇÕES)
     // =============================================
 
@@ -2028,27 +2501,6 @@
       }, 2000);
     }
 
-    function exportComprehensiveReport() {
-      showNotification('📋 Gerando relatório completo...', 'success');
-      setTimeout(() => {
-        showNotification('✅ Relatório completo gerado com sucesso!', 'success');
-      }, 2000);
-    }
-
-    function exportFinancialReport() {
-      showNotification('💰 Gerando relatório financeiro...', 'success');
-      setTimeout(() => {
-        showNotification('✅ Relatório financeiro gerado com sucesso!', 'success');
-      }, 2000);
-    }
-
-    function exportInventoryReport() {
-      showNotification('📦 Gerando relatório de estoque...', 'success');
-      setTimeout(() => {
-        showNotification('✅ Relatório de estoque gerado com sucesso!', 'success');
-      }, 2000);
-    }
-
     function applyDateFilter() {
       const startDate = document.getElementById('startDate').value;
       const endDate = document.getElementById('endDate').value;
@@ -2173,10 +2625,6 @@
         showNotification('❌ Erro ao exportar para Excel', 'error');
         console.error('Erro na exportação:', error);
       }
-    }
-
-    function exportPerformanceToExcel() {
-      showNotification('📈 Exportando performance para Excel...', 'success');
     }
 
     function renderFogosList() {
