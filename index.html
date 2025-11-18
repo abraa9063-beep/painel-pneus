@@ -1,1675 +1,342 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Transportes Canarinho - Relatórios Avançados</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
-  <!-- Chart.js para gráficos -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  
-  <!-- SheetJS para Excel -->
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  
-  <style>
-    :root {
-      --bg: #0f172a;
-      --panel: #111827;
-      --accent: #38bdf8;
-      --accent-dark: #0ea5e9;
-      --text: #e2e8f0;
-      --muted: #94a3b8;
-      --danger: #f43f5e;
-      --warn: #f97316;
-      --success: #10b981;
-      --purple: #8b5cf6;
-      --radius: 12px;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    }
-    
-    * {
-      box-sizing: border-box;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    body {
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding-bottom: 70px;
-      overflow-x: hidden;
-    }
-    
-    header {
-      padding: 16px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-      background: rgba(2, 6, 23, 0.95);
-      backdrop-filter: blur(10px);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-    
-    header h1 {
-      margin: 0;
-      font-size: 1.2rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    /* Navegação por tabs */
-    .tabs-container {
-      position: sticky;
-      top: 60px;
-      background: var(--bg);
-      z-index: 90;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    }
-    
-    .tabs-scroll {
-      display: flex;
-      overflow-x: auto;
-      scrollbar-width: none;
-      -ms-overflow-style: none;
-      padding: 0 15px;
-      gap: 8px;
-    }
-    
-    .tabs-scroll::-webkit-scrollbar {
-      display: none;
-    }
-    
-    .tab-btn {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      color: var(--text);
-      padding: 12px 20px;
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      flex-shrink: 0;
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    
-    .tab-btn.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: white;
-      border-color: var(--accent);
-      box-shadow: var(--shadow);
-    }
-    
-    .hidden {
-      display: none !important;
-    }
-    
-    /* Layout principal de relatórios */
-    .reports-container {
-      padding: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-    
-    .report-header {
-      display: flex;
-      justify-content: between;
-      align-items: center;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-      gap: 15px;
-    }
-    
-    .report-title {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, var(--accent), var(--purple));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .controls-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    
-    .date-range {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      background: rgba(15, 23, 42, 0.6);
-      padding: 12px 16px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-    }
-    
-    .input, select, button {
-      padding: 12px 16px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      background: rgba(15, 23, 42, 0.8);
-      color: var(--text);
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-    }
-    
-    .input:focus, select:focus {
-      outline: none;
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
-    }
-    
-    button {
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: white;
-      border: none;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: var(--shadow);
-    }
-    
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
-    }
-    
-    .btn-success {
-      background: linear-gradient(135deg, var(--success), #059669);
-    }
-    
-    .btn-warning {
-      background: linear-gradient(135deg, var(--warn), #ea580c);
-    }
-    
-    .btn-danger {
-      background: linear-gradient(135deg, var(--danger), #dc2626);
-    }
-    
-    .btn-purple {
-      background: linear-gradient(135deg, var(--purple), #7c3aed);
-    }
-    
-    .btn-xs {
-      padding: 8px 12px;
-      font-size: 0.8rem;
-      background: rgba(15, 23, 42, 0.4);
-      color: var(--text);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    
-    /* Cards de métricas */
-    .metrics-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-      margin-bottom: 30px;
-    }
-    
-    .metric-card {
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
-      padding: 25px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .metric-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 4px;
-      background: linear-gradient(90deg, var(--accent), var(--purple));
-    }
-    
-    .metric-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-    
-    .metric-value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      margin-bottom: 8px;
-      background: linear-gradient(135deg, var(--text), var(--muted));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    
-    .metric-label {
-      color: var(--muted);
-      font-size: 0.9rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .metric-change {
-      font-size: 0.8rem;
-      margin-top: 8px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    
-    .positive {
-      color: var(--success);
-    }
-    
-    .negative {
-      color: var(--danger);
-    }
-    
-    /* Grid de gráficos */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 25px;
-      margin-bottom: 30px;
-    }
-    
-    .chart-card {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: var(--radius);
-      padding: 25px;
-      backdrop-filter: blur(10px);
-    }
-    
-    .chart-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .chart-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--text);
-    }
-    
-    .chart-container {
-      position: relative;
-      height: 300px;
-      width: 100%;
-    }
-    
-    /* Tabelas de relatórios */
-    .table-card {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: var(--radius);
-      overflow: hidden;
-      backdrop-filter: blur(10px);
-      margin-bottom: 25px;
-    }
-    
-    .table-header {
-      padding: 20px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .table-title {
-      font-size: 1.3rem;
-      font-weight: 600;
-    }
-    
-    .table-container {
-      overflow-x: auto;
-    }
-    
-    .data-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    
-    .data-table th {
-      background: rgba(30, 41, 59, 0.8);
-      padding: 15px 12px;
-      text-align: left;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-    }
-    
-    .data-table td {
-      padding: 15px 12px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.05);
-      font-size: 0.9rem;
-    }
-    
-    .data-table tr:hover {
-      background: rgba(56, 189, 248, 0.05);
-    }
-    
-    .status-badge {
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    
-    .status-novo { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-    .status-usado { background: rgba(249, 115, 22, 0.2); color: #f97316; }
-    .status-reformado { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
-    .status-alta { background: rgba(244, 63, 94, 0.2); color: #f43f5e; }
-    .status-media { background: rgba(249, 115, 22, 0.2); color: #f97316; }
-    .status-baixa { background: rgba(16, 185, 129, 0.2); color: #10b981; }
-    
-    /* Cards de exportação */
-    .export-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 30px;
-    }
-    
-    .export-card {
-      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
-      padding: 25px;
-      border-radius: var(--radius);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      text-align: center;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    
-    .export-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-      border-color: var(--accent);
-    }
-    
-    .export-icon {
-      font-size: 3rem;
-      margin-bottom: 15px;
-    }
-    
-    .export-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      margin-bottom: 10px;
-    }
-    
-    .export-desc {
-      color: var(--muted);
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-    
-    /* Barra de navegação inferior */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(2, 6, 23, 0.95);
-      backdrop-filter: blur(10px);
-      border-top: 1px solid rgba(148, 163, 184, 0.1);
-      display: flex;
-      padding: 10px 15px;
-      z-index: 99;
-    }
-    
-    .nav-btn {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      background: none;
-      border: none;
-      color: var(--muted);
-      padding: 8px 0;
-      font-size: 0.7rem;
-      cursor: pointer;
-      transition: all 0.3s;
-    }
-    
-    .nav-btn.active {
-      color: var(--accent);
-    }
-    
-    .nav-icon {
-      font-size: 1.2rem;
-    }
-    
-    /* Loading e estados vazios */
-    .loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 40px;
-      color: var(--muted);
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-    
-    .empty-state-icon {
-      font-size: 4rem;
-      margin-bottom: 20px;
-      opacity: 0.5;
-    }
+// =============================================
+// FUNÇÕES DE EXPORTAÇÃO PDF CORRIGIDAS
+// =============================================
 
-    /* Notificações */
-    .notification {
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 12px 24px;
-      border-radius: var(--radius);
-      color: white;
-      z-index: 1001;
-      animation: slideIn 0.3s ease;
-      text-align: center;
-      min-width: 300px;
-    }
-    .notification.success { background: var(--success); }
-    .notification.error { background: var(--danger); }
-    .notification.warning { background: var(--warn); }
-    @keyframes slideIn {
-      from { transform: translateX(-50%) translateY(-100%); opacity: 0; }
-      to { transform: translateX(-50%) translateY(0); opacity: 1; }
-    }
-
-    /* Modais */
-    .modal-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(2, 6, 23, 0.9);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-      padding: 15px;
-    }
-    .modal {
-      background: var(--bg);
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      border-radius: var(--radius);
-      padding: 20px;
-      width: 100%;
-      max-width: 600px;
-      max-height: 90vh;
-      overflow-y: auto;
-    }
-    .modal h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 1.3rem;
-    }
-    .modal-actions {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 15px;
-    }
-    .field-row {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-    }
-    label {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
+function exportComprehensiveReport() {
+    showNotification('📊 Gerando relatório completo...', 'success');
     
-    /* Responsividade */
-    @media (max-width: 768px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .metrics-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .report-header {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      
-      .controls-row {
-        justify-content: center;
-      }
-      
-      .date-range {
-        flex-direction: column;
-      }
-    }
-
-    /* Estilos específicos para fogos */
-    .fogo-item {
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.1);
-      border-radius: var(--radius);
-      padding: 15px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    
-    .fogo-info {
-      flex: 1;
-    }
-    
-    .fogo-number {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: var(--accent);
-    }
-    
-    .fogo-details {
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    
-    .fogo-actions {
-      display: flex;
-      gap: 8px;
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Transportes Canarinho - Relatórios</h1>
-  </header>
-  
-  <div class="tabs-container">
-    <div class="tabs-scroll">
-      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
-      <button class="tab-btn" data-tab="estoque">Estoque</button>
-      <button class="tab-btn" data-tab="movimentacao">Movimentação</button>
-      <button class="tab-btn" data-tab="financeiro">Financeiro</button>
-      <button class="tab-btn" data-tab="performance">Performance</button>
-      <button class="tab-btn" data-tab="fogos">Controle Fogos</button>
-    </div>
-  </div>
-
-  <main>
-    <!-- DASHBOARD PRINCIPAL -->
-<div id="tab-dashboard" class="tab-content">
-  <div class="reports-container">
-    <div class="report-header">
-      <h2 class="report-title">Dashboard Geral</h2>
-      <div class="controls-row">
-        <div class="date-range">
-          <input type="date" id="startDate" class="input">
-          <span>até</span>
-          <input type="date" id="endDate" class="input">
-        </div>
-        <button onclick="applyDateFilter()">
-          Aplicar Filtro
-        </button>
-      </div>
-    </div>
-
-    <!-- Métricas Principais -->
-    <div class="metrics-grid" id="dashboardMetrics">
-      <!-- Será preenchido via JavaScript -->
-    </div>
-
-    <!-- Gráficos -->
-    <div class="charts-grid">
-      <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">Estoque por Status</h3>
-        </div>
-        <div class="chart-container">
-          <canvas id="statusChart"></canvas>
-        </div>
-      </div>
-      
-      <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">Distribuição por Container</h3>
-        </div>
-        <div class="chart-container">
-          <canvas id="containerChart"></canvas>
-        </div>
-      </div>
-      
-      <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">Movimentação Mensal</h3>
-        </div>
-        <div class="chart-container">
-          <canvas id="movementChart"></canvas>
-        </div>
-      </div>
-      
-      <div class="chart-card">
-        <div class="chart-header">
-          <h3 class="chart-title">Top Marcas</h3>
-        </div>
-        <div class="chart-container">
-          <canvas id="brandsChart"></canvas>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabela de Alertas -->
-    <div class="table-card">
-      <div class="table-header">
-        <h3 class="table-title">Alertas e Ações Necessárias</h3>
-        <button class="btn-xs" onclick="markAllAlertsAsResolved()" style="background: var(--success); color: white;">
-          Marcar Todos como Resolvidos
-        </button>
-      </div>
-      <div class="table-container">
-        <table class="data-table" id="alertsTable">
-          <thead>
-            <tr>
-              <th>Tipo</th>
-              <th>Descrição</th>
-              <th>Container</th>
-              <th>Prioridade</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="alertsTableBody">
-            <!-- Será preenchido via JavaScript -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Cards de Exportação -->
-    <div class="export-cards">
-      <div class="export-card" onclick="exportComprehensiveReport()">
-        <div class="export-title">Relatório Completo</div>
-        <div class="export-desc">Exporte todos os dados do sistema em um relatório detalhado em PDF</div>
-      </div>
-      
-      <div class="export-card" onclick="exportFinancialReport()">
-        <div class="export-title">Relatório Financeiro</div>
-        <div class="export-desc">Análise financeira completa com custos, valores e projeções</div>
-      </div>
-      
-      <div class="export-card" onclick="exportInventoryReport()">
-        <div class="export-title">Relatório de Estoque</div>
-        <div class="export-desc">Inventário completo com valores e status de todos os pneus</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-    <!-- RELATÓRIO DE ESTOQUE -->
-    <div id="tab-estoque" class="tab-content hidden">
-      <div class="reports-container">
-        <div class="report-header">
-          <h2 class="report-title">Relatório de Estoque</h2>
-          <div class="controls-row">
-            <select id="containerFilter" class="input">
-              <option value="">Todos Containers</option>
-              <option value="container1">Container 1</option>
-              <option value="container2">Container 2</option>
-              <option value="container3">Container 3</option>
-            </select>
-            <select id="statusFilter" class="input">
-              <option value="">Todos Status</option>
-              <option value="Novo">Novo</option>
-              <option value="Usado">Usado</option>
-              <option value="Reformado">Reformado</option>
-            </select>
-            <button onclick="generateStockReport()">
-              Gerar Relatório
-            </button>
-            <button onclick="exportStockToExcel()" class="btn-success">
-              Exportar Excel
-            </button>
-          </div>
-        </div>
-
-        <!-- Botões de Ação para Estoque -->
-        <div class="controls-row" style="margin-bottom: 25px;">
-          <button onclick="openAddPneuModal()" class="btn-success">
-            Adicionar Pneu ao Estoque
-          </button>
-          <button onclick="openRemovePneuModal()" class="btn-warning">
-            Retirar do Estoque
-          </button>
-          <button onclick="openDeletePneuModal()" class="btn-danger">
-            Excluir Pneu
-          </button>
-        </div>
-
-        <div class="table-card">
-          <div class="table-header">
-            <h3 class="table-title">Estoque Detalhado</h3>
-            <div style="color: var(--muted); font-size: 0.9rem;">
-              <span id="stockCount">0</span> itens encontrados
-            </div>
-          </div>
-          <div class="table-container">
-            <table class="data-table" id="stockTable">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Medida</th>
-                  <th>Marca/Modelo</th>
-                  <th>Status</th>
-                  <th>Qtd</th>
-                  <th>Container</th>
-                  <th>Valor Unit.</th>
-                  <th>Valor Total</th>
-                  <th>Entrada</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Será preenchido via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- PERFORMANCE POR VEÍCULO -->
-    <div id="tab-performance" class="tab-content hidden">
-      <div class="reports-container">
-        <div class="report-header">
-          <h2 class="report-title">Performance por Veículo</h2>
-          <div class="controls-row">
-            <select id="veiculoFilter" class="input">
-              <option value="">Todos Veículos</option>
-              <option value="VOLVO FH-540">VOLVO FH-540</option>
-              <option value="SCANIA R450">SCANIA R450</option>
-              <option value="MERCEDES AXOR">MERCEDES AXOR</option>
-              <option value="VOLKSWAGER 8.160">VOLKSWAGER 8.160</option>
-            </select>
-            <select id="periodoFilter" class="input">
-              <option value="30">Últimos 30 dias</option>
-              <option value="90">Últimos 90 dias</option>
-              <option value="180">Últimos 6 meses</option>
-              <option value="365">Último ano</option>
-            </select>
-            <button onclick="generatePerformanceReport()">
-              Gerar Relatório
-            </button>
-            <button onclick="exportPerformanceToExcel()" class="btn-purple">
-              Exportar Excel
-            </button>
-          </div>
-        </div>
-
-        <!-- Métricas de Performance -->
-        <div class="metrics-grid" id="performanceMetrics">
-          <!-- Será preenchido via JavaScript -->
-        </div>
-
-        <!-- Gráficos de Performance -->
-        <div class="charts-grid">
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Custo por KM por Veículo</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="custoKmChart"></canvas>
-            </div>
-          </div>
-          
-          <div class="chart-card">
-            <div class="chart-header">
-              <h3 class="chart-title">Durabilidade dos Pneus</h3>
-            </div>
-            <div class="chart-container">
-              <canvas id="durabilidadeChart"></canvas>
-            </div>
-          </div>
-        </div>
-
-        <!-- Tabela de Performance Detalhada -->
-        <div class="table-card">
-          <div class="table-header">
-            <h3 class="table-title">Performance Detalhada por Veículo</h3>
-          </div>
-          <div class="table-container">
-            <table class="data-table" id="performanceTable">
-              <thead>
-                <tr>
-                  <th>Veículo</th>
-                  <th>KM Rodados</th>
-                  <th>Pneus Usados</th>
-                  <th>Custo Total</th>
-                  <th>Custo/KM</th>
-                  <th>Durabilidade Média</th>
-                  <th>Eficiência</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Será preenchido via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tabela de Histórico de Pneus por Veículo -->
-        <div class="table-card">
-          <div class="table-header">
-            <h3 class="table-title">Histórico de Pneus por Veículo</h3>
-          </div>
-          <div class="table-container">
-            <table class="data-table" id="historicoPneusTable">
-              <thead>
-                <tr>
-                  <th>Veículo</th>
-                  <th>Pneu</th>
-                  <th>Marca/Modelo</th>
-                  <th>Data Instalação</th>
-                  <th>Data Remoção</th>
-                  <th>KM Rodados</th>
-                  <th>Custo</th>
-                  <th>Custo/KM</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Será preenchido via JavaScript -->
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- OUTRAS ABAS -->
-    <div id="tab-movimentacao" class="tab-content hidden">
-      <div class="reports-container">
-        <div class="report-header">
-          <h2 class="report-title">Relatório de Movimentação</h2>
-          <div class="empty-state">
-            <div class="empty-state-icon">Movimentação</div>
-            <p>Módulo em Desenvolvimento</p>
-            <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div id="tab-financeiro" class="tab-content hidden">
-      <div class="reports-container">
-        <div class="report-header">
-          <h2 class="report-title">Relatório Financeiro</h2>
-          <div class="empty-state">
-            <div class="empty-state-icon">Financeiro</div>
-            <p>Módulo em Desenvolvimento</p>
-            <p style="font-size: 0.8rem; margin-top: 10px;">Em breve disponível</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- CONTROLE DE FOGOS -->
-    <div id="tab-fogos" class="tab-content hidden">
-      <div class="reports-container">
-        <div class="report-header">
-          <h2 class="report-title">Controle de Fogos</h2>
-          <div class="controls-row">
-            <button onclick="openAddFogoModal()" class="btn-success">
-              Adicionar Fogo
-            </button>
-            <button onclick="openRemoveFogoModal()" class="btn-warning">
-              Retirar do Fogo
-            </button>
-            <button onclick="openDeleteFogoModal()" class="btn-danger">
-              Excluir Fogo
-            </button>
-          </div>
-        </div>
-
-        <!-- Lista de Fogos Ativos -->
-        <div class="table-card">
-          <div class="table-header">
-            <h3 class="table-title">Fogos Ativos</h3>
-            <div style="color: var(--muted); font-size: 0.9rem;">
-              <span id="fogosCount">0</span> fogos ativos
-            </div>
-          </div>
-          <div class="table-container">
-            <div id="fogosList" style="padding: 20px;">
-              <!-- Lista de fogos será preenchida aqui -->
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </main>
-
-  <!-- Barra de navegação inferior -->
-  <div class="bottom-nav">
-    <button class="nav-btn active" data-tab="dashboard">
-      <span class="nav-icon">📊</span>
-      <span>Dashboard</span>
-    </button>
-    <button class="nav-btn" data-tab="estoque">
-      <span class="nav-icon">📦</span>
-      <span>Estoque</span>
-    </button>
-    <button class="nav-btn" data-tab="movimentacao">
-      <span class="nav-icon">🔄</span>
-      <span>Movimentação</span>
-    </button>
-    <button class="nav-btn" data-tab="financeiro">
-      <span class="nav-icon">💵</span>
-      <span>Financeiro</span>
-    </button>
-    <button class="nav-btn" data-tab="performance">
-      <span class="nav-icon">🚛</span>
-      <span>Performance</span>
-    </button>
-    <button class="nav-btn" data-tab="fogos">
-      <span class="nav-icon">🔥</span>
-      <span>Fogos</span>
-    </button>
-  </div>
-
-  <!-- Modal Adicionar Pneu -->
-  <div class="modal-backdrop" id="addPneuModal">
-    <div class="modal">
-      <h2>Adicionar Pneu ao Estoque</h2>
-      
-      <div style="display: flex; flex-direction: column; gap: 15px;">
-        <div class="field-row">
-          <div class="field-group">
-            <label for="pneuMedida">Medida</label>
-            <input type="text" id="pneuMedida" class="input" placeholder="Ex: 295/80 R22.5" required>
-          </div>
-          <div class="field-group">
-            <label for="pneuMarca">Marca</label>
-            <input type="text" id="pneuMarca" class="input" placeholder="Ex: Michelin" required>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div class="field-group">
-            <label for="pneuModelo">Modelo</label>
-            <input type="text" id="pneuModelo" class="input" placeholder="Ex: X Line Energy" required>
-          </div>
-          <div class="field-group">
-            <label for="pneuStatus">Status</label>
-            <select id="pneuStatus" class="input" required>
-              <option value="Novo">Novo</option>
-              <option value="Usado">Usado</option>
-              <option value="Reformado">Reformado</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div class="field-group">
-            <label for="pneuQuantidade">Quantidade</label>
-            <input type="number" id="pneuQuantidade" class="input" min="1" value="1" required>
-          </div>
-          <div class="field-group">
-            <label for="pneuPreco">Preço Unitário (R$)</label>
-            <input type="number" id="pneuPreco" class="input" min="0" step="0.01" placeholder="0.00" required>
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="pneuContainer">Container</label>
-          <select id="pneuContainer" class="input" required>
-            <option value="container1">Container 1</option>
-            <option value="container2">Container 2</option>
-            <option value="container3">Container 3</option>
-          </select>
-        </div>
-
-        <div class="field-group">
-          <label for="pneuObservacoes">Observações</label>
-          <textarea id="pneuObservacoes" class="input" placeholder="Observações sobre o pneu..." style="width: 100%; height: 60px;"></textarea>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closeAddPneuModal()">Cancelar</button>
-        <button onclick="confirmAddPneu()" class="btn-success">Adicionar Pneu</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Adicionar Fogo -->
-  <div class="modal-backdrop" id="addFogoModal">
-    <div class="modal">
-      <h2>Adicionar Fogo</h2>
-      
-      <div style="display: flex; flex-direction: column; gap: 15px;">
-        <div class="field-group">
-          <label for="fogoPneuSelect">Selecionar Pneu do Estoque</label>
-          <select id="fogoPneuSelect" class="input">
-            <option value="">Selecione um pneu...</option>
-          </select>
-        </div>
-
-        <div class="field-row">
-          <div class="field-group">
-            <label for="fogoQuantidade">Quantidade de Fogos</label>
-            <input type="number" id="fogoQuantidade" class="input" min="1" value="1">
-          </div>
-          <div class="field-group">
-            <label for="fogoNumeroInicial">Número Inicial do Fogo</label>
-            <input type="number" id="fogoNumeroInicial" class="input" min="1" value="1">
-          </div>
-        </div>
-
-        <div class="field-group">
-          <label for="fogoVeiculo">Veículo</label>
-          <select id="fogoVeiculo" class="input">
-            <option value="VOLVO FH-540">VOLVO FH-540</option>
-            <option value="SCANIA R450">SCANIA R450</option>
-            <option value="MERCEDES AXOR">MERCEDES AXOR</option>
-            <option value="VOLKSWAGER 8.160">VOLKSWAGER 8.160</option>
-            <option value="">Sem Veículo</option>
-          </select>
-        </div>
-
-        <div class="field-group">
-          <label for="fogoPosicao">Posição no Veículo</label>
-          <select id="fogoPosicao" class="input">
-            <option value="Dianteira Esquerda">Dianteira Esquerda</option>
-            <option value="Dianteira Direita">Dianteira Direita</option>
-            <option value="Traseira Externa Esquerda">Traseira Externa Esquerda</option>
-            <option value="Traseira Interna Esquerda">Traseira Interna Esquerda</option>
-            <option value="Traseira Externa Direita">Traseira Externa Direita</option>
-            <option value="Traseira Interna Direita">Traseira Interna Direita</option>
-            <option value="Estepe">Estepe</option>
-            <option value="">Sem Posição</option>
-          </select>
-        </div>
-
-        <div class="field-group">
-          <label for="fogoObservacoes">Observações</label>
-          <textarea id="fogoObservacoes" class="input" placeholder="Observações sobre o fogo..." style="width: 100%; height: 60px;"></textarea>
-        </div>
-
-        <div id="fogoPreview" style="background: rgba(15, 23, 42, 0.4); padding: 15px; border-radius: var(--radius); border: 1px solid rgba(148, 163, 184, 0.2);">
-          <strong>Prévia dos Fogos:</strong>
-          <div id="fogoPreviewList" style="margin-top: 10px; font-size: 0.9rem; color: var(--muted);">
-            Nenhum fogo gerado ainda
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closeAddFogoModal()">Cancelar</button>
-        <button onclick="confirmAddFogo()" class="btn-success">Adicionar Fogos</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Editar Fogo -->
-  <div class="modal-backdrop" id="editFogoModal">
-    <div class="modal">
-      <h2>Editar Fogo</h2>
-      
-      <div style="display: flex; flex-direction: column; gap: 15px;">
-        <div class="field-group">
-          <label for="editFogoNumero">Número do Fogo</label>
-          <input type="text" id="editFogoNumero" class="input" readonly>
-        </div>
-
-        <div class="field-group">
-          <label for="editFogoVeiculo">Veículo</label>
-          <select id="editFogoVeiculo" class="input">
-            <option value="VOLVO FH-540">VOLVO FH-540</option>
-            <option value="SCANIA R450">SCANIA R450</option>
-            <option value="MERCEDES AXOR">MERCEDES AXOR</option>
-            <option value="VOLKSWAGER 8.160">VOLKSWAGER 8.160</option>
-            <option value="">Sem Veículo</option>
-          </select>
-        </div>
-
-        <div class="field-group">
-          <label for="editFogoPosicao">Posição no Veículo</label>
-          <select id="editFogoPosicao" class="input">
-            <option value="Dianteira Esquerda">Dianteira Esquerda</option>
-            <option value="Dianteira Direita">Dianteira Direita</option>
-            <option value="Traseira Externa Esquerda">Traseira Externa Esquerda</option>
-            <option value="Traseira Interna Esquerda">Traseira Interna Esquerda</option>
-            <option value="Traseira Externa Direita">Traseira Externa Direita</option>
-            <option value="Traseira Interna Direita">Traseira Interna Direita</option>
-            <option value="Estepe">Estepe</option>
-            <option value="">Sem Posição</option>
-          </select>
-        </div>
-
-        <div class="field-group">
-          <label for="editFogoObservacoes">Observações</label>
-          <textarea id="editFogoObservacoes" class="input" placeholder="Observações sobre o fogo..." style="width: 100%; height: 80px;"></textarea>
-        </div>
-      </div>
-
-      <div class="modal-actions">
-        <button class="btn-xs" onclick="closeEditFogoModal()">Cancelar</button>
-        <button onclick="confirmEditFogo()" class="btn-success">Salvar Alterações</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Dados de exemplo para demonstração
-    let reportData = {
-      items: [],
-      fogos: [],
-      movements: [],
-      performance: [],
-      ultimoFogo: 0 // Para controle numeração sequencial
+    // Criar dados para o relatório completo
+    const dadosRelatorio = {
+        titulo: "Relatório Completo - Transportes Canarinho",
+        dataGeracao: new Date().toLocaleString('pt-BR'),
+        resumo: {
+            totalEstoque: reportData.items.reduce((sum, item) => sum + item.qty, 0),
+            totalFogos: reportData.fogos.length,
+            valorTotalEstoque: reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0),
+            alertasPendentes: sistemaAlertas.filter(a => a.status === 'pendente').length
+        },
+        estoque: reportData.items,
+        fogos: reportData.fogos,
+        alertas: sistemaAlertas.filter(a => a.status === 'pendente'),
+        performance: reportData.performance.filter(p => !p.tipo)
     };
 
-    // Gráficos
-    let statusChart, containerChart, movementChart, brandsChart, custoKmChart, durabilidadeChart;
+    // Gerar e baixar o PDF
+    gerarPDFCompleto(dadosRelatorio);
+    showNotification('✅ Relatório completo gerado e baixado!', 'success');
+}
 
-    // Variável para controlar fogo sendo editado
-    let fogoEditando = null;
-
-    // =============================================
-    // SISTEMA DE ALERTAS FUNCIONAL
-    // =============================================
-
-    // Array global para gerenciar alertas
-    let sistemaAlertas = [];
-
-    function inicializarSistemaAlertas() {
-      // Carregar alertas do localStorage ou criar padrão
-      const alertasSalvos = localStorage.getItem('tc_alertas');
-      sistemaAlertas = alertasSalvos ? JSON.parse(alertasSalvos) : [
-        {
-          id: 'alert-1',
-          tipo: 'Estoque Baixo',
-          descricao: 'Pneus 295/80 R22.5 com menos de 5 unidades',
-          container: 'Container 1',
-          prioridade: 'Alta',
-          acao: 'Repor Estoque',
-          dataCriacao: new Date().toISOString(),
-          status: 'pendente'
+function exportFinancialReport() {
+    showNotification('💰 Gerando relatório financeiro...', 'success');
+    
+    // Calcular totais financeiros
+    const totalInvestido = reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0);
+    const custoFogosAtivos = reportData.fogos.reduce((sum, fogo) => {
+        const pneu = reportData.items.find(p => p.id === fogo.pneuId);
+        return sum + (pneu ? pneu.preco : 0);
+    }, 0);
+    
+    const dadosFinanceiros = {
+        titulo: "Relatório Financeiro - Transportes Canarinho",
+        dataGeracao: new Date().toLocaleString('pt-BR'),
+        totais: {
+            investimentoTotal: totalInvestido,
+            valorEmFogos: custoFogosAtivos,
+            valorEmEstoque: totalInvestido - custoFogosAtivos
         },
-        {
-          id: 'alert-2',
-          tipo: 'Valorização',
-          descricao: 'Pneus Michelin aumentaram 12% no último mês',
-          container: 'Todos',
-          prioridade: 'Média',
-          acao: 'Revisar Preços',
-          dataCriacao: new Date().toISOString(),
-          status: 'pendente'
-        },
-        {
-          id: 'alert-3',
-          tipo: 'Vencimento',
-          descricao: '5 pneus reformados próximos do vencimento',
-          container: 'Container 2',
-          prioridade: 'Alta',
-          acao: 'Verificar Data',
-          dataCriacao: new Date().toISOString(),
-          status: 'pendente'
+        estoquePorStatus: calcularEstoquePorStatus(),
+        top5MaisCaros: reportData.items
+            .sort((a, b) => (b.preco * b.qty) - (a.preco * a.qty))
+            .slice(0, 5)
+    };
+
+    gerarPDFFinanceiro(dadosFinanceiros);
+    showNotification('✅ Relatório financeiro gerado e baixado!', 'success');
+}
+
+function exportInventoryReport() {
+    showNotification('📦 Gerando relatório de estoque...', 'success');
+    
+    const dadosEstoque = {
+        titulo: "Relatório de Estoque - Transportes Canarinho", 
+        dataGeracao: new Date().toLocaleString('pt-BR'),
+        itens: reportData.items,
+        totais: {
+            porStatus: calcularEstoquePorStatus(),
+            porContainer: calcularEstoquePorContainer(),
+            porMarca: calcularEstoquePorMarca()
         }
-      ];
-      
-      salvarAlertas();
-      renderizarAlertas();
-    }
+    };
 
-    function renderizarAlertas() {
-      const tbody = document.getElementById('alertsTableBody');
-      if (!tbody) return;
+    gerarPDFEstoque(dadosEstoque);
+    showNotification('✅ Relatório de estoque gerado e baixado!', 'success');
+}
 
-      const alertasPendentes = sistemaAlertas.filter(alerta => alerta.status === 'pendente');
+// =============================================
+// GERADORES DE PDF CORRIGIDOS
+// =============================================
 
-      if (alertasPendentes.length === 0) {
-        tbody.innerHTML = `
-          <tr>
-            <td colspan="5" style="text-align: center; padding: 40px; color: var(--muted);">
-              🎉 Todos os alertas foram resolvidos!
-            </td>
-          </tr>
-        `;
-        return;
-      }
-
-      tbody.innerHTML = alertasPendentes.map(alerta => `
-        <tr>
-          <td><strong>${alerta.tipo}</strong></td>
-          <td>${alerta.descricao}</td>
-          <td>${alerta.container}</td>
-          <td>
-            <span class="status-badge ${alerta.prioridade === 'Alta' ? 'status-alta' : alerta.prioridade === 'Média' ? 'status-media' : 'status-baixa'}">
-              ${alerta.prioridade}
-            </span>
-          </td>
-          <td>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-              <button class="btn-xs" onclick="executarAcaoAlerta('${alerta.id}')" 
-                      style="background: var(--accent); color: white;">
-                ${alerta.acao}
-              </button>
-              <button class="btn-xs" onclick="marcarAlertaComoVerificado('${alerta.id}')" 
-                      style="background: var(--success); color: white;">
-                ✅ Verificado
-              </button>
-            </div>
-          </td>
-        </tr>
-      `).join('');
-    }
-
-    function executarAcaoAlerta(alertaId) {
-      const alerta = sistemaAlertas.find(a => a.id === alertaId);
-      if (!alerta) return;
-
-      // Executar ação específica baseada no tipo de alerta
-      switch(alerta.tipo) {
-        case 'Estoque Baixo':
-          // Focar na aba de estoque e aplicar filtro
-          document.querySelector('.tab-btn[data-tab="estoque"]').click();
-          document.getElementById('containerFilter').value = 'container1';
-          setTimeout(() => generateStockReport(), 500);
-          showNotification(`🔍 Navegando para ${alerta.container} - ${alerta.descricao}`, 'success');
-          break;
-          
-        case 'Valorização':
-          // Simular revisão de preços
-          showNotification(`💰 ${alerta.descricao} - Revisando tabela de preços...`, 'warning');
-          setTimeout(() => {
-            showNotification('✅ Tabela de preços atualizada com sucesso!', 'success');
-          }, 2000);
-          break;
-          
-        case 'Vencimento':
-          // Focar na aba de estoque com filtro de status
-          document.querySelector('.tab-btn[data-tab="estoque"]').click();
-          document.getElementById('statusFilter').value = 'Reformado';
-          setTimeout(() => generateStockReport(), 500);
-          showNotification(`📅 Verificando pneus reformados com vencimento próximo...`, 'warning');
-          break;
-          
-        default:
-          showNotification(`⚡ Executando ação: ${alerta.acao}`, 'success');
-      }
-
-      // Marcar como em andamento
-      alerta.status = 'em_andamento';
-      salvarAlertas();
-      renderizarAlertas();
-    }
-
-    function marcarAlertaComoVerificado(alertaId) {
-      const alerta = sistemaAlertas.find(a => a.id === alertaId);
-      if (alerta) {
-        alerta.status = 'resolvido';
-        alerta.dataResolucao = new Date().toISOString();
-        salvarAlertas();
-        renderizarAlertas();
-        showNotification('✅ Alerta marcado como resolvido!', 'success');
-        
-        // Atualizar dashboard
-        renderDashboardMetrics();
-      }
-    }
-
-    function markAllAlertsAsResolved() {
-      if (sistemaAlertas.filter(a => a.status === 'pendente').length === 0) {
-        showNotification('ℹ️ Não há alertas pendentes para resolver.', 'warning');
-        return;
-      }
-
-      if (confirm('Deseja marcar TODOS os alertas como resolvidos?')) {
-        sistemaAlertas.forEach(alerta => {
-          if (alerta.status === 'pendente') {
-            alerta.status = 'resolvido';
-            alerta.dataResolucao = new Date().toISOString();
-          }
-        });
-        
-        salvarAlertas();
-        renderizarAlertas();
-        renderDashboardMetrics();
-        showNotification('🎉 Todos os alertas foram marcados como resolvidos!', 'success');
-      }
-    }
-
-    function salvarAlertas() {
-      localStorage.setItem('tc_alertas', JSON.stringify(sistemaAlertas));
-    }
-
-    function adicionarNovoAlerta(tipo, descricao, container, prioridade, acao) {
-      const novoAlerta = {
-        id: 'alert-' + Date.now(),
-        tipo: tipo,
-        descricao: descricao,
-        container: container,
-        prioridade: prioridade,
-        acao: acao,
-        dataCriacao: new Date().toISOString(),
-        status: 'pendente'
-      };
-      
-      sistemaAlertas.push(novoAlerta);
-      salvarAlertas();
-      renderizarAlertas();
-      renderDashboardMetrics();
-      
-      // Mostrar notificação do novo alerta
-      showNotification(`🚨 Novo alerta: ${tipo} - ${descricao}`, 'warning');
-    }
-
-    // Função para verificar e gerar alertas automaticamente
-    function verificarAlertasAutomaticos() {
-      // Verificar estoque baixo
-      const alertasEstoqueBaixo = verificarEstoqueBaixo();
-      alertasEstoqueBaixo.forEach(alerta => {
-        if (!sistemaAlertas.some(a => a.descricao === alerta.descricao && a.status === 'pendente')) {
-          adicionarNovoAlerta(
-            alerta.tipo,
-            alerta.descricao,
-            alerta.container,
-            alerta.prioridade,
-            alerta.acao
-          );
-        }
-      });
-    }
-
-    function verificarEstoqueBaixo() {
-      const alertas = [];
-      const limiteEstoqueBaixo = 5;
-      
-      reportData.items.forEach(item => {
-        if (item.qty <= limiteEstoqueBaixo) {
-          alertas.push({
-            tipo: 'Estoque Baixo',
-            descricao: `${item.medida} ${item.marca} com apenas ${item.qty} unidades`,
-            container: item.container,
-            prioridade: item.qty <= 2 ? 'Alta' : 'Média',
-            acao: 'Repor Estoque'
-          });
-        }
-      });
-      
-      return alertas;
-    }
-
-    // =============================================
-    // FUNÇÕES DE RELATÓRIOS REAIS
-    // =============================================
-
-    function exportComprehensiveReport() {
-        showNotification('📊 Gerando relatório completo...', 'success');
-        
-        setTimeout(() => {
-            // Criar dados para o relatório completo
-            const dadosRelatorio = {
-                titulo: "Relatório Completo - Transportes Canarinho",
-                dataGeracao: new Date().toLocaleString('pt-BR'),
-                resumo: {
-                    totalEstoque: reportData.items.reduce((sum, item) => sum + item.qty, 0),
-                    totalFogos: reportData.fogos.length,
-                    valorTotalEstoque: reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0),
-                    alertasPendentes: sistemaAlertas.filter(a => a.status === 'pendente').length
-                },
-                estoque: reportData.items,
-                fogos: reportData.fogos,
-                alertas: sistemaAlertas.filter(a => a.status === 'pendente'),
-                performance: reportData.performance.filter(p => !p.tipo)
-            };
-
-            // Gerar PDF
-            gerarPDFCompleto(dadosRelatorio);
-            showNotification('✅ Relatório completo gerado e baixado!', 'success');
-        }, 1500);
-    }
-
-    function exportFinancialReport() {
-        showNotification('💰 Gerando relatório financeiro...', 'success');
-        
-        setTimeout(() => {
-            // Calcular totais financeiros
-            const totalInvestido = reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0);
-            const custoFogosAtivos = reportData.fogos.reduce((sum, fogo) => {
-                const pneu = reportData.items.find(p => p.id === fogo.pneuId);
-                return sum + (pneu ? pneu.preco : 0);
-            }, 0);
-            
-            const dadosFinanceiros = {
-                titulo: "Relatório Financeiro - Transportes Canarinho",
-                dataGeracao: new Date().toLocaleString('pt-BR'),
-                totais: {
-                    investimentoTotal: totalInvestido,
-                    valorEmFogos: custoFogosAtivos,
-                    valorEmEstoque: totalInvestido - custoFogosAtivos
-                },
-                estoquePorStatus: calcularEstoquePorStatus(),
-                top5MaisCaros: reportData.items
-                    .sort((a, b) => (b.preco * b.qty) - (a.preco * a.qty))
-                    .slice(0, 5)
-            };
-
-            gerarPDFFinanceiro(dadosFinanceiros);
-            showNotification('✅ Relatório financeiro gerado e baixado!', 'success');
-        }, 1500);
-    }
-
-    function exportInventoryReport() {
-        showNotification('📦 Gerando relatório de estoque...', 'success');
-        
-        setTimeout(() => {
-            // Usar a mesma função de exportação para Excel, mas em PDF
-            const dadosEstoque = {
-                titulo: "Relatório de Estoque - Transportes Canarinho", 
-                dataGeracao: new Date().toLocaleString('pt-BR'),
-                itens: reportData.items,
-                totais: {
-                    porStatus: calcularEstoquePorStatus(),
-                    porContainer: calcularEstoquePorContainer(),
-                    porMarca: calcularEstoquePorMarca()
+function gerarPDFCompleto(dados) {
+    // Criar conteúdo HTML para o PDF
+    const conteudoHTML = `
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>${dados.titulo}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 20px; 
+                    color: #333;
+                    line-height: 1.4;
                 }
-            };
-
-            gerarPDFEstoque(dadosEstoque);
-            showNotification('✅ Relatório de estoque gerado e baixado!', 'success');
-        }, 1500);
-    }
-
-    // =============================================
-    // GERADORES DE PDF
-    // =============================================
-
-    function gerarPDFCompleto(dados) {
-        // Criar conteúdo HTML para o PDF
-        const conteudoHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>${dados.titulo}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-                    .section { margin-bottom: 30px; }
-                    .metricas { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
-                    .metrica { background: #f5f5f5; padding: 15px; border-radius: 5px; text-align: center; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                    .valor { text-align: right; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>${dados.titulo}</h1>
-                    <p>Gerado em: ${dados.dataGeracao}</p>
-                </div>
-                
-                <div class="section">
-                    <h2>📊 Resumo Geral</h2>
-                    <div class="metricas">
-                        <div class="metrica">
-                            <h3>Total em Estoque</h3>
-                            <p style="font-size: 24px; font-weight: bold;">${dados.resumo.totalEstoque}</p>
-                        </div>
-                        <div class="metrica">
-                            <h3>Pneus com Fogo</h3>
-                            <p style="font-size: 24px; font-weight: bold;">${dados.resumo.totalFogos}</p>
-                        </div>
-                        <div class="metrica">
-                            <h3>Valor Total</h3>
-                            <p style="font-size: 24px; font-weight: bold;">R$ ${dados.resumo.valorTotalEstoque.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
-                        </div>
-                        <div class="metrica">
-                            <h3>Alertas Pendentes</h3>
-                            <p style="font-size: 24px; font-weight: bold;">${dados.resumo.alertasPendentes}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="section">
-                    <h2>📦 Estoque Detalhado</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Medida</th>
-                                <th>Marca/Modelo</th>
-                                <th>Status</th>
-                                <th>Qtd</th>
-                                <th>Valor Unit.</th>
-                                <th>Valor Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${dados.estoque.map(item => `
-                                <tr>
-                                    <td>${item.id}</td>
-                                    <td>${item.medida}</td>
-                                    <td>${item.marca} ${item.modelo}</td>
-                                    <td>${item.status}</td>
-                                    <td>${item.qty}</td>
-                                    <td class="valor">R$ ${(item.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                                    <td class="valor">R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                
-                ${dados.alertas.length > 0 ? `
-                <div class="section">
-                    <h2>🚨 Alertas Pendentes</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Tipo</th>
-                                <th>Descrição</th>
-                                <th>Container</th>
-                                <th>Prioridade</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${dados.alertas.map(alerta => `
-                                <tr>
-                                    <td>${alerta.tipo}</td>
-                                    <td>${alerta.descricao}</td>
-                                    <td>${alerta.container}</td>
-                                    <td>${alerta.prioridade}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
-                ` : ''}
-            </body>
-            </html>
-        `;
-
-        // Gerar e baixar o PDF
-        gerarPDF(conteudoHTML, 'relatorio_completo_transportes_canarinho.pdf');
-    }
-
-    function gerarPDFFinanceiro(dados) {
-        const conteudoHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>${dados.titulo}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-                    .metricas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
-                    .metrica { background: #f5f5f5; padding: 15px; border-radius: 5px; text-align: center; }
-                    .valor { font-size: 24px; font-weight: bold; color: #2c5aa0; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>${dados.titulo}</h1>
-                    <p>Gerado em: ${dados.dataGeracao}</p>
-                </div>
-                
+                .header { 
+                    text-align: center; 
+                    border-bottom: 2px solid #333; 
+                    padding-bottom: 10px; 
+                    margin-bottom: 20px; 
+                }
+                .section { 
+                    margin-bottom: 30px; 
+                    page-break-inside: avoid;
+                }
+                .metricas { 
+                    display: grid; 
+                    grid-template-columns: repeat(2, 1fr); 
+                    gap: 15px; 
+                    margin-bottom: 20px; 
+                }
+                .metrica { 
+                    background: #f5f5f5; 
+                    padding: 15px; 
+                    border-radius: 5px; 
+                    text-align: center; 
+                    border: 1px solid #ddd;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 10px; 
+                    font-size: 12px;
+                }
+                th, td { 
+                    border: 1px solid #ddd; 
+                    padding: 8px; 
+                    text-align: left; 
+                }
+                th { 
+                    background-color: #f2f2f2; 
+                    font-weight: bold;
+                }
+                .valor { 
+                    text-align: right; 
+                }
+                .total-row {
+                    font-weight: bold;
+                    background-color: #e8f4fd;
+                }
+                @media print {
+                    body { margin: 10px; }
+                    .section { page-break-inside: avoid; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>${dados.titulo}</h1>
+                <p><strong>Gerado em:</strong> ${dados.dataGeracao}</p>
+            </div>
+            
+            <div class="section">
+                <h2>📊 Resumo Geral</h2>
                 <div class="metricas">
                     <div class="metrica">
-                        <h3>Investimento Total</h3>
-                        <div class="valor">R$ ${dados.totais.investimentoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                        <h3>Total em Estoque</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #2c5aa0; margin: 5px 0;">${dados.resumo.totalEstoque}</p>
+                        <p style="color: #666; font-size: 12px;">unidades</p>
                     </div>
                     <div class="metrica">
-                        <h3>Valor em Fogos</h3>
-                        <div class="valor">R$ ${dados.totais.valorEmFogos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                        <h3>Pneus com Fogo</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #d35400; margin: 5px 0;">${dados.resumo.totalFogos}</p>
+                        <p style="color: #666; font-size: 12px;">fogos ativos</p>
                     </div>
                     <div class="metrica">
-                        <h3>Valor em Estoque</h3>
-                        <div class="valor">R$ ${dados.totais.valorEmEstoque.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                        <h3>Valor Total</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #27ae60; margin: 5px 0;">R$ ${dados.resumo.valorTotalEstoque.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</p>
+                        <p style="color: #666; font-size: 12px;">investimento</p>
+                    </div>
+                    <div class="metrica">
+                        <h3>Alertas Pendentes</h3>
+                        <p style="font-size: 24px; font-weight: bold; color: #c0392b; margin: 5px 0;">${dados.resumo.alertasPendentes}</p>
+                        <p style="color: #666; font-size: 12px;">atenção necessária</p>
                     </div>
                 </div>
-                
+            </div>
+            
+            <div class="section">
+                <h2>📦 Estoque Detalhado</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Medida</th>
+                            <th>Marca/Modelo</th>
+                            <th>Status</th>
+                            <th>Qtd</th>
+                            <th>Valor Unit.</th>
+                            <th>Valor Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dados.estoque.map(item => `
+                            <tr>
+                                <td><strong>${item.id}</strong></td>
+                                <td>${item.medida}</td>
+                                <td>${item.marca} ${item.modelo}</td>
+                                <td>${item.status}</td>
+                                <td>${item.qty}</td>
+                                <td class="valor">R$ ${(item.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                <td class="valor"><strong>R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
+                            </tr>
+                        `).join('')}
+                        <tr class="total-row">
+                            <td colspan="4"><strong>TOTAL GERAL</strong></td>
+                            <td><strong>${dados.estoque.reduce((sum, item) => sum + item.qty, 0)}</strong></td>
+                            <td></td>
+                            <td class="valor"><strong>R$ ${dados.estoque.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            ${dados.alertas.length > 0 ? `
+            <div class="section">
+                <h2>🚨 Alertas Pendentes</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Tipo</th>
+                            <th>Descrição</th>
+                            <th>Container</th>
+                            <th>Prioridade</th>
+                            <th>Ação Recomendada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${dados.alertas.map(alerta => `
+                            <tr>
+                                <td><strong>${alerta.tipo}</strong></td>
+                                <td>${alerta.descricao}</td>
+                                <td>${alerta.container}</td>
+                                <td style="color: ${alerta.prioridade === 'Alta' ? '#c0392b' : alerta.prioridade === 'Média' ? '#d35400' : '#27ae60'}">
+                                    <strong>${alerta.prioridade}</strong>
+                                </td>
+                                <td>${alerta.acao}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+            ` : ''}
+            
+            <div class="section">
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 11px;">
+                    <p>Relatório gerado automaticamente pelo Sistema Transportes Canarinho</p>
+                    <p>${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
+
+    // Usar método de impressão do navegador para gerar PDF
+    gerarPDFViaImpressao(conteudoHTML, 'relatorio_completo_transportes_canarinho.pdf');
+}
+
+function gerarPDFFinanceiro(dados) {
+    const conteudoHTML = `
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>${dados.titulo}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 20px; 
+                    color: #333;
+                    line-height: 1.4;
+                }
+                .header { 
+                    text-align: center; 
+                    border-bottom: 2px solid #333; 
+                    padding-bottom: 10px; 
+                    margin-bottom: 20px; 
+                }
+                .metricas { 
+                    display: grid; 
+                    grid-template-columns: repeat(3, 1fr); 
+                    gap: 15px; 
+                    margin: 20px 0; 
+                }
+                .metrica { 
+                    background: #f5f5f5; 
+                    padding: 15px; 
+                    border-radius: 5px; 
+                    text-align: center; 
+                    border: 1px solid #ddd;
+                }
+                .valor { 
+                    font-size: 24px; 
+                    font-weight: bold; 
+                    color: #2c5aa0; 
+                    margin: 5px 0;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 10px; 
+                    font-size: 12px;
+                }
+                th, td { 
+                    border: 1px solid #ddd; 
+                    padding: 8px; 
+                    text-align: left; 
+                }
+                th { 
+                    background-color: #f2f2f2; 
+                    font-weight: bold;
+                }
+                .total-row {
+                    font-weight: bold;
+                    background-color: #e8f4fd;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>${dados.titulo}</h1>
+                <p><strong>Gerado em:</strong> ${dados.dataGeracao}</p>
+            </div>
+            
+            <div class="metricas">
+                <div class="metrica">
+                    <h3>Investimento Total</h3>
+                    <div class="valor">R$ ${dados.totais.investimentoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    <p style="color: #666; font-size: 12px;">valor total investido</p>
+                </div>
+                <div class="metrica">
+                    <h3>Valor em Fogos</h3>
+                    <div class="valor">R$ ${dados.totais.valorEmFogos.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    <p style="color: #666; font-size: 12px;">em uso nos veículos</p>
+                </div>
+                <div class="metrica">
+                    <h3>Valor em Estoque</h3>
+                    <div class="valor">R$ ${dados.totais.valorEmEstoque.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
+                    <p style="color: #666; font-size: 12px;">disponível para uso</p>
+                </div>
+            </div>
+            
+            <div class="section">
                 <h2>📊 Distribuição por Status</h2>
                 <table>
                     <thead>
@@ -1677,19 +344,32 @@
                             <th>Status</th>
                             <th>Quantidade</th>
                             <th>Valor Total</th>
+                            <th>% do Total</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${Object.entries(dados.estoquePorStatus).map(([status, info]) => `
-                            <tr>
-                                <td>${status}</td>
-                                <td>${info.quantidade}</td>
-                                <td>R$ ${info.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                            </tr>
-                        `).join('')}
+                        ${Object.entries(dados.estoquePorStatus).map(([status, info]) => {
+                            const percentual = ((info.valorTotal / dados.totais.investimentoTotal) * 100).toFixed(1);
+                            return `
+                                <tr>
+                                    <td><strong>${status}</strong></td>
+                                    <td>${info.quantidade}</td>
+                                    <td>R$ ${info.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                    <td>${percentual}%</td>
+                                </tr>
+                            `;
+                        }).join('')}
+                        <tr class="total-row">
+                            <td><strong>TOTAL</strong></td>
+                            <td><strong>${Object.values(dados.estoquePorStatus).reduce((sum, info) => sum + info.quantidade, 0)}</strong></td>
+                            <td><strong>R$ ${Object.values(dados.estoquePorStatus).reduce((sum, info) => sum + info.valorTotal, 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
                     </tbody>
                 </table>
-                
+            </div>
+            
+            <div class="section">
                 <h2>🏆 Top 5 Mais Valiosos</h2>
                 <table>
                     <thead>
@@ -1698,73 +378,123 @@
                             <th>Medida</th>
                             <th>Marca/Modelo</th>
                             <th>Quantidade</th>
+                            <th>Valor Unitário</th>
                             <th>Valor Total</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${dados.top5MaisCaros.map(item => `
                             <tr>
-                                <td>${item.id}</td>
+                                <td><strong>${item.id}</strong></td>
                                 <td>${item.medida}</td>
                                 <td>${item.marca} ${item.modelo}</td>
                                 <td>${item.qty}</td>
-                                <td>R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                <td>R$ ${(item.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                <td><strong>R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
-            </body>
-            </html>
-        `;
+            </div>
+            
+            <div class="section">
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 11px;">
+                    <p>Relatório Financeiro - Sistema Transportes Canarinho</p>
+                    <p>${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
+                </div>
+            </div>
+        </body>
+        </html>
+    `;
 
-        gerarPDF(conteudoHTML, 'relatorio_financeiro_transportes_canarinho.pdf');
-    }
+    gerarPDFViaImpressao(conteudoHTML, 'relatorio_financeiro_transportes_canarinho.pdf');
+}
 
-    function gerarPDFEstoque(dados) {
-        const conteudoHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>${dados.titulo}</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .header { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; }
-                    .resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin: 20px 0; }
-                    .card { background: #f5f5f5; padding: 15px; border-radius: 5px; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-                    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                    .valor { text-align: right; }
-                </style>
-            </head>
-            <body>
-                <div class="header">
-                    <h1>${dados.titulo}</h1>
-                    <p>Gerado em: ${dados.dataGeracao}</p>
+function gerarPDFEstoque(dados) {
+    const conteudoHTML = `
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>${dados.titulo}</title>
+            <style>
+                body { 
+                    font-family: Arial, sans-serif; 
+                    margin: 20px; 
+                    color: #333;
+                    line-height: 1.4;
+                }
+                .header { 
+                    text-align: center; 
+                    border-bottom: 2px solid #333; 
+                    padding-bottom: 10px; 
+                    margin-bottom: 20px; 
+                }
+                .resumo { 
+                    display: grid; 
+                    grid-template-columns: repeat(3, 1fr); 
+                    gap: 15px; 
+                    margin: 20px 0; 
+                }
+                .card { 
+                    background: #f5f5f5; 
+                    padding: 15px; 
+                    border-radius: 5px; 
+                    border: 1px solid #ddd;
+                }
+                table { 
+                    width: 100%; 
+                    border-collapse: collapse; 
+                    margin-top: 10px; 
+                    font-size: 11px;
+                }
+                th, td { 
+                    border: 1px solid #ddd; 
+                    padding: 6px; 
+                    text-align: left; 
+                }
+                th { 
+                    background-color: #f2f2f2; 
+                    font-weight: bold;
+                }
+                .valor { 
+                    text-align: right; 
+                }
+                .total-row {
+                    font-weight: bold;
+                    background-color: #e8f4fd;
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>${dados.titulo}</h1>
+                <p><strong>Gerado em:</strong> ${dados.dataGeracao}</p>
+            </div>
+            
+            <div class="resumo">
+                <div class="card">
+                    <h3>📊 Por Status</h3>
+                    ${Object.entries(dados.totais.porStatus).map(([status, info]) => `
+                        <p><strong>${status}:</strong> ${info.quantidade} unidades<br>
+                        <span style="color: #666; font-size: 11px;">R$ ${info.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span></p>
+                    `).join('')}
                 </div>
-                
-                <div class="resumo">
-                    <div class="card">
-                        <h3>Por Status</h3>
-                        ${Object.entries(dados.totais.porStatus).map(([status, info]) => `
-                            <p><strong>${status}:</strong> ${info.quantidade} unidades (R$ ${info.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})})</p>
-                        `).join('')}
-                    </div>
-                    <div class="card">
-                        <h3>Por Container</h3>
-                        ${Object.entries(dados.totais.porContainer).map(([container, info]) => `
-                            <p><strong>${container}:</strong> ${info.quantidade} unidades</p>
-                        `).join('')}
-                    </div>
-                    <div class="card">
-                        <h3>Por Marca</h3>
-                        ${Object.entries(dados.totais.porMarca).map(([marca, quantidade]) => `
-                            <p><strong>${marca}:</strong> ${quantidade} unidades</p>
-                        `).join('')}
+                <div class="card">
+                    <h3>📦 Por Container</h3>
+                    ${Object.entries(dados.totais.porContainer).map(([container, info]) => `
+                        <p><strong>${container}:</strong> ${info.quantidade} unidades<br>
+                        <span style="color: #666; font-size: 11px;">R$ ${info.valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</span></p>
+                    `).join('')}
                 </div>
+                <div class="card">
+                    <h3>🏷️ Por Marca</h3>
+                    ${Object.entries(dados.totais.porMarca).map(([marca, quantidade]) => `
+                        <p><strong>${marca}:</strong> ${quantidade} unidades</p>
+                    `).join('')}
                 </div>
-                
+            </div>
+            
+            <div class="section">
                 <h2>📋 Estoque Completo</h2>
                 <table>
                     <thead>
@@ -1782,933 +512,56 @@
                     <tbody>
                         ${dados.itens.map(item => `
                             <tr>
-                                <td>${item.id}</td>
+                                <td><strong>${item.id}</strong></td>
                                 <td>${item.medida}</td>
                                 <td>${item.marca} ${item.modelo}</td>
                                 <td>${item.status}</td>
                                 <td>${item.qty}</td>
                                 <td>${item.container}</td>
                                 <td class="valor">R$ ${(item.preco || 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                                <td class="valor">R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+                                <td class="valor"><strong>R$ ${((item.qty * (item.preco || 0))).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
                             </tr>
                         `).join('')}
+                        <tr class="total-row">
+                            <td colspan="4"><strong>TOTAL GERAL</strong></td>
+                            <td><strong>${dados.itens.reduce((sum, item) => sum + item.qty, 0)}</strong></td>
+                            <td></td>
+                            <td></td>
+                            <td class="valor"><strong>R$ ${dados.itens.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
+                        </tr>
                     </tbody>
                 </table>
-            </body>
-            </html>
-        `;
-
-        gerarPDF(conteudoHTML, 'relatorio_estoque_transportes_canarinho.pdf');
-    }
-
-    // =============================================
-    // FUNÇÃO PRINCIPAL PARA GERAR PDF
-    // =============================================
-
-    function gerarPDF(conteudoHTML, nomeArquivo) {
-        // Criar um blob com o conteúdo HTML
-        const blob = new Blob([conteudoHTML], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        
-        // Criar link para download
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = nomeArquivo;
-        link.style.display = 'none';
-        
-        // Adicionar ao documento e clicar
-        document.body.appendChild(link);
-        link.click();
-        
-        // Limpar
-        setTimeout(() => {
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }, 100);
-    }
-
-    // =============================================
-    // FUNÇÕES AUXILIARES PARA CÁLCULOS
-    // =============================================
-
-    function calcularEstoquePorStatus() {
-        const porStatus = {};
-        
-        reportData.items.forEach(item => {
-            if (!porStatus[item.status]) {
-                porStatus[item.status] = {
-                    quantidade: 0,
-                    valorTotal: 0
-                };
-            }
-            porStatus[item.status].quantidade += item.qty;
-            porStatus[item.status].valorTotal += item.qty * (item.preco || 0);
-        });
-        
-        return porStatus;
-    }
-
-    function calcularEstoquePorContainer() {
-        const porContainer = {};
-        
-        reportData.items.forEach(item => {
-            if (!porContainer[item.container]) {
-                porContainer[item.container] = {
-                    quantidade: 0,
-                    valorTotal: 0
-                };
-            }
-            porContainer[item.container].quantidade += item.qty;
-            porContainer[item.container].valorTotal += item.qty * (item.preco || 0);
-        });
-        
-        return porContainer;
-    }
-
-    function calcularEstoquePorMarca() {
-        const porMarca = {};
-        
-        reportData.items.forEach(item => {
-            if (!porMarca[item.marca]) {
-                porMarca[item.marca] = 0;
-            }
-            porMarca[item.marca] += item.qty;
-        });
-        
-        return porMarca;
-    }
-
-    // =============================================
-    // ATUALIZAR FUNÇÃO DE EXPORTAÇÃO DE PERFORMANCE
-    // =============================================
-
-    function exportPerformanceToExcel() {
-        try {
-            // Filtrar apenas dados de performance (não histórico)
-            const dadosPerformance = reportData.performance.filter(p => !p.tipo);
-            
-            const ws = XLSX.utils.json_to_sheet(dadosPerformance.map(item => ({
-                'Veículo': item.veiculo,
-                'KM Rodados': item.kmRodados,
-                'Pneus Usados': item.pneusUsados,
-                'Custo Total': item.custoTotal,
-                'Custo/KM': item.custoKm.toFixed(4),
-                'Durabilidade Média': item.durabilidadeMedia,
-                'Eficiência': (item.eficiencia * 100).toFixed(1) + '%',
-                'Status': item.status
-            })));
-            
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Performance");
-            XLSX.writeFile(wb, "performance_veiculos_canarinho.xlsx");
-            showNotification('📈 Performance exportada para Excel com sucesso!', 'success');
-        } catch (error) {
-            showNotification('❌ Erro ao exportar performance para Excel', 'error');
-            console.error('Erro na exportação:', error);
-        }
-    }
-
-    // =============================================
-    // CÓDIGO ORIGINAL (COM ALGUMAS MODIFICAÇÕES)
-    // =============================================
-
-    document.addEventListener('DOMContentLoaded', function() {
-      console.log('Iniciando aplicação...');
-      loadReportData();
-      setupEventListeners();
-      initializeCharts();
-      inicializarSistemaAlertas(); // ← SISTEMA DE ALERTAS INICIALIZADO
-      verificarAlertasAutomaticos(); // ← VERIFICAÇÃO AUTOMÁTICA
-      renderDashboard();
-      
-      // Definir datas padrão
-      const today = new Date();
-      const lastMonth = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-      
-      document.getElementById('startDate').value = lastMonth.toISOString().split('T')[0];
-      document.getElementById('endDate').value = today.toISOString().split('T')[0];
-    });
-
-    function setupEventListeners() {
-      console.log('Configurando event listeners...');
-      
-      // Tabs
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-          document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
-          document.querySelectorAll('.nav-btn').forEach(nav => nav.classList.remove('active'));
-          
-          this.classList.add('active');
-          const tabName = this.dataset.tab;
-          document.getElementById('tab-' + tabName).classList.remove('hidden');
-          
-          // Ativar nav correspondente
-          document.querySelector(`.nav-btn[data-tab="${tabName}"]`).classList.add('active');
-          
-          // Carregar dados específicos da aba
-          switch(tabName) {
-            case 'dashboard':
-              renderDashboard();
-              break;
-            case 'estoque':
-              generateStockReport();
-              break;
-            case 'performance':
-              generatePerformanceReport();
-              break;
-            case 'fogos':
-              renderFogosList();
-              break;
-          }
-        });
-      });
-
-      // Navegação inferior
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const tabName = this.dataset.tab;
-          document.querySelector(`.tab-btn[data-tab="${tabName}"]`).click();
-        });
-      });
-
-      // Atualizar preview quando quantidade mudar
-      const fogoQuantidade = document.getElementById('fogoQuantidade');
-      const fogoNumeroInicial = document.getElementById('fogoNumeroInicial');
-      
-      if (fogoQuantidade) {
-        fogoQuantidade.addEventListener('input', updateFogoPreview);
-      }
-      if (fogoNumeroInicial) {
-        fogoNumeroInicial.addEventListener('input', updateFogoPreview);
-      }
-    }
-
-    function loadReportData() {
-      console.log('Carregando dados...');
-      
-      // Carregar dados do localStorage
-      const savedItems = localStorage.getItem('tc_pneus');
-      const savedFogos = localStorage.getItem('tc_fogos');
-      const savedUltimoFogo = localStorage.getItem('tc_ultimo_fogo');
-      
-      reportData.items = savedItems ? JSON.parse(savedItems) : generateSampleData();
-      reportData.fogos = savedFogos ? JSON.parse(savedFogos) : [];
-      reportData.ultimoFogo = savedUltimoFogo ? parseInt(savedUltimoFogo) : 100;
-      
-      // Gerar dados de performance
-      reportData.performance = generatePerformanceData();
-      
-      console.log('Dados carregados:', reportData);
-    }
-
-    function generateSampleData() {
-      return [
-        {
-          id: "PNEU-001",
-          medida: "295/80 R22.5",
-          marca: "Michelin",
-          modelo: "X Line Energy",
-          dataEntrada: "2024-01-15",
-          status: "Novo",
-          qty: 8,
-          preco: 1250.00,
-          container: "container1"
-        },
-        {
-          id: "PNEU-002", 
-          medida: "295/80 R22.5",
-          marca: "Bridgestone",
-          modelo: "R298",
-          dataEntrada: "2024-01-20",
-          status: "Usado",
-          qty: 12,
-          preco: 650.00,
-          container: "container2"
-        },
-        {
-          id: "PNEU-003",
-          medida: "315/80 R22.5",
-          marca: "Goodyear",
-          modelo: "Fuel Max",
-          dataEntrada: "2024-02-01",
-          status: "Reformado",
-          qty: 6,
-          preco: 850.00,
-          container: "container1"
-        }
-      ];
-    }
-
-    function generatePerformanceData() {
-      const veiculos = ['VOLVO FH-540', 'SCANIA R450', 'MERCEDES AXOR', 'VOLKSWAGER 8.160'];
-      const performance = [];
-
-      veiculos.forEach(veiculo => {
-        const kmRodados = Math.floor(Math.random() * 50000) + 100000;
-        const pneusUsados = Math.floor(Math.random() * 8) + 4;
-        const custoTotal = Math.floor(Math.random() * 20000) + 10000;
-        const custoKm = custoTotal / kmRodados;
-        const durabilidade = Math.floor(Math.random() * 30000) + 40000;
-        
-        performance.push({
-          veiculo: veiculo,
-          kmRodados: kmRodados,
-          pneusUsados: pneusUsados,
-          custoTotal: custoTotal,
-          custoKm: custoKm,
-          durabilidadeMedia: durabilidade,
-          eficiencia: Math.random() * 0.3 + 0.7, // 70-100%
-          status: custoKm < 0.15 ? 'Ótimo' : custoKm < 0.25 ? 'Bom' : 'Atenção'
-        });
-
-        // Adicionar histórico de pneus
-        for (let i = 0; i < pneusUsados; i++) {
-          performance.push({
-            tipo: 'historico',
-            veiculo: veiculo,
-            pneu: `FOGO-${Math.floor(Math.random() * 9000) + 1000}`,
-            marca: ['Michelin', 'Bridgestone', 'Goodyear', 'Pirelli'][Math.floor(Math.random() * 4)],
-            modelo: ['X Line', 'R298', 'Fuel Max', 'P01'][Math.floor(Math.random() * 4)],
-            dataInstalacao: new Date(2024, Math.floor(Math.random() * 6), Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-            dataRemocao: new Date(2024, Math.floor(Math.random() * 6) + 6, Math.floor(Math.random() * 28) + 1).toISOString().split('T')[0],
-            kmRodados: Math.floor(Math.random() * 40000) + 30000,
-            custo: Math.floor(Math.random() * 2000) + 800,
-            status: ['Troca Normal', 'Desgaste', 'Reforma', 'Danificado'][Math.floor(Math.random() * 4)]
-          });
-        }
-      });
-
-      return performance;
-    }
-
-    function initializeCharts() {
-      console.log('Inicializando gráficos...');
-      
-      try {
-        const statusCtx = document.getElementById('statusChart').getContext('2d');
-        const containerCtx = document.getElementById('containerChart').getContext('2d');
-        const movementCtx = document.getElementById('movementChart').getContext('2d');
-        const brandsCtx = document.getElementById('brandsChart').getContext('2d');
-
-        // Configurações comuns
-        const chartOptions = {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: {
-                color: '#e2e8f0',
-                font: {
-                  size: 12
-                }
-              }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: '#94a3b8' },
-              grid: { color: 'rgba(148, 163, 184, 0.1)' }
-            },
-            y: {
-              ticks: { color: '#94a3b8' },
-              grid: { color: 'rgba(148, 163, 184, 0.1)' }
-            }
-          }
-        };
-
-        // Gráfico de Status
-        statusChart = new Chart(statusCtx, {
-          type: 'doughnut',
-          data: {
-            labels: ['Novo', 'Usado', 'Reformado'],
-            datasets: [{
-              data: [45, 30, 25],
-              backgroundColor: [
-                '#10b981',
-                '#f97316', 
-                '#8b5cf6'
-              ],
-              borderWidth: 0
-            }]
-          },
-          options: chartOptions
-        });
-
-        // Gráfico de Containers
-        containerChart = new Chart(containerCtx, {
-          type: 'bar',
-          data: {
-            labels: ['Container 1', 'Container 2', 'Container 3'],
-            datasets: [{
-              label: 'Quantidade',
-              data: [65, 45, 35],
-              backgroundColor: '#38bdf8',
-              borderColor: '#0ea5e9',
-              borderWidth: 0
-            }]
-          },
-          options: chartOptions
-        });
-
-        // Gráfico de Movimentação
-        movementChart = new Chart(movementCtx, {
-          type: 'line',
-          data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr'],
-            datasets: [
-              {
-                label: 'Entradas',
-                data: [25, 30, 22, 35],
-                borderColor: '#10b981',
-                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                tension: 0.4,
-                fill: true
-              },
-              {
-                label: 'Saídas',
-                data: [18, 25, 20, 28],
-                borderColor: '#f43f5e',
-                backgroundColor: 'rgba(244, 63, 94, 0.1)',
-                tension: 0.4,
-                fill: true
-              }
-            ]
-          },
-          options: chartOptions
-        });
-
-        // Gráfico de Marcas
-        brandsChart = new Chart(brandsCtx, {
-          type: 'polarArea',
-          data: {
-            labels: ['Michelin', 'Bridgestone', 'Goodyear', 'Pirelli', 'Continental'],
-            datasets: [{
-              data: [35, 25, 20, 12, 8],
-              backgroundColor: [
-                '#38bdf8',
-                '#10b981',
-                '#f97316',
-                '#8b5cf6',
-                '#f43f5e'
-              ]
-            }]
-          },
-          options: chartOptions
-        });
-
-        console.log('Gráficos inicializados com sucesso!');
-      } catch (error) {
-        console.error('Erro ao inicializar gráficos:', error);
-      }
-    }
-
-    function renderDashboard() {
-      console.log('Renderizando dashboard...');
-      renderDashboardMetrics();
-      renderizarAlertas(); // ← AGORA USA O SISTEMA DE ALERTAS FUNCIONAL
-      updateCharts();
-    }
-
-    function renderDashboardMetrics() {
-      const totalEstoque = reportData.items.reduce((sum, item) => sum + item.qty, 0);
-      const totalFogos = reportData.fogos.length;
-      const valorTotal = reportData.items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0);
-      const pneusNovos = reportData.items.filter(item => item.status === 'Novo').reduce((sum, item) => sum + item.qty, 0);
-      const alertasPendentes = sistemaAlertas.filter(a => a.status === 'pendente').length;
-
-      const metricsContainer = document.getElementById('dashboardMetrics');
-      if (metricsContainer) {
-        metricsContainer.innerHTML = `
-          <div class="metric-card">
-            <div class="metric-value">${totalEstoque}</div>
-            <div class="metric-label">Total em Estoque</div>
-            <div class="metric-change positive">↑ 12% vs mês anterior</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">${totalFogos}</div>
-            <div class="metric-label">Pneus com Fogo</div>
-            <div class="metric-change positive">↑ 8% vs mês anterior</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</div>
-            <div class="metric-label">Valor Total Estoque</div>
-            <div class="metric-change positive">↑ 15% vs mês anterior</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value ${alertasPendentes > 0 ? 'alert-high' : ''}">${alertasPendentes}</div>
-            <div class="metric-label">Alertas Pendentes</div>
-            <div class="metric-change ${alertasPendentes > 0 ? 'negative' : 'positive'}">
-              ${alertasPendentes > 0 ? '⚠️ Atenção necessária' : '✅ Tudo sob controle'}
             </div>
-          </div>
-        `;
-      }
-    }
-
-    function updateCharts() {
-      // Atualizar dados dos gráficos com informações reais
-      const statusData = {
-        'Novo': 0,
-        'Usado': 0,
-        'Reformado': 0
-      };
-
-      reportData.items.forEach(item => {
-        statusData[item.status] += item.qty;
-      });
-
-      if (statusChart) {
-        statusChart.data.datasets[0].data = [
-          statusData.Novo,
-          statusData.Usado,
-          statusData.Reformado
-        ];
-        statusChart.update();
-      }
-    }
-
-    // =============================================
-    // FUNÇÕES DE MODAIS E CRUD
-    // =============================================
-
-    function openAddPneuModal() {
-      document.getElementById('addPneuModal').style.display = 'flex';
-    }
-
-    function closeAddPneuModal() {
-      document.getElementById('addPneuModal').style.display = 'none';
-    }
-
-    function confirmAddPneu() {
-      const medida = document.getElementById('pneuMedida').value;
-      const marca = document.getElementById('pneuMarca').value;
-      const modelo = document.getElementById('pneuModelo').value;
-      const status = document.getElementById('pneuStatus').value;
-      const qty = parseInt(document.getElementById('pneuQuantidade').value);
-      const preco = parseFloat(document.getElementById('pneuPreco').value);
-      const container = document.getElementById('pneuContainer').value;
-      const observacoes = document.getElementById('pneuObservacoes').value;
-
-      if (!medida || !marca || !modelo || !status || !qty || !preco) {
-        showNotification('Preencha todos os campos obrigatórios!', 'error');
-        return;
-      }
-
-      const novoPneu = {
-        id: `PNEU-${Date.now()}`,
-        medida: medida,
-        marca: marca,
-        modelo: modelo,
-        status: status,
-        qty: qty,
-        preco: preco,
-        container: container,
-        dataEntrada: new Date().toISOString().split('T')[0],
-        observacoes: observacoes
-      };
-
-      reportData.items.push(novoPneu);
-      saveData();
-      closeAddPneuModal();
-      showNotification('Pneu adicionado com sucesso!', 'success');
-      
-      // Verificar alertas automáticos após adicionar pneu
-      verificarAlertasAutomaticos();
-      
-      // Atualizar a view atual
-      if (document.getElementById('tab-estoque').classList.contains('hidden')) {
-        generateStockReport();
-      } else {
-        renderDashboard();
-      }
-    }
-
-    function openAddFogoModal() {
-      // Popular select com pneus disponíveis
-      const select = document.getElementById('fogoPneuSelect');
-      select.innerHTML = '<option value="">Selecione um pneu...</option>';
-      
-      reportData.items.forEach(item => {
-        if (item.qty > 0) {
-          const option = document.createElement('option');
-          option.value = item.id;
-          option.textContent = `${item.id} - ${item.medida} - ${item.marca} ${item.modelo} (${item.qty} disponíveis)`;
-          select.appendChild(option);
-        }
-      });
-
-      document.getElementById('addFogoModal').style.display = 'flex';
-      updateFogoPreview();
-    }
-
-    function closeAddFogoModal() {
-      document.getElementById('addFogoModal').style.display = 'none';
-    }
-
-    function updateFogoPreview() {
-      const quantidade = parseInt(document.getElementById('fogoQuantidade').value) || 1;
-      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value) || 1;
-      
-      const previewList = document.getElementById('fogoPreviewList');
-      previewList.innerHTML = '';
-      
-      for (let i = 0; i < quantidade; i++) {
-        const div = document.createElement('div');
-        div.textContent = `Fogo ${numeroInicial + i}`;
-        previewList.appendChild(div);
-      }
-    }
-
-    function confirmAddFogo() {
-      const pneuId = document.getElementById('fogoPneuSelect').value;
-      const quantidade = parseInt(document.getElementById('fogoQuantidade').value);
-      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value);
-      const veiculo = document.getElementById('fogoVeiculo').value;
-      const posicao = document.getElementById('fogoPosicao').value;
-      const observacoes = document.getElementById('fogoObservacoes').value;
-
-      if (!pneuId || !quantidade || !numeroInicial) {
-        showNotification('Preencha todos os campos obrigatórios!', 'error');
-        return;
-      }
-
-      const pneu = reportData.items.find(p => p.id === pneuId);
-      if (!pneu) {
-        showNotification('Pneu não encontrado!', 'error');
-        return;
-      }
-
-      if (pneu.qty < quantidade) {
-        showNotification(`Quantidade insuficiente! Disponível: ${pneu.qty}`, 'error');
-        return;
-      }
-
-      // Criar fogos
-      for (let i = 0; i < quantidade; i++) {
-        const numeroFogo = numeroInicial + i;
-        
-        const novoFogo = {
-          id: `FOGO-${Date.now()}-${i}`,
-          numero: numeroFogo,
-          pneuId: pneuId,
-          medida: pneu.medida,
-          marca: pneu.marca,
-          modelo: pneu.modelo,
-          veiculo: veiculo,
-          posicao: posicao,
-          dataInstalacao: new Date().toISOString().split('T')[0],
-          observacoes: observacoes,
-          status: 'Ativo'
-        };
-
-        reportData.fogos.push(novoFogo);
-      }
-
-      // Atualizar estoque
-      pneu.qty -= quantidade;
-      reportData.ultimoFogo = Math.max(reportData.ultimoFogo, numeroInicial + quantidade - 1);
-
-      saveData();
-      closeAddFogoModal();
-      showNotification(`${quantidade} fogos adicionados com sucesso!`, 'success');
-      
-      // Verificar alertas automáticos após adicionar fogos
-      verificarAlertasAutomaticos();
-      
-      // Atualizar views
-      renderFogosList();
-      renderDashboard();
-    }
-
-    function openEditFogoModal(fogoNumero) {
-      const fogo = reportData.fogos.find(f => f.numero === fogoNumero);
-      if (!fogo) return;
-
-      fogoEditando = fogo;
-      
-      document.getElementById('editFogoNumero').value = fogo.numero;
-      document.getElementById('editFogoVeiculo').value = fogo.veiculo || '';
-      document.getElementById('editFogoPosicao').value = fogo.posicao || '';
-      document.getElementById('editFogoObservacoes').value = fogo.observacoes || '';
-      
-      document.getElementById('editFogoModal').style.display = 'flex';
-    }
-
-    function closeEditFogoModal() {
-      document.getElementById('editFogoModal').style.display = 'none';
-      fogoEditando = null;
-    }
-
-    function confirmEditFogo() {
-      if (!fogoEditando) return;
-
-      fogoEditando.veiculo = document.getElementById('editFogoVeiculo').value;
-      fogoEditando.posicao = document.getElementById('editFogoPosicao').value;
-      fogoEditando.observacoes = document.getElementById('editFogoObservacoes').value;
-
-      saveData();
-      closeEditFogoModal();
-      showNotification('Fogo atualizado com sucesso!', 'success');
-      renderFogosList();
-    }
-
-    function deleteFogo(fogoNumero) {
-      if (!confirm(`Tem certeza que deseja excluir o fogo ${fogoNumero}?`)) return;
-
-      const index = reportData.fogos.findIndex(f => f.numero === fogoNumero);
-      if (index !== -1) {
-        // Devolver pneu ao estoque
-        const fogo = reportData.fogos[index];
-        const pneu = reportData.items.find(p => p.id === fogo.pneuId);
-        if (pneu) {
-          pneu.qty += 1;
-        }
-
-        reportData.fogos.splice(index, 1);
-        saveData();
-        showNotification('Fogo excluído com sucesso!', 'success');
-        renderFogosList();
-        renderDashboard();
-      }
-    }
-
-    function deletePneu(pneuId) {
-      if (!confirm('Tem certeza que deseja excluir este pneu?')) return;
-
-      const index = reportData.items.findIndex(p => p.id === pneuId);
-      if (index !== -1) {
-        reportData.items.splice(index, 1);
-        saveData();
-        showNotification('Pneu excluído com sucesso!', 'success');
-        generateStockReport();
-        renderDashboard();
-      }
-    }
-
-    // =============================================
-    // FUNÇÕES DE RELATÓRIOS
-    // =============================================
-
-    function generateDashboardReport() {
-      showNotification('📊 Gerando relatório do dashboard...', 'success');
-      setTimeout(() => {
-        showNotification('✅ Relatório do dashboard gerado com sucesso!', 'success');
-      }, 2000);
-    }
-
-    function applyDateFilter() {
-      const startDate = document.getElementById('startDate').value;
-      const endDate = document.getElementById('endDate').value;
-      
-      if (startDate && endDate) {
-        showNotification(`📅 Filtro aplicado: ${startDate} até ${endDate}`, 'success');
-        renderDashboard();
-      } else {
-        showNotification('⚠️ Selecione ambas as datas para aplicar o filtro', 'warning');
-      }
-    }
-
-    function generateStockReport() {
-      const containerFilter = document.getElementById('containerFilter').value;
-      const statusFilter = document.getElementById('statusFilter').value;
-
-      const filteredItems = reportData.items.filter(item => {
-        const matchContainer = !containerFilter || item.container === containerFilter;
-        const matchStatus = !statusFilter || item.status === statusFilter;
-        return matchContainer && matchStatus;
-      });
-
-      const tbody = document.querySelector('#stockTable tbody');
-      const totalCount = document.getElementById('stockCount');
-
-      if (tbody && totalCount) {
-        if (filteredItems.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="10" style="text-align: center; padding: 40px; color: var(--muted);">
-                Nenhum item encontrado com os filtros selecionados
-              </td>
-            </tr>
-          `;
-        } else {
-          tbody.innerHTML = filteredItems.map(item => {
-            const valorUnitario = item.preco || 0;
-            const valorTotal = valorUnitario * item.qty;
             
-            return `
-              <tr>
-                <td><strong>${item.id}</strong></td>
-                <td>${item.medida}</td>
-                <td>${item.marca} ${item.modelo}</td>
-                <td>
-                  <span class="status-badge status-${item.status.toLowerCase()}">
-                    ${item.status}
-                  </span>
-                </td>
-                <td>${item.qty}</td>
-                <td>${item.container}</td>
-                <td>R$ ${valorUnitario.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                <td><strong>R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
-                <td>${new Date(item.dataEntrada).toLocaleDateString('pt-BR')}</td>
-                <td>
-                  <button class="btn-xs btn-danger" onclick="deletePneu('${item.id}')">Excluir</button>
-                </td>
-              </tr>
-            `;
-          }).join('');
-        }
-
-        totalCount.textContent = filteredItems.length;
-      }
-    }
-
-    function generatePerformanceReport() {
-      showNotification('🚛 Gerando relatório de performance...', 'success');
-      
-      // Atualizar métricas de performance
-      const performanceMetrics = document.getElementById('performanceMetrics');
-      if (performanceMetrics) {
-        performanceMetrics.innerHTML = `
-          <div class="metric-card">
-            <div class="metric-value">4</div>
-            <div class="metric-label">Veículos Ativos</div>
-            <div class="metric-change positive">↑ 100% operacionais</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">R$ 0.18</div>
-            <div class="metric-label">Custo Médio/KM</div>
-            <div class="metric-change negative">↑ 5% vs mês anterior</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">42.5k</div>
-            <div class="metric-label">KM Médio por Pneu</div>
-            <div class="metric-change positive">↑ 8% vs mês anterior</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">84%</div>
-            <div class="metric-label">Eficiência Geral</div>
-            <div class="metric-change positive">↑ 3% vs mês anterior</div>
-          </div>
-        `;
-      }
-    }
-
-    function exportStockToExcel() {
-      try {
-        const ws = XLSX.utils.json_to_sheet(reportData.items.map(item => ({
-          'ID': item.id,
-          'Medida': item.medida,
-          'Marca': item.marca,
-          'Modelo': item.modelo,
-          'Status': item.status,
-          'Quantidade': item.qty,
-          'Preço Unitário': item.preco,
-          'Valor Total': (item.qty * item.preco),
-          'Container': item.container,
-          'Data Entrada': item.dataEntrada,
-          'Observações': item.observacoes || ''
-        })));
-        
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Estoque");
-        XLSX.writeFile(wb, "estoque_transportes_canarinho.xlsx");
-        showNotification('📊 Estoque exportado para Excel com sucesso!', 'success');
-      } catch (error) {
-        showNotification('❌ Erro ao exportar para Excel', 'error');
-        console.error('Erro na exportação:', error);
-      }
-    }
-
-    function renderFogosList() {
-      const fogosList = document.getElementById('fogosList');
-      const fogosCount = document.getElementById('fogosCount');
-
-      if (fogosList && fogosCount) {
-        if (reportData.fogos.length === 0) {
-          fogosList.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">🔥</div>
-              <p>Nenhum fogo cadastrado</p>
-              <p style="font-size: 0.8rem; margin-top: 10px;">Use o botão "Adicionar Fogo" para começar</p>
-            </div>
-          `;
-        } else {
-          fogosList.innerHTML = reportData.fogos.map(fogo => `
-            <div class="fogo-item">
-              <div class="fogo-info">
-                <div class="fogo-number">Fogo ${fogo.numero}</div>
-                <div class="fogo-details">
-                  ${fogo.medida} - ${fogo.marca} ${fogo.modelo}
-                  ${fogo.veiculo ? ` • ${fogo.veiculo}` : ''}
-                  ${fogo.posicao ? ` • ${fogo.posicao}` : ''}
+            <div class="section">
+                <div style="text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #666; font-size: 11px;">
+                    <p>Relatório de Estoque - Sistema Transportes Canarinho</p>
+                    <p>${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
                 </div>
-              </div>
-              <div class="fogo-actions">
-                <button class="btn-xs" onclick="openEditFogoModal(${fogo.numero})">Editar</button>
-                <button class="btn-xs btn-danger" onclick="deleteFogo(${fogo.numero})">Excluir</button>
-              </div>
             </div>
-          `).join('');
-        }
+        </body>
+        </html>
+    `;
 
-        fogosCount.textContent = reportData.fogos.length;
-      }
-    }
+    gerarPDFViaImpressao(conteudoHTML, 'relatorio_estoque_transportes_canarinho.pdf');
+}
 
-    // =============================================
-    // FUNÇÕES UTILITÁRIAS
-    // =============================================
+// =============================================
+// FUNÇÃO PRINCIPAL PARA GERAR PDF (CORRIGIDA)
+// =============================================
 
-    function showNotification(message, type = 'success') {
-      const existingNotifications = document.querySelectorAll('.notification');
-      existingNotifications.forEach(notif => notif.remove());
-      
-      const notification = document.createElement('div');
-      notification.className = `notification ${type}`;
-      notification.textContent = message;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 3000);
-    }
-
-    function saveData() {
-      localStorage.setItem('tc_pneus', JSON.stringify(reportData.items));
-      localStorage.setItem('tc_fogos', JSON.stringify(reportData.fogos));
-      localStorage.setItem('tc_ultimo_fogo', reportData.ultimoFogo.toString());
-      salvarAlertas(); // ← SALVA TAMBÉM OS ALERTAS
-    }
-
-    // Funções dos modais que ainda não foram implementados
-    function openRemovePneuModal() {
-      showNotification('🔄 Modal Remover Pneu - Em desenvolvimento', 'warning');
-    }
-
-    function openRemoveFogoModal() {
-      showNotification('🔄 Modal Retirar do Fogo - Em desenvolvimento', 'warning');
-    }
-
-    function openDeletePneuModal() {
-      showNotification('🗑️ Modal Excluir Pneu - Em desenvolvimento', 'warning');
-    }
-
-    function openDeleteFogoModal() {
-      showNotification('🗑️ Modal Excluir Fogo - Em desenvolvimento', 'warning');
-    }
-
-    console.log('Aplicação carregada com sucesso!');
-  </script>
-</body>
-</html>
+function gerarPDFViaImpressao(conteudoHTML, nomeArquivo) {
+    // Criar uma nova janela para impressão
+    const janelaImpressao = window.open('', '_blank');
+    janelaImpressao.document.write(conteudoHTML);
+    janelaImpressao.document.close();
+    
+    // Aguardar o conteúdo carregar e então imprimir
+    setTimeout(() => {
+        janelaImpressao.print();
+        // Fechar a janela após um tempo (opcional)
+        setTimeout(() => {
+            janelaImpressao.close();
+        }, 1000);
+    }, 500);
+}
