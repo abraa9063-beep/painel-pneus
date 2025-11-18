@@ -1513,6 +1513,7 @@
     function gerarPDFCompleto(dados) {
         // Criar conteúdo HTML para o PDF
         const conteudoHTML = `
+            <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
@@ -1689,6 +1690,7 @@
 
     function gerarPDFFinanceiro(dados) {
         const conteudoHTML = `
+            <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
@@ -1846,6 +1848,7 @@
 
     function gerarPDFEstoque(dados) {
         const conteudoHTML = `
+            <!DOCTYPE html>
             <html>
             <head>
                 <meta charset="UTF-8">
@@ -1925,7 +1928,7 @@
                         ${Object.entries(dados.totais.porMarca).map(([marca, quantidade]) => `
                             <p><strong>${marca}:</strong> ${quantidade} unidades</p>
                         `).join('')}
-                </div>
+                    </div>
                 </div>
                 
                 <div class="section">
@@ -1985,19 +1988,29 @@
     // =============================================
 
     function gerarPDFViaImpressao(conteudoHTML, nomeArquivo) {
-        // Criar uma nova janela para impressão
-        const janelaImpressao = window.open('', '_blank');
-        janelaImpressao.document.write(conteudoHTML);
-        janelaImpressao.document.close();
-        
-        // Aguardar o conteúdo carregar e então imprimir
-        setTimeout(() => {
-            janelaImpressao.print();
-            // Fechar a janela após um tempo (opcional)
+        try {
+            // Criar uma nova janela para impressão
+            const janelaImpressao = window.open('', '_blank');
+            if (!janelaImpressao) {
+                showNotification('❌ Pop-up bloqueado! Permita pop-ups para gerar o PDF.', 'error');
+                return;
+            }
+            
+            janelaImpressao.document.write(conteudoHTML);
+            janelaImpressao.document.close();
+            
+            // Aguardar o conteúdo carregar e então imprimir
             setTimeout(() => {
-                janelaImpressao.close();
+                janelaImpressao.focus();
+                janelaImpressao.print();
+                
+                // Não fechar automaticamente - deixar usuário controlar
+                showNotification('📄 PDF gerado com sucesso! Use a opção de impressão do navegador para salvar como PDF.', 'success');
             }, 1000);
-        }, 500);
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            showNotification('❌ Erro ao gerar PDF. Tente novamente.', 'error');
+        }
     }
 
     // =============================================
