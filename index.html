@@ -385,24 +385,33 @@
     .status-media { background: rgba(249, 115, 22, 0.2); color: #f97316; }
     .status-baixa { background: rgba(16, 185, 129, 0.2); color: #10b981; }
     
-    <!-- Cards de Exportação -->
-<div class="export-cards">
-  <div class="export-card" onclick="exportComprehensiveReport()">
-    <div class="export-title">📊 Relatório Completo</div>
-    <div class="export-desc">Exporte todos os dados do sistema em um relatório detalhado em PDF</div>
-  </div>
-  
-  <div class="export-card" onclick="exportFinancialReport()">
-    <div class="export-title">💰 Relatório Financeiro</div>
-    <div class="export-desc">Análise financeira completa com custos, valores e projeções</div>
-  </div>
-  
-  <div class="export-card" onclick="exportInventoryReport()">
-    <div class="export-title">📦 Relatório de Estoque</div>
-    <div class="export-desc">Inventário completo com valores e status de todos os pneus</div>
-  </div>
+   <!-- Barra de navegação inferior -->
+<div class="bottom-nav">
+  <button class="nav-btn active" data-tab="dashboard">
+    <span class="nav-icon">📊</span>
+    <span>Dashboard</span>
+  </button>
+  <button class="nav-btn" data-tab="estoque">
+    <span class="nav-icon">📦</span>
+    <span>Estoque</span>
+  </button>
+  <button class="nav-btn" data-tab="movimentacao">
+    <span class="nav-icon">🔄</span>
+    <span>Movimentação</span>
+  </button>
+  <button class="nav-btn" data-tab="financeiro">
+    <span class="nav-icon">💵</span>
+    <span>Financeiro</span>
+  </button>
+  <button class="nav-btn" data-tab="performance">
+    <span class="nav-icon">🚛</span>
+    <span>Performance</span>
+  </button>
+  <button class="nav-btn" data-tab="fogos">
+    <span class="nav-icon">🔥</span>
+    <span>Fogos</span>
+  </button>
 </div>
-    }
     
     /* Barra de navegação inferior */
     .bottom-nav {
@@ -2242,4 +2251,5 @@
   </script>
 </body>
 </html>
+
 
