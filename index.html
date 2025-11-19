@@ -588,6 +588,93 @@
       align-items: center;
     }
     
+    /* NOVOS ESTILOS PARA TABS DE CONTAINER */
+    .container-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+      padding-bottom: 10px;
+    }
+
+    .container-tab {
+      padding: 12px 24px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: var(--radius);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      flex: 1;
+      text-align: center;
+    }
+
+    .container-tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      color: white;
+      border-color: var(--accent);
+      box-shadow: var(--shadow);
+    }
+
+    .container-content {
+      display: none;
+    }
+
+    .container-content.active {
+      display: block;
+    }
+
+    .container-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 15px;
+      background: rgba(15, 23, 42, 0.4);
+      border-radius: var(--radius);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+    }
+
+    .container-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .container-stats {
+      display: flex;
+      gap: 20px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--text);
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* Ajustes para tabelas por container */
+    .container-table {
+      margin-top: 15px;
+    }
+
+    /* Remover filtros antigos */
+    .old-filters {
+      display: none;
+    }
+
     /* Responsividade */
     @media (max-width: 768px) {
       .charts-grid {
@@ -622,6 +709,20 @@
       .action-buttons {
         flex-direction: column;
         align-items: stretch;
+      }
+
+      .container-tabs {
+        flex-direction: column;
+      }
+      
+      .container-stats {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .stat-item {
+        flex: 1;
+        min-width: 80px;
       }
     }
 
@@ -782,26 +883,14 @@
   </div>
 </div>
 
-    <!-- RELATÓRIO DE ESTOQUE -->
+    <!-- RELATÓRIO DE ESTOQUE MODIFICADO -->
     <div id="tab-estoque" class="tab-content hidden">
       <div class="reports-container">
         <div class="report-header">
-          <h2 class="report-title">Relatório de Estoque</h2>
+          <h2 class="report-title">Relatório de Estoque por Container</h2>
           <div class="controls-row">
-            <select id="containerFilter" class="input">
-              <option value="">Todos Containers</option>
-              <option value="container1">Container 1</option>
-              <option value="container2">Container 2</option>
-              <option value="container3">Container 3</option>
-            </select>
-            <select id="statusFilter" class="input">
-              <option value="">Todos Status</option>
-              <option value="Novo">Novo</option>
-              <option value="Usado">Usado</option>
-              <option value="Reformado">Reformado</option>
-            </select>
-            <button onclick="generateStockReport()">
-              Gerar Relatório
+            <button onclick="openAddPneuModal()" class="btn-success">
+              Adicionar Pneu ao Estoque
             </button>
             <button onclick="exportStockToExcel()" class="btn-success">
               Exportar Excel
@@ -809,41 +898,157 @@
           </div>
         </div>
 
-        <!-- Botões de Ação para Estoque - MODIFICADO (REMOVIDOS OS BOTÕES) -->
-        <div class="controls-row" style="margin-bottom: 25px;">
-          <button onclick="openAddPneuModal()" class="btn-success">
-            Adicionar Pneu ao Estoque
-          </button>
-          <!-- BOTÕES "Retirar do Estoque" e "Excluir Pneu" REMOVIDOS -->
+        <!-- Tabs dos Containers -->
+        <div class="container-tabs">
+          <div class="container-tab active" data-container="container1">
+            📦 Container 1
+          </div>
+          <div class="container-tab" data-container="container2">
+            📦 Container 2
+          </div>
+          <div class="container-tab" data-container="container3">
+            📦 Container 3
+          </div>
         </div>
 
-        <div class="table-card">
-          <div class="table-header">
-            <h3 class="table-title">Estoque Detalhado</h3>
-            <div style="color: var(--muted); font-size: 0.9rem;">
-              <span id="stockCount">0</span> itens encontrados
+        <!-- Container 1 -->
+        <div id="container1-content" class="container-content active">
+          <div class="container-header">
+            <div>
+              <h3 class="container-title">Container 1</h3>
+              <p style="color: var(--muted); margin-top: 5px;">Armazenamento principal - Pneus novos e premium</p>
+            </div>
+            <div class="container-stats">
+              <div class="stat-item">
+                <span class="stat-value" id="container1-total">0</span>
+                <span class="stat-label">Total Itens</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" id="container1-valor">R$ 0</span>
+                <span class="stat-label">Valor Total</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" id="container1-novos">0</span>
+                <span class="stat-label">Pneus Novos</span>
+              </div>
             </div>
           </div>
-          <div class="table-container">
-            <table class="data-table" id="stockTable">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Medida</th>
-                  <th>Marca/Modelo</th>
-                  <th>Status</th>
-                  <th>Qtd</th>
-                  <th>Container</th>
-                  <th>Valor Unit.</th>
-                  <th>Valor Total</th>
-                  <th>Entrada</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <!-- Será preenchido via JavaScript -->
-              </tbody>
-            </table>
+
+          <div class="table-card container-table">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Medida</th>
+                    <th>Marca/Modelo</th>
+                    <th>Status</th>
+                    <th>Qtd</th>
+                    <th>Valor Unit.</th>
+                    <th>Valor Total</th>
+                    <th>Entrada</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="container1-table-body">
+                  <!-- Será preenchido via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Container 2 -->
+        <div id="container2-content" class="container-content">
+          <div class="container-header">
+            <div>
+              <h3 class="container-title">Container 2</h3>
+              <p style="color: var(--muted); margin-top: 5px;">Pneus usados e reformados</p>
+            </div>
+            <div class="container-stats">
+              <div class="stat-item">
+                <span class="stat-value" id="container2-total">0</span>
+                <span class="stat-label">Total Itens</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" id="container2-valor">R$ 0</span>
+                <span class="stat-label">Valor Total</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" id="container2-usados">0</span>
+                <span class="stat-label">Pneus Usados</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card container-table">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Medida</th>
+                    <th>Marca/Modelo</th>
+                    <th>Status</th>
+                    <th>Qtd</th>
+                    <th>Valor Unit.</th>
+                    <th>Valor Total</th>
+                    <th>Entrada</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="container2-table-body">
+                  <!-- Será preenchido via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Container 3 -->
+        <div id="container3-content" class="container-content">
+          <div class="container-header">
+            <div>
+              <h3 class="container-title">Container 3</h3>
+              <p style="color: var(--muted); margin-top: 5px;">Estoque diverso e emergencial</p>
+            </div>
+            <div class="container-stats">
+              <div class="stat-item">
+                <span class="stat-value" id="container3-total">0</span>
+                <span class="stat-label">Total Itens</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" id="container3-valor">R$ 0</span>
+                <span class="stat-label">Valor Total</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-value" id="container3-reformados">0</span>
+                <span class="stat-label">Pneus Reformados</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-card container-table">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Medida</th>
+                    <th>Marca/Modelo</th>
+                    <th>Status</th>
+                    <th>Qtd</th>
+                    <th>Valor Unit.</th>
+                    <th>Valor Total</th>
+                    <th>Entrada</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="container3-table-body">
+                  <!-- Será preenchido via JavaScript -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -1248,6 +1453,121 @@
     // Variável para controlar fogo sendo editado
     let fogoEditando = null;
 
+    // Sistema de alertas
+    let sistemaAlertas = [];
+
+    // =============================================
+    // NOVAS FUNÇÕES PARA CONTROLE DE CONTAINERS
+    // =============================================
+
+    function setupContainerTabs() {
+      console.log('Configurando tabs de containers...');
+      
+      document.querySelectorAll('.container-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+          // Remover active de todas as tabs
+          document.querySelectorAll('.container-tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.container-content').forEach(c => c.classList.remove('active'));
+          
+          // Ativar tab clicada
+          this.classList.add('active');
+          const container = this.dataset.container;
+          document.getElementById(`${container}-content`).classList.add('active');
+          
+          // Atualizar dados do container
+          updateContainerData(container);
+        });
+      });
+    }
+
+    function updateContainerData(container) {
+      console.log(`Atualizando dados do ${container}...`);
+      
+      const containerItems = reportData.items.filter(item => item.container === container);
+      const tableBody = document.getElementById(`${container}-table-body`);
+      
+      // Atualizar estatísticas
+      updateContainerStats(container, containerItems);
+      
+      // Atualizar tabela
+      if (containerItems.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="9" style="text-align: center; padding: 40px; color: var(--muted);">
+              Nenhum pneu encontrado neste container
+            </td>
+          </tr>
+        `;
+      } else {
+        tableBody.innerHTML = containerItems.map(item => {
+          const valorUnitario = item.preco || 0;
+          const valorTotal = valorUnitario * item.qty;
+          
+          return `
+            <tr>
+              <td><strong>${item.id}</strong></td>
+              <td>${item.medida}</td>
+              <td>${item.marca} ${item.modelo}</td>
+              <td>
+                <span class="status-badge status-${item.status.toLowerCase()}">
+                  ${item.status}
+                </span>
+              </td>
+              <td>${item.qty}</td>
+              <td>R$ ${valorUnitario.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+              <td><strong>R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
+              <td>${new Date(item.dataEntrada).toLocaleDateString('pt-BR')}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn-xs" onclick="openEditPneuModal('${item.id}')">Editar</button>
+                  <div class="quantity-control">
+                    <input type="number" class="quantity-input" value="1" min="1" max="${item.qty}">
+                    <button class="btn-xs btn-danger" onclick="removePneuQuantity('${item.id}', this)">Excluir Qtd</button>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function updateContainerStats(container, items) {
+      const totalItens = items.reduce((sum, item) => sum + item.qty, 0);
+      const valorTotal = items.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0);
+      
+      // Estatísticas específicas por container
+      let statSpecific = 0;
+      if (container === 'container1') {
+        statSpecific = items.filter(item => item.status === 'Novo').reduce((sum, item) => sum + item.qty, 0);
+      } else if (container === 'container2') {
+        statSpecific = items.filter(item => item.status === 'Usado').reduce((sum, item) => sum + item.qty, 0);
+      } else if (container === 'container3') {
+        statSpecific = items.filter(item => item.status === 'Reformado').reduce((sum, item) => sum + item.qty, 0);
+      }
+      
+      // Atualizar elementos HTML
+      document.getElementById(`${container}-total`).textContent = totalItens;
+      document.getElementById(`${container}-valor`).textContent = `R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+      
+      if (container === 'container1') {
+        document.getElementById(`${container}-novos`).textContent = statSpecific;
+      } else if (container === 'container2') {
+        document.getElementById(`${container}-usados`).textContent = statSpecific;
+      } else if (container === 'container3') {
+        document.getElementById(`${container}-reformados`).textContent = statSpecific;
+      }
+    }
+
+    function generateStockReport() {
+      console.log('Gerando relatório de estoque por containers...');
+      
+      // Atualizar todos os containers
+      updateContainerData('container1');
+      updateContainerData('container2');
+      updateContainerData('container3');
+    }
+
     // =============================================
     // FUNÇÕES PARA CONTROLE DE QUANTIDADE DE PNEUS
     // =============================================
@@ -1313,9 +1633,6 @@
     // =============================================
     // SISTEMA DE ALERTAS FUNCIONAL
     // =============================================
-
-    // Array global para gerenciar alertas
-    let sistemaAlertas = [];
 
     function inicializarSistemaAlertas() {
       // Carregar alertas do localStorage ou criar padrão
@@ -2196,6 +2513,71 @@
     }
 
     // =============================================
+    // ATUALIZAR FUNÇÃO DE EXPORTAÇÃO EXCEL
+    // =============================================
+
+    function exportStockToExcel() {
+      try {
+        // Criar uma aba para cada container
+        const wb = XLSX.utils.book_new();
+        
+        // Container 1
+        const container1Items = reportData.items.filter(item => item.container === 'container1');
+        const ws1 = XLSX.utils.json_to_sheet(container1Items.map(item => ({
+          'ID': item.id,
+          'Medida': item.medida,
+          'Marca': item.marca,
+          'Modelo': item.modelo,
+          'Status': item.status,
+          'Quantidade': item.qty,
+          'Preço Unitário': item.preco,
+          'Valor Total': (item.qty * item.preco),
+          'Data Entrada': item.dataEntrada,
+          'Observações': item.observacoes || ''
+        })));
+        XLSX.utils.book_append_sheet(wb, ws1, "Container 1");
+        
+        // Container 2
+        const container2Items = reportData.items.filter(item => item.container === 'container2');
+        const ws2 = XLSX.utils.json_to_sheet(container2Items.map(item => ({
+          'ID': item.id,
+          'Medida': item.medida,
+          'Marca': item.marca,
+          'Modelo': item.modelo,
+          'Status': item.status,
+          'Quantidade': item.qty,
+          'Preço Unitário': item.preco,
+          'Valor Total': (item.qty * item.preco),
+          'Data Entrada': item.dataEntrada,
+          'Observações': item.observacoes || ''
+        })));
+        XLSX.utils.book_append_sheet(wb, ws2, "Container 2");
+        
+        // Container 3
+        const container3Items = reportData.items.filter(item => item.container === 'container3');
+        const ws3 = XLSX.utils.json_to_sheet(container3Items.map(item => ({
+          'ID': item.id,
+          'Medida': item.medida,
+          'Marca': item.marca,
+          'Modelo': item.modelo,
+          'Status': item.status,
+          'Quantidade': item.qty,
+          'Preço Unitário': item.preco,
+          'Valor Total': (item.qty * item.preco),
+          'Data Entrada': item.dataEntrada,
+          'Observações': item.observacoes || ''
+        })));
+        XLSX.utils.book_append_sheet(wb, ws3, "Container 3");
+        
+        XLSX.writeFile(wb, "estoque_containers_transportes_canarinho.xlsx");
+        showNotification('📊 Estoque exportado para Excel com sucesso!', 'success');
+      } catch (error) {
+        showNotification('❌ Erro ao exportar para Excel', 'error');
+        console.error('Erro na exportação:', error);
+      }
+    }
+
+    // =============================================
     // CÓDIGO ORIGINAL (COM ALGUMAS MODIFICAÇÕES)
     // =============================================
 
@@ -2203,9 +2585,10 @@
       console.log('Iniciando aplicação...');
       loadReportData();
       setupEventListeners();
+      setupContainerTabs(); // ← NOVA FUNÇÃO ADICIONADA
       initializeCharts();
-      inicializarSistemaAlertas(); // ← SISTEMA DE ALERTAS INICIALIZADO
-      verificarAlertasAutomaticos(); // ← VERIFICAÇÃO AUTOMÁTICA
+      inicializarSistemaAlertas();
+      verificarAlertasAutomaticos();
       renderDashboard();
       
       // Definir datas padrão
@@ -2219,7 +2602,7 @@
     function setupEventListeners() {
       console.log('Configurando event listeners...');
       
-      // Tabs
+      // Tabs principais
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2239,7 +2622,7 @@
               renderDashboard();
               break;
             case 'estoque':
-              generateStockReport();
+              generateStockReport(); // ← AGORA USA O NOVO SISTEMA
               break;
             case 'performance':
               generatePerformanceReport();
@@ -2494,7 +2877,7 @@
     function renderDashboard() {
       console.log('Renderizando dashboard...');
       renderDashboardMetrics();
-      renderizarAlertas(); // ← AGORA USA O SISTEMA DE ALERTAS FUNCIONAL
+      renderizarAlertas();
       updateCharts();
     }
 
@@ -2607,12 +2990,11 @@
       // Verificar alertas automáticos após adicionar pneu
       verificarAlertasAutomaticos();
       
-      // Atualizar a view atual
-      if (document.getElementById('tab-estoque').classList.contains('hidden')) {
-        generateStockReport();
-      } else {
-        renderDashboard();
-      }
+      // Atualizar o container específico
+      updateContainerData(container);
+      
+      // Atualizar dashboard
+      renderDashboard();
     }
 
     function openAddFogoModal() {
@@ -2764,70 +3146,6 @@
       }
     }
 
-    // =============================================
-    // FUNÇÃO ATUALIZADA PARA GERAR RELATÓRIO DE ESTOQUE
-    // =============================================
-
-    function generateStockReport() {
-      const containerFilter = document.getElementById('containerFilter').value;
-      const statusFilter = document.getElementById('statusFilter').value;
-
-      const filteredItems = reportData.items.filter(item => {
-        const matchContainer = !containerFilter || item.container === containerFilter;
-        const matchStatus = !statusFilter || item.status === statusFilter;
-        return matchContainer && matchStatus;
-      });
-
-      const tbody = document.querySelector('#stockTable tbody');
-      const totalCount = document.getElementById('stockCount');
-
-      if (tbody && totalCount) {
-        if (filteredItems.length === 0) {
-          tbody.innerHTML = `
-            <tr>
-              <td colspan="10" style="text-align: center; padding: 40px; color: var(--muted);">
-                Nenhum item encontrado com os filtros selecionados
-              </td>
-            </tr>
-          `;
-        } else {
-          tbody.innerHTML = filteredItems.map(item => {
-            const valorUnitario = item.preco || 0;
-            const valorTotal = valorUnitario * item.qty;
-            
-            return `
-              <tr>
-                <td><strong>${item.id}</strong></td>
-                <td>${item.medida}</td>
-                <td>${item.marca} ${item.modelo}</td>
-                <td>
-                  <span class="status-badge status-${item.status.toLowerCase()}">
-                    ${item.status}
-                  </span>
-                </td>
-                <td>${item.qty}</td>
-                <td>${item.container}</td>
-                <td>R$ ${valorUnitario.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
-                <td><strong>R$ ${valorTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
-                <td>${new Date(item.dataEntrada).toLocaleDateString('pt-BR')}</td>
-                <td>
-                  <div class="action-buttons">
-                    <button class="btn-xs" onclick="openEditPneuModal('${item.id}')">Editar</button>
-                    <div class="quantity-control">
-                      <input type="number" class="quantity-input" value="1" min="1" max="${item.qty}">
-                      <button class="btn-xs btn-danger" onclick="removePneuQuantity('${item.id}', this)">Excluir Qtd</button>
-                    </div>
-                  </div>
-                </td>
-              </tr>
-            `;
-          }).join('');
-        }
-
-        totalCount.textContent = filteredItems.length;
-      }
-    }
-
     function generatePerformanceReport() {
       showNotification('🚛 Gerando relatório de performance...', 'success');
       
@@ -2859,32 +3177,6 @@
             <div class="metric-change positive">↑ 3% vs mês anterior</div>
           </div>
         `;
-      }
-    }
-
-    function exportStockToExcel() {
-      try {
-        const ws = XLSX.utils.json_to_sheet(reportData.items.map(item => ({
-          'ID': item.id,
-          'Medida': item.medida,
-          'Marca': item.marca,
-          'Modelo': item.modelo,
-          'Status': item.status,
-          'Quantidade': item.qty,
-          'Preço Unitário': item.preco,
-          'Valor Total': (item.qty * item.preco),
-          'Container': item.container,
-          'Data Entrada': item.dataEntrada,
-          'Observações': item.observacoes || ''
-        })));
-        
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Estoque");
-        XLSX.writeFile(wb, "estoque_transportes_canarinho.xlsx");
-        showNotification('📊 Estoque exportado para Excel com sucesso!', 'success');
-      } catch (error) {
-        showNotification('❌ Erro ao exportar para Excel', 'error');
-        console.error('Erro na exportação:', error);
       }
     }
 
@@ -2949,7 +3241,7 @@
       localStorage.setItem('tc_pneus', JSON.stringify(reportData.items));
       localStorage.setItem('tc_fogos', JSON.stringify(reportData.fogos));
       localStorage.setItem('tc_ultimo_fogo', reportData.ultimoFogo.toString());
-      salvarAlertas(); // ← SALVA TAMBÉM OS ALERTAS
+      salvarAlertas();
     }
 
     // Funções dos modais que ainda não foram implementados
@@ -2959,6 +3251,10 @@
 
     function openDeleteFogoModal() {
       showNotification('🗑️ Modal Excluir Fogo - Em desenvolvimento', 'warning');
+    }
+
+    function applyDateFilter() {
+      showNotification('📅 Filtro de datas aplicado!', 'success');
     }
 
     console.log('Aplicação carregada com sucesso!');
