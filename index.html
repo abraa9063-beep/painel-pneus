@@ -943,15 +943,15 @@
         <div class="container-tabs">
           <div class="container-tab active" data-container="container1">
             <div class="container-tab-title">Container 1</div>
-            <div class="container-tab-subtitle">Pneus novos e premium</div>
+            <div class="container-tab-subtitle">Pneus novos sem fogo</div>
           </div>
           <div class="container-tab" data-container="container2">
             <div class="container-tab-title">Container 2</div>
-            <div class="container-tab-subtitle">Pneus usados e reformados</div>
+            <div class="container-tab-subtitle">Pneus usados sem fogo</div>
           </div>
           <div class="container-tab" data-container="container3">
             <div class="container-tab-title">Container 3</div>
-            <div class="container-tab-subtitle">Estoque diverso e emergencial</div>
+            <div class="container-tab-subtitle">Pneus reformados sem fogo</div>
           </div>
         </div>
 
@@ -960,7 +960,7 @@
           <div class="container-header">
             <div>
               <h3 class="container-title">Container 1</h3>
-              <p style="color: var(--muted); margin-top: 5px;">Armazenamento principal - Pneus novos e premium</p>
+              <p style="color: var(--muted); margin-top: 5px;">Armazenamento principal - Pneus novos sem fogo</p>
             </div>
             <div class="container-stats">
               <div class="stat-item">
@@ -983,7 +983,6 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Medida</th>
                     <th>Marca/Modelo</th>
                     <th>Status</th>
@@ -1007,7 +1006,7 @@
           <div class="container-header">
             <div>
               <h3 class="container-title">Container 2</h3>
-              <p style="color: var(--muted); margin-top: 5px;">Pneus usados e reformados</p>
+              <p style="color: var(--muted); margin-top: 5px;">Pneus usados sem fogo</p>
             </div>
             <div class="container-stats">
               <div class="stat-item">
@@ -1030,7 +1029,6 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Medida</th>
                     <th>Marca/Modelo</th>
                     <th>Status</th>
@@ -1054,7 +1052,7 @@
           <div class="container-header">
             <div>
               <h3 class="container-title">Container 3</h3>
-              <p style="color: var(--muted); margin-top: 5px;">Estoque diverso e emergencial</p>
+              <p style="color: var(--muted); margin-top: 5px;">Estoque diverso - Pneus reformados sem fogo</p>
             </div>
             <div class="container-stats">
               <div class="stat-item">
@@ -1077,7 +1075,6 @@
               <table class="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
                     <th>Medida</th>
                     <th>Marca/Modelo</th>
                     <th>Status</th>
@@ -1344,9 +1341,9 @@
         <div class="field-group">
           <label for="pneuContainer">Container</label>
           <select id="pneuContainer" class="input" required>
-            <option value="container1">Container 1</option>
-            <option value="container2">Container 2</option>
-            <option value="container3">Container 3</option>
+            <option value="container1">Container 1 - Pneus novos sem fogo</option>
+            <option value="container2">Container 2 - Pneus usados sem fogo</option>
+            <option value="container3">Container 3 - Pneus reformados sem fogo</option>
           </select>
         </div>
 
@@ -1537,7 +1534,7 @@
       if (containerItems.length === 0) {
         tableBody.innerHTML = `
           <tr>
-            <td colspan="9" style="text-align: center; padding: 40px; color: var(--muted);">
+            <td colspan="8" style="text-align: center; padding: 40px; color: var(--muted);">
               Nenhum pneu encontrado neste container
             </td>
           </tr>
@@ -1549,7 +1546,6 @@
           
           return `
             <tr>
-              <td><strong>${item.id}</strong></td>
               <td>${item.medida}</td>
               <td>${item.marca} ${item.modelo}</td>
               <td>
@@ -2075,7 +2071,6 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Medida</th>
                                 <th>Marca/Modelo</th>
                                 <th>Status</th>
@@ -2087,7 +2082,6 @@
                         <tbody>
                             ${dados.estoque.map(item => `
                                 <tr>
-                                    <td><strong>${item.id}</strong></td>
                                     <td>${item.medida}</td>
                                     <td>${item.marca} ${item.modelo}</td>
                                     <td>${item.status}</td>
@@ -2097,7 +2091,7 @@
                                 </tr>
                             `).join('')}
                             <tr class="total-row">
-                                <td colspan="4"><strong>TOTAL GERAL</strong></td>
+                                <td colspan="3"><strong>TOTAL GERAL</strong></td>
                                 <td><strong>${dados.estoque.reduce((sum, item) => sum + item.qty, 0)}</strong></td>
                                 <td></td>
                                 <td class="valor"><strong>R$ ${dados.estoque.reduce((sum, item) => sum + (item.qty * (item.preco || 0)), 0).toLocaleString('pt-BR', {minimumFractionDigits: 2})}</strong></td>
@@ -2272,7 +2266,6 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Item</th>
                                 <th>Medida</th>
                                 <th>Marca/Modelo</th>
                                 <th>Quantidade</th>
@@ -2283,7 +2276,6 @@
                         <tbody>
                             ${dados.top5MaisCaros.map(item => `
                                 <tr>
-                                    <td><strong>${item.id}</strong></td>
                                     <td>${item.medida}</td>
                                     <td>${item.marca} ${item.modelo}</td>
                                     <td>${item.qty}</td>
@@ -2398,7 +2390,6 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Medida</th>
                                 <th>Marca/Modelo</th>
                                 <th>Status</th>
@@ -2411,7 +2402,6 @@
                         <tbody>
                             ${dados.itens.map(item => `
                                 <tr>
-                                    <td><strong>${item.id}</strong></td>
                                     <td>${item.medida}</td>
                                     <td>${item.marca} ${item.modelo}</td>
                                     <td>${item.status}</td>
@@ -2422,7 +2412,7 @@
                                 </tr>
                             `).join('')}
                             <tr class="total-row">
-                                <td colspan="4"><strong>TOTAL GERAL</strong></td>
+                                <td colspan="3"><strong>TOTAL GERAL</strong></td>
                                 <td><strong>${dados.itens.reduce((sum, item) => sum + item.qty, 0)}</strong></td>
                                 <td></td>
                                 <td></td>
@@ -2568,7 +2558,6 @@
         // Container 1
         const container1Items = reportData.items.filter(item => item.container === 'container1');
         const ws1 = XLSX.utils.json_to_sheet(container1Items.map(item => ({
-          'ID': item.id,
           'Medida': item.medida,
           'Marca': item.marca,
           'Modelo': item.modelo,
@@ -2584,7 +2573,6 @@
         // Container 2
         const container2Items = reportData.items.filter(item => item.container === 'container2');
         const ws2 = XLSX.utils.json_to_sheet(container2Items.map(item => ({
-          'ID': item.id,
           'Medida': item.medida,
           'Marca': item.marca,
           'Modelo': item.modelo,
@@ -2600,7 +2588,6 @@
         // Container 3
         const container3Items = reportData.items.filter(item => item.container === 'container3');
         const ws3 = XLSX.utils.json_to_sheet(container3Items.map(item => ({
-          'ID': item.id,
           'Medida': item.medida,
           'Marca': item.marca,
           'Modelo': item.modelo,
@@ -3050,7 +3037,7 @@
         if (item.qty > 0) {
           const option = document.createElement('option');
           option.value = item.id;
-          option.textContent = `${item.id} - ${item.medida} - ${item.marca} ${item.modelo} (${item.qty} disponíveis)`;
+          option.textContent = `${item.medida} - ${item.marca} ${item.modelo} (${item.qty} disponíveis)`;
           select.appendChild(option);
         }
       });
