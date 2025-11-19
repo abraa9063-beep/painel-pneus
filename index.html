@@ -947,11 +947,11 @@
           </div>
           <div class="container-tab" data-container="container2">
             <div class="container-tab-title">Container 2</div>
-            <div class="container-tab-subtitle">Pneus usados sem fogo</div>
+            <div class="container-tab-subtitle">Pneus novos sem fogo</div>
           </div>
           <div class="container-tab" data-container="container3">
             <div class="container-tab-title">Container 3</div>
-            <div class="container-tab-subtitle">Pneus reformados sem fogo</div>
+            <div class="container-tab-subtitle">Pneus novos sem fogo</div>
           </div>
         </div>
 
@@ -960,7 +960,7 @@
           <div class="container-header">
             <div>
               <h3 class="container-title">Container 1</h3>
-              <p style="color: var(--muted); margin-top: 5px;">Armazenamento principal - Pneus novos sem fogo</p>
+              <p style="color: var(--muted); margin-top: 5px;">Pneus novos sem fogo</p>
             </div>
             <div class="container-stats">
               <div class="stat-item">
@@ -986,8 +986,8 @@
                     <th>Medida</th>
                     <th>Marca/Modelo</th>
                     <th>Status</th>
-                    <th>Qtd</th>
-                    <th>Valor Unit.</th>
+                    <th>QTD</th>
+                    <th>Valor Unit</th>
                     <th>Valor Total</th>
                     <th>Entrada</th>
                     <th>Ações</th>
@@ -1006,7 +1006,7 @@
           <div class="container-header">
             <div>
               <h3 class="container-title">Container 2</h3>
-              <p style="color: var(--muted); margin-top: 5px;">Pneus usados sem fogo</p>
+              <p style="color: var(--muted); margin-top: 5px;">Pneus novos sem fogo</p>
             </div>
             <div class="container-stats">
               <div class="stat-item">
@@ -1019,7 +1019,7 @@
               </div>
               <div class="stat-item">
                 <span class="stat-value" id="container2-usados">0</span>
-                <span class="stat-label">Pneus Usados</span>
+                <span class="stat-label">Pneus Novos</span>
               </div>
             </div>
           </div>
@@ -1032,8 +1032,8 @@
                     <th>Medida</th>
                     <th>Marca/Modelo</th>
                     <th>Status</th>
-                    <th>Qtd</th>
-                    <th>Valor Unit.</th>
+                    <th>QTD</th>
+                    <th>Valor Unit</th>
                     <th>Valor Total</th>
                     <th>Entrada</th>
                     <th>Ações</th>
@@ -1052,7 +1052,7 @@
           <div class="container-header">
             <div>
               <h3 class="container-title">Container 3</h3>
-              <p style="color: var(--muted); margin-top: 5px;">Estoque diverso - Pneus reformados sem fogo</p>
+              <p style="color: var(--muted); margin-top: 5px;">Pneus novos sem fogo</p>
             </div>
             <div class="container-stats">
               <div class="stat-item">
@@ -1065,7 +1065,7 @@
               </div>
               <div class="stat-item">
                 <span class="stat-value" id="container3-reformados">0</span>
-                <span class="stat-label">Pneus Reformados</span>
+                <span class="stat-label">Pneus Novos</span>
               </div>
             </div>
           </div>
@@ -1078,8 +1078,8 @@
                     <th>Medida</th>
                     <th>Marca/Modelo</th>
                     <th>Status</th>
-                    <th>Qtd</th>
-                    <th>Valor Unit.</th>
+                    <th>QTD</th>
+                    <th>Valor Unit</th>
                     <th>Valor Total</th>
                     <th>Entrada</th>
                     <th>Ações</th>
@@ -1329,11 +1329,11 @@
 
         <div class="field-row">
           <div class="field-group">
-            <label for="pneuQuantidade">Quantidade</label>
+            <label for="pneuQuantidade">QTD</label>
             <input type="number" id="pneuQuantidade" class="input" min="1" value="1" required>
           </div>
           <div class="field-group">
-            <label for="pneuPreco">Preço Unitário (R$)</label>
+            <label for="pneuPreco">Valor Unit (R$)</label>
             <input type="number" id="pneuPreco" class="input" min="0" step="0.01" placeholder="0.00" required>
           </div>
         </div>
@@ -1342,8 +1342,8 @@
           <label for="pneuContainer">Container</label>
           <select id="pneuContainer" class="input" required>
             <option value="container1">Container 1 - Pneus novos sem fogo</option>
-            <option value="container2">Container 2 - Pneus usados sem fogo</option>
-            <option value="container3">Container 3 - Pneus reformados sem fogo</option>
+            <option value="container2">Container 2 - Pneus novos sem fogo</option>
+            <option value="container3">Container 3 - Pneus novos sem fogo</option>
           </select>
         </div>
 
@@ -1356,6 +1356,45 @@
       <div class="modal-actions">
         <button class="btn-xs" onclick="closeAddPneuModal()">Cancelar</button>
         <button onclick="confirmAddPneu()" class="btn-success">Adicionar Pneu</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Excluir Quantidade -->
+  <div class="modal-backdrop" id="deleteQuantityModal">
+    <div class="modal">
+      <h2>Excluir Quantidade</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-group">
+          <label for="deletePneuInfo">Pneu Selecionado</label>
+          <input type="text" id="deletePneuInfo" class="input" readonly>
+        </div>
+
+        <div class="field-group">
+          <label for="deleteQuantidade">Quantidade a Excluir</label>
+          <input type="number" id="deleteQuantidade" class="input" min="1" value="1">
+        </div>
+
+        <div class="field-group">
+          <label for="deleteMotivo">Motivo da Exclusão</label>
+          <select id="deleteMotivo" class="input">
+            <option value="Danificado">Pneu Danificado</option>
+            <option value="Venda">Venda</option>
+            <option value="Uso">Uso em Veículo</option>
+            <option value="Outro">Outro</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="deleteObservacoes">Observações</label>
+          <textarea id="deleteObservacoes" class="input" placeholder="Detalhes sobre a exclusão..." style="width: 100%; height: 80px;"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeDeleteQuantityModal()">Cancelar</button>
+        <button onclick="confirmDeleteQuantity()" class="btn-danger">Excluir Quantidade</button>
       </div>
     </div>
   </div>
@@ -1491,8 +1530,9 @@
     // Gráficos
     let statusChart, containerChart, movementChart, brandsChart, custoKmChart, durabilidadeChart;
 
-    // Variável para controlar fogo sendo editado
+    // Variáveis para controle
     let fogoEditando = null;
+    let pneuParaExcluir = null;
 
     // Sistema de alertas
     let sistemaAlertas = [];
@@ -1560,10 +1600,7 @@
               <td>
                 <div class="action-buttons">
                   <button class="btn-xs" onclick="openEditPneuModal('${item.id}')">Editar</button>
-                  <div class="quantity-control">
-                    <input type="number" class="quantity-input" value="1" min="1" max="${item.qty}">
-                    <button class="btn-xs btn-danger" onclick="removePneuQuantity('${item.id}', this)">Excluir Qtd</button>
-                  </div>
+                  <button class="btn-xs btn-danger" onclick="openDeleteQuantityModal('${item.id}')">Excluir Qtd</button>
                 </div>
               </td>
             </tr>
@@ -1581,9 +1618,9 @@
       if (container === 'container1') {
         statSpecific = items.filter(item => item.status === 'Novo').reduce((sum, item) => sum + item.qty, 0);
       } else if (container === 'container2') {
-        statSpecific = items.filter(item => item.status === 'Usado').reduce((sum, item) => sum + item.qty, 0);
+        statSpecific = items.filter(item => item.status === 'Novo').reduce((sum, item) => sum + item.qty, 0);
       } else if (container === 'container3') {
-        statSpecific = items.filter(item => item.status === 'Reformado').reduce((sum, item) => sum + item.qty, 0);
+        statSpecific = items.filter(item => item.status === 'Novo').reduce((sum, item) => sum + item.qty, 0);
       }
       
       // Atualizar elementos HTML
@@ -1623,51 +1660,83 @@
         // mas preenchido com os dados atuais do pneu
     }
 
-    function removePneuQuantity(pneuId, buttonElement) {
+    function openDeleteQuantityModal(pneuId) {
         const pneu = reportData.items.find(p => p.id === pneuId);
         if (!pneu) {
             showNotification('Pneu não encontrado!', 'error');
             return;
         }
 
-        // Encontrar o input de quantidade na mesma linha
-        const row = buttonElement.closest('tr');
-        const quantityInput = row.querySelector('.quantity-input');
-        const quantidadeRemover = parseInt(quantityInput.value);
+        pneuParaExcluir = pneu;
+        
+        // Preencher informações do modal
+        document.getElementById('deletePneuInfo').value = `${pneu.medida} - ${pneu.marca} ${pneu.modelo} (${pneu.qty} disponíveis)`;
+        document.getElementById('deleteQuantidade').value = 1;
+        document.getElementById('deleteQuantidade').max = pneu.qty;
+        document.getElementById('deleteMotivo').value = 'Danificado';
+        document.getElementById('deleteObservacoes').value = '';
+        
+        document.getElementById('deleteQuantityModal').style.display = 'flex';
+    }
 
-        if (!quantidadeRemover || quantidadeRemover <= 0) {
+    function closeDeleteQuantityModal() {
+        document.getElementById('deleteQuantityModal').style.display = 'none';
+        pneuParaExcluir = null;
+    }
+
+    function confirmDeleteQuantity() {
+        if (!pneuParaExcluir) return;
+
+        const quantidade = parseInt(document.getElementById('deleteQuantidade').value);
+        const motivo = document.getElementById('deleteMotivo').value;
+        const observacoes = document.getElementById('deleteObservacoes').value;
+
+        if (!quantidade || quantidade <= 0) {
             showNotification('Informe uma quantidade válida!', 'error');
             return;
         }
 
-        if (quantidadeRemover > pneu.qty) {
-            showNotification(`Quantidade indisponível! Disponível: ${pneu.qty}`, 'error');
+        if (quantidade > pneuParaExcluir.qty) {
+            showNotification(`Quantidade indisponível! Disponível: ${pneuParaExcluir.qty}`, 'error');
             return;
         }
 
-        if (confirm(`Remover ${quantidadeRemover} unidade(s) do pneu ${pneuId}?`)) {
-            // Atualizar quantidade
-            pneu.qty -= quantidadeRemover;
-            
-            // Se quantidade chegar a zero, remover o pneu
-            if (pneu.qty <= 0) {
-                const index = reportData.items.findIndex(p => p.id === pneuId);
-                if (index !== -1) {
-                    reportData.items.splice(index, 1);
-                    showNotification(`Pneu ${pneuId} removido do estoque!`, 'success');
-                }
-            } else {
-                showNotification(`${quantidadeRemover} unidade(s) removida(s) do pneu ${pneuId}`, 'success');
+        // Atualizar quantidade
+        pneuParaExcluir.qty -= quantidade;
+        
+        // Registrar movimento de saída
+        const movimento = {
+            id: `MOV-${Date.now()}`,
+            pneuId: pneuParaExcluir.id,
+            tipo: 'exclusao',
+            quantidade: quantidade,
+            motivo: motivo,
+            observacoes: observacoes,
+            data: new Date().toISOString()
+        };
+        
+        reportData.movements.push(movimento);
+        
+        // Se quantidade chegar a zero, remover o pneu
+        if (pneuParaExcluir.qty <= 0) {
+            const index = reportData.items.findIndex(p => p.id === pneuParaExcluir.id);
+            if (index !== -1) {
+                reportData.items.splice(index, 1);
+                showNotification(`Pneu ${pneuParaExcluir.id} removido do estoque!`, 'success');
             }
-
-            // Salvar e atualizar
-            saveData();
-            generateStockReport();
-            renderDashboard();
-            
-            // Verificar alertas automáticos
-            verificarAlertasAutomaticos();
+        } else {
+            showNotification(`${quantidade} unidade(s) excluída(s) do pneu ${pneuParaExcluir.id}`, 'success');
         }
+
+        // Salvar e atualizar
+        saveData();
+        generateStockReport();
+        renderDashboard();
+        
+        // Verificar alertas automáticos
+        verificarAlertasAutomaticos();
+        
+        closeDeleteQuantityModal();
     }
 
     // =============================================
@@ -2562,10 +2631,10 @@
           'Marca': item.marca,
           'Modelo': item.modelo,
           'Status': item.status,
-          'Quantidade': item.qty,
-          'Preço Unitário': item.preco,
+          'QTD': item.qty,
+          'Valor Unit': item.preco,
           'Valor Total': (item.qty * item.preco),
-          'Data Entrada': item.dataEntrada,
+          'Entrada': item.dataEntrada,
           'Observações': item.observacoes || ''
         })));
         XLSX.utils.book_append_sheet(wb, ws1, "Container 1");
@@ -2577,10 +2646,10 @@
           'Marca': item.marca,
           'Modelo': item.modelo,
           'Status': item.status,
-          'Quantidade': item.qty,
-          'Preço Unitário': item.preco,
+          'QTD': item.qty,
+          'Valor Unit': item.preco,
           'Valor Total': (item.qty * item.preco),
-          'Data Entrada': item.dataEntrada,
+          'Entrada': item.dataEntrada,
           'Observações': item.observacoes || ''
         })));
         XLSX.utils.book_append_sheet(wb, ws2, "Container 2");
@@ -2592,10 +2661,10 @@
           'Marca': item.marca,
           'Modelo': item.modelo,
           'Status': item.status,
-          'Quantidade': item.qty,
-          'Preço Unitário': item.preco,
+          'QTD': item.qty,
+          'Valor Unit': item.preco,
           'Valor Total': (item.qty * item.preco),
-          'Data Entrada': item.dataEntrada,
+          'Entrada': item.dataEntrada,
           'Observações': item.observacoes || ''
         })));
         XLSX.utils.book_append_sheet(wb, ws3, "Container 3");
@@ -2722,7 +2791,7 @@
           marca: "Bridgestone",
           modelo: "R298",
           dataEntrada: "2024-01-20",
-          status: "Usado",
+          status: "Novo",
           qty: 12,
           preco: 650.00,
           container: "container2"
@@ -2733,10 +2802,10 @@
           marca: "Goodyear",
           modelo: "Fuel Max",
           dataEntrada: "2024-02-01",
-          status: "Reformado",
+          status: "Novo",
           qty: 6,
           preco: 850.00,
-          container: "container1"
+          container: "container3"
         }
       ];
     }
