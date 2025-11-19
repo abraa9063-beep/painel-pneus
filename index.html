@@ -588,33 +588,65 @@
       align-items: center;
     }
     
-    /* NOVOS ESTILOS PARA TABS DE CONTAINER */
+    /* NOVOS ESTILOS PARA TABS DE CONTAINER - MODIFICADOS */
     .container-tabs {
       display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-      padding-bottom: 10px;
+      gap: 20px;
+      margin-bottom: 30px;
+      justify-content: center;
     }
 
     .container-tab {
-      padding: 12px 24px;
-      background: rgba(15, 23, 42, 0.6);
-      border: 1px solid rgba(148, 163, 184, 0.2);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.6));
+      padding: 25px;
       border-radius: var(--radius);
-      color: var(--text);
-      cursor: pointer;
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      backdrop-filter: blur(10px);
       transition: all 0.3s ease;
-      font-weight: 500;
-      flex: 1;
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
       text-align: center;
+      min-width: 200px;
+      flex: 1;
+      max-width: 300px;
+    }
+
+    .container-tab::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent), var(--purple));
+    }
+
+    .container-tab:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
     }
 
     .container-tab.active {
-      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-      color: white;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(139, 92, 246, 0.2));
       border-color: var(--accent);
-      box-shadow: var(--shadow);
+      box-shadow: 0 8px 25px rgba(56, 189, 248, 0.3);
+    }
+
+    .container-tab-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--text), var(--muted));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .container-tab-subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
     }
 
     .container-content {
@@ -713,6 +745,12 @@
 
       .container-tabs {
         flex-direction: column;
+        gap: 15px;
+      }
+      
+      .container-tab {
+        min-width: auto;
+        max-width: none;
       }
       
       .container-stats {
@@ -901,16 +939,19 @@
           </div>
         </div>
 
-        <!-- Tabs dos Containers -->
+        <!-- Tabs dos Containers - MODIFICADO -->
         <div class="container-tabs">
           <div class="container-tab active" data-container="container1">
-            Container 1
+            <div class="container-tab-title">Container 1</div>
+            <div class="container-tab-subtitle">Pneus novos e premium</div>
           </div>
           <div class="container-tab" data-container="container2">
-            Container 2
+            <div class="container-tab-title">Container 2</div>
+            <div class="container-tab-subtitle">Pneus usados e reformados</div>
           </div>
           <div class="container-tab" data-container="container3">
-            Container 3
+            <div class="container-tab-title">Container 3</div>
+            <div class="container-tab-subtitle">Estoque diverso e emergencial</div>
           </div>
         </div>
 
