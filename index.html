@@ -933,9 +933,7 @@
             <button onclick="exportStockToExcel()" class="btn-success">
               Exportar Excel
             </button>
-            <button onclick="generateStockReport()" class="btn-success">
-              Atualizar Relatório
-            </button>
+            <!-- BOTÃO ATUALIZAR RELATÓRIO REMOVIDO -->
           </div>
         </div>
 
@@ -1360,6 +1358,71 @@
     </div>
   </div>
 
+  <!-- Modal Editar Pneu -->
+  <div class="modal-backdrop" id="editPneuModal">
+    <div class="modal">
+      <h2>Editar Pneu</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-row">
+          <div class="field-group">
+            <label for="editPneuMedida">Medida</label>
+            <input type="text" id="editPneuMedida" class="input" placeholder="Ex: 295/80 R22.5" required>
+          </div>
+          <div class="field-group">
+            <label for="editPneuMarca">Marca</label>
+            <input type="text" id="editPneuMarca" class="input" placeholder="Ex: Michelin" required>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="editPneuModelo">Modelo</label>
+            <input type="text" id="editPneuModelo" class="input" placeholder="Ex: X Line Energy" required>
+          </div>
+          <div class="field-group">
+            <label for="editPneuStatus">Status</label>
+            <select id="editPneuStatus" class="input" required>
+              <option value="Novo">Novo</option>
+              <option value="Usado">Usado</option>
+              <option value="Reformado">Reformado</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="editPneuQuantidade">QTD</label>
+            <input type="number" id="editPneuQuantidade" class="input" min="1" value="1" required>
+          </div>
+          <div class="field-group">
+            <label for="editPneuPreco">Valor Unit (R$)</label>
+            <input type="number" id="editPneuPreco" class="input" min="0" step="0.01" placeholder="0.00" required>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label for="editPneuContainer">Container</label>
+          <select id="editPneuContainer" class="input" required>
+            <option value="container1">Container 1 - Pneus novos sem fogo</option>
+            <option value="container2">Container 2 - Pneus novos sem fogo</option>
+            <option value="container3">Container 3 - Pneus novos sem fogo</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="editPneuObservacoes">Observações</label>
+          <textarea id="editPneuObservacoes" class="input" placeholder="Observações sobre o pneu..." style="width: 100%; height: 60px;"></textarea>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeEditPneuModal()">Cancelar</button>
+        <button onclick="confirmEditPneu()" class="btn-success">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Modal Excluir Quantidade -->
   <div class="modal-backdrop" id="deleteQuantityModal">
     <div class="modal">
@@ -1533,6 +1596,7 @@
     // Variáveis para controle
     let fogoEditando = null;
     let pneuParaExcluir = null;
+    let pneuEditando = null;
 
     // Sistema de alertas
     let sistemaAlertas = [];
@@ -1653,11 +1717,62 @@
         const pneu = reportData.items.find(p => p.id === pneuId);
         if (!pneu) return;
 
-        // Preencher modal de edição (você pode criar um modal específico para edição)
-        showNotification(`✏️ Editando pneu ${pneuId} - Em desenvolvimento`, 'warning');
+        pneuEditando = pneu;
         
-        // Para implementação completa, crie um modal similar ao de adicionar
-        // mas preenchido com os dados atuais do pneu
+        // Preencher modal com dados atuais
+        document.getElementById('editPneuMedida').value = pneu.medida;
+        document.getElementById('editPneuMarca').value = pneu.marca;
+        document.getElementById('editPneuModelo').value = pneu.modelo;
+        document.getElementById('editPneuStatus').value = pneu.status;
+        document.getElementById('editPneuQuantidade').value = pneu.qty;
+        document.getElementById('editPneuPreco').value = pneu.preco;
+        document.getElementById('editPneuContainer').value = pneu.container;
+        document.getElementById('editPneuObservacoes').value = pneu.observacoes || '';
+        
+        document.getElementById('editPneuModal').style.display = 'flex';
+    }
+
+    function closeEditPneuModal() {
+        document.getElementById('editPneuModal').style.display = 'none';
+        pneuEditando = null;
+    }
+
+    function confirmEditPneu() {
+        if (!pneuEditando) return;
+
+        const medida = document.getElementById('editPneuMedida').value;
+        const marca = document.getElementById('editPneuMarca').value;
+        const modelo = document.getElementById('editPneuModelo').value;
+        const status = document.getElementById('editPneuStatus').value;
+        const qty = parseInt(document.getElementById('editPneuQuantidade').value);
+        const preco = parseFloat(document.getElementById('editPneuPreco').value);
+        const container = document.getElementById('editPneuContainer').value;
+        const observacoes = document.getElementById('editPneuObservacoes').value;
+
+        if (!medida || !marca || !modelo || !status || !qty || !preco) {
+            showNotification('Preencha todos os campos obrigatórios!', 'error');
+            return;
+        }
+
+        // Atualizar dados do pneu
+        pneuEditando.medida = medida;
+        pneuEditando.marca = marca;
+        pneuEditando.modelo = modelo;
+        pneuEditando.status = status;
+        pneuEditando.qty = qty;
+        pneuEditando.preco = preco;
+        pneuEditando.container = container;
+        pneuEditando.observacoes = observacoes;
+
+        saveData();
+        closeEditPneuModal();
+        showNotification('Pneu atualizado com sucesso!', 'success');
+        
+        // Atualizar o container específico
+        updateContainerData(container);
+        
+        // Atualizar dashboard
+        renderDashboard();
     }
 
     function openDeleteQuantityModal(pneuId) {
