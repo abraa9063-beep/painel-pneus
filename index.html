@@ -795,6 +795,236 @@
       display: flex;
       gap: 8px;
     }
+
+    /* ============================================= */
+    /* NOVOS ESTILOS PARA MOVIMENTAÇÃO DE PNEUS */
+    /* ============================================= */
+    
+    .movement-container {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 20px;
+      height: calc(100vh - 200px);
+      min-height: 600px;
+    }
+    
+    .vehicles-panel {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: var(--radius);
+      padding: 20px;
+      overflow-y: auto;
+    }
+    
+    .vehicle-item {
+      background: rgba(30, 41, 59, 0.8);
+      padding: 15px;
+      border-radius: var(--radius);
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    
+    .vehicle-item:hover {
+      background: rgba(56, 189, 248, 0.1);
+    }
+    
+    .vehicle-item.active {
+      border-color: var(--accent);
+      background: rgba(56, 189, 248, 0.15);
+    }
+    
+    .vehicle-plate {
+      font-weight: bold;
+      font-size: 1.1rem;
+      color: var(--accent);
+    }
+    
+    .vehicle-model {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    
+    .visualization-panel {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .vehicle-display {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .truck-diagram {
+      width: 100%;
+      max-width: 600px;
+      height: 300px;
+      position: relative;
+      background: rgba(30, 41, 59, 0.3);
+      border-radius: var(--radius);
+      border: 2px solid rgba(148, 163, 184, 0.2);
+    }
+    
+    /* Desenho do caminhão */
+    .truck-cabin {
+      position: absolute;
+      left: 10%;
+      top: 30%;
+      width: 25%;
+      height: 40%;
+      background: #4a5568;
+      border-radius: 10px 0 0 10px;
+    }
+    
+    .truck-chassis {
+      position: absolute;
+      left: 35%;
+      top: 40%;
+      width: 60%;
+      height: 20%;
+      background: #2d3748;
+      border-radius: 5px;
+    }
+    
+    /* Posições dos eixos */
+    .axle {
+      position: absolute;
+      width: 80px;
+      height: 30px;
+      background: rgba(74, 85, 104, 0.7);
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .axle:hover {
+      background: rgba(56, 189, 248, 0.3);
+    }
+    
+    .axle-front {
+      left: 40%;
+      top: 35%;
+    }
+    
+    .axle-rear-left {
+      left: 60%;
+      top: 35%;
+    }
+    
+    .axle-rear-right {
+      left: 75%;
+      top: 35%;
+    }
+    
+    .axle-spare {
+      left: 15%;
+      top: 70%;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: rgba(74, 85, 104, 0.5);
+    }
+    
+    .tire-slot {
+      width: 25px;
+      height: 25px;
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 50%;
+      border: 2px dashed var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+    
+    .tire-slot.filled {
+      background: var(--success);
+      border: 2px solid var(--success);
+    }
+    
+    .available-tires {
+      margin-top: 20px;
+      background: rgba(30, 41, 59, 0.5);
+      border-radius: var(--radius);
+      padding: 15px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    
+    .tire-item {
+      background: rgba(15, 23, 42, 0.8);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: grab;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      transition: all 0.3s ease;
+    }
+    
+    .tire-item:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+    
+    .tire-item:active {
+      cursor: grabbing;
+    }
+    
+    .tire-number {
+      font-weight: bold;
+      color: var(--accent);
+    }
+    
+    .tire-details {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    
+    .drop-zone {
+      border: 2px dashed var(--accent) !important;
+      background: rgba(56, 189, 248, 0.1) !important;
+    }
+    
+    /* Indicador de posição */
+    .position-indicator {
+      position: absolute;
+      background: var(--accent);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      font-weight: bold;
+      z-index: 10;
+    }
+
+    @media (max-width: 768px) {
+      .movement-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+        height: auto;
+      }
+      
+      .vehicles-panel {
+        max-height: 200px;
+      }
+      
+      .truck-diagram {
+        height: 250px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -810,6 +1040,8 @@
       <button class="tab-btn" data-tab="financeiro">Financeiro</button>
       <button class="tab-btn" data-tab="performance">Performance</button>
       <button class="tab-btn" data-tab="fogos">Controle Fogos</button>
+      <!-- NOVA ABA -->
+      <button class="tab-btn" data-tab="movimento-pneus">Movimento Pneus</button>
     </div>
   </div>
 
@@ -1263,6 +1495,57 @@
         </div>
       </div>
     </div>
+
+    <!-- ============================================= -->
+    <!-- NOVA ABA: MOVIMENTO DE PNEUS -->
+    <!-- ============================================= -->
+    <div id="tab-movimento-pneus" class="tab-content hidden">
+      <div class="reports-container">
+        <div class="report-header">
+          <h2 class="report-title">Movimentação de Pneus nos Veículos</h2>
+          <div class="controls-row">
+            <button onclick="saveTirePositions()" class="btn-success">
+              💾 Salvar Posições
+            </button>
+            <button onclick="resetTirePositions()" class="btn-warning">
+              🔄 Resetar
+            </button>
+          </div>
+        </div>
+
+        <div class="movement-container">
+          <!-- Painel de veículos -->
+          <div class="vehicles-panel">
+            <h3 style="margin-bottom: 15px; color: var(--accent);">Veículos</h3>
+            <div id="vehiclesList">
+              <!-- Veículos serão carregados via JavaScript -->
+            </div>
+          </div>
+
+          <!-- Visualização e movimentação -->
+          <div class="visualization-panel">
+            <div class="vehicle-display">
+              <div id="selectedVehicleInfo" style="margin-bottom: 20px; text-align: center;">
+                <h3 id="currentVehicle" style="color: var(--accent);">Selecione um veículo</h3>
+                <p id="vehicleDetails" style="color: var(--muted);">Clique em um veículo à esquerda para visualizar</p>
+              </div>
+              
+              <div class="truck-diagram" id="truckDiagram">
+                <!-- Desenho do caminhão será gerado via JavaScript -->
+              </div>
+
+              <!-- Pneus disponíveis -->
+              <div class="available-tires">
+                <h4 style="margin-bottom: 10px; color: var(--accent);">Pneus Disponíveis</h4>
+                <div id="availableTiresList">
+                  <!-- Pneus disponíveis serão carregados via JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- Barra de navegação inferior -->
@@ -1290,6 +1573,11 @@
     <button class="nav-btn" data-tab="fogos">
       <span class="nav-icon">🔥</span>
       <span>Fogos</span>
+    </button>
+    <!-- NOVO BOTÃO NA NAVEGAÇÃO -->
+    <button class="nav-btn" data-tab="movimento-pneus">
+      <span class="nav-icon">🎯</span>
+      <span>Posição</span>
     </button>
   </div>
 
@@ -1581,6 +1869,425 @@
   </div>
 
   <script>
+    // =============================================
+    // SISTEMA DE MOVIMENTAÇÃO DE PNEUS - NOVO
+    // =============================================
+
+    let veiculos = [];
+    let veiculoSelecionado = null;
+    let pneusDisponiveis = [];
+    let arrastandoPneu = null;
+
+    // Inicializar sistema de movimentação
+    function inicializarSistemaMovimentacao() {
+      console.log('Inicializando sistema de movimentação...');
+      
+      // Carregar veículos
+      carregarVeiculos();
+      
+      // Carregar pneus disponíveis
+      carregarPneusDisponiveis();
+      
+      // Configurar eventos de drag and drop
+      configurarDragAndDrop();
+    }
+
+    function carregarVeiculos() {
+      veiculos = [
+        {
+          id: 'V001',
+          placa: 'ABC-1234',
+          modelo: 'VOLVO FH-540',
+          tipo: 'cavalo',
+          eixos: {
+            dianteiro: { esquerda: null, direita: null },
+            traseiro1: { esquerda: null, direita: null },
+            traseiro2: { esquerda: null, direita: null },
+            estepe: null
+          }
+        },
+        {
+          id: 'V002',
+          placa: 'DEF-5678',
+          modelo: 'SCANIA R450',
+          tipo: 'cavalo',
+          eixos: {
+            dianteiro: { esquerda: null, direita: null },
+            traseiro1: { esquerda: null, direita: null },
+            traseiro2: { esquerda: null, direita: null },
+            estepe: null
+          }
+        },
+        {
+          id: 'V003',
+          placa: 'GHI-9012',
+          modelo: 'Carreta Baú',
+          tipo: 'carreta',
+          eixos: {
+            traseiro1: { esquerda: null, direita: null },
+            traseiro2: { esquerda: null, direita: null },
+            traseiro3: { esquerda: null, direita: null },
+            estepe: null
+          }
+        }
+      ];
+
+      // Carregar do localStorage se existir
+      const veiculosSalvos = localStorage.getItem('tc_veiculos_posicoes');
+      if (veiculosSalvos) {
+        const dados = JSON.parse(veiculosSalvos);
+        veiculos = veiculos.map(veiculo => {
+          const veiculoSalvo = dados.find(v => v.id === veiculo.id);
+          return veiculoSalvo ? { ...veiculo, eixos: veiculoSalvo.eixos } : veiculo;
+        });
+      }
+
+      renderizarListaVeiculos();
+    }
+
+    function carregarPneusDisponiveis() {
+      // Pegar todos os fogos ativos que não estão em veículos
+      pneusDisponiveis = reportData.fogos.filter(fogo => 
+        fogo.status === 'Ativo' && !fogo.veiculo
+      );
+      
+      renderizarPneusDisponiveis();
+    }
+
+    function renderizarListaVeiculos() {
+      const container = document.getElementById('vehiclesList');
+      container.innerHTML = '';
+
+      veiculos.forEach(veiculo => {
+        const div = document.createElement('div');
+        div.className = `vehicle-item ${veiculoSelecionado?.id === veiculo.id ? 'active' : ''}`;
+        div.innerHTML = `
+          <div class="vehicle-plate">${veiculo.placa}</div>
+          <div class="vehicle-model">${veiculo.modelo}</div>
+          <div style="font-size: 0.8rem; color: var(--muted); margin-top: 5px;">
+            ${Object.values(veiculo.eixos).flatMap(eixo => 
+              eixo && typeof eixo === 'object' ? Object.values(eixo) : [eixo]
+            ).filter(Boolean).length} pneus instalados
+          </div>
+        `;
+        div.addEventListener('click', () => selecionarVeiculo(veiculo));
+        container.appendChild(div);
+      });
+    }
+
+    function selecionarVeiculo(veiculo) {
+      veiculoSelecionado = veiculo;
+      renderizarListaVeiculos();
+      renderizarDiagramaVeiculo();
+      
+      // Atualizar informações do veículo
+      document.getElementById('currentVehicle').textContent = `${veiculo.placa} - ${veiculo.modelo}`;
+      document.getElementById('vehicleDetails').textContent = `Tipo: ${veiculo.tipo === 'cavalo' ? 'Cavalo Mecânico' : 'Carreta'}`;
+    }
+
+    function renderizarDiagramaVeiculo() {
+      const container = document.getElementById('truckDiagram');
+      container.innerHTML = '';
+
+      if (!veiculoSelecionado) {
+        container.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted);">
+            Selecione um veículo para visualizar
+          </div>
+        `;
+        return;
+      }
+
+      // Criar desenho baseado no tipo de veículo
+      if (veiculoSelecionado.tipo === 'cavalo') {
+        criarDiagramaCavalo(container);
+      } else {
+        criarDiagramaCarreta(container);
+      }
+    }
+
+    function criarDiagramaCavalo(container) {
+      // Cabine
+      const cabin = document.createElement('div');
+      cabin.className = 'truck-cabin';
+      container.appendChild(cabin);
+
+      // Chassis
+      const chassis = document.createElement('div');
+      chassis.className = 'truck-chassis';
+      container.appendChild(chassis);
+
+      // Eixos para cavalo
+      const eixos = [
+        { id: 'dianteiro', nome: 'Dianteiro', left: '40%', top: '35%' },
+        { id: 'traseiro1', nome: 'Traseiro 1', left: '60%', top: '35%' },
+        { id: 'traseiro2', nome: 'Traseiro 2', left: '75%', top: '35%' },
+        { id: 'estepe', nome: 'Estepe', left: '15%', top: '70%' }
+      ];
+
+      eixos.forEach(eixo => {
+        const axleDiv = document.createElement('div');
+        axleDiv.className = `axle axle-${eixo.id}`;
+        axleDiv.style.left = eixo.left;
+        axleDiv.style.top = eixo.top;
+        axleDiv.dataset.eixo = eixo.id;
+
+        // Adicionar indicador de posição
+        const indicator = document.createElement('div');
+        indicator.className = 'position-indicator';
+        indicator.style.top = '-25px';
+        indicator.style.left = '50%';
+        indicator.style.transform = 'translateX(-50%)';
+        indicator.textContent = eixo.nome;
+        axleDiv.appendChild(indicator);
+
+        if (eixo.id === 'estepe') {
+          // Estepe (único)
+          const tireSlot = document.createElement('div');
+          tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
+          tireSlot.dataset.posicao = eixo.id;
+          tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'E';
+          axleDiv.appendChild(tireSlot);
+        } else {
+          // Eixos duplos (esquerda/direita)
+          const leftSlot = document.createElement('div');
+          leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
+          leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
+          leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
+          
+          const rightSlot = document.createElement('div');
+          rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
+          rightSlot.dataset.posicao = `${eixo.id}-direita`;
+          rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
+          
+          axleDiv.appendChild(leftSlot);
+          axleDiv.appendChild(rightSlot);
+        }
+
+        container.appendChild(axleDiv);
+      });
+    }
+
+    function criarDiagramaCarreta(container) {
+      const chassis = document.createElement('div');
+      chassis.className = 'truck-chassis';
+      chassis.style.left = '10%';
+      chassis.style.width = '80%';
+      container.appendChild(chassis);
+
+      const eixos = [
+        { id: 'traseiro1', nome: 'Traseiro 1', left: '30%', top: '35%' },
+        { id: 'traseiro2', nome: 'Traseiro 2', left: '50%', top: '35%' },
+        { id: 'traseiro3', nome: 'Traseiro 3', left: '70%', top: '35%' },
+        { id: 'estepe', nome: 'Estepe', left: '15%', top: '70%' }
+      ];
+
+      eixos.forEach(eixo => {
+        const axleDiv = document.createElement('div');
+        axleDiv.className = `axle axle-${eixo.id}`;
+        axleDiv.style.left = eixo.left;
+        axleDiv.style.top = eixo.top;
+        axleDiv.dataset.eixo = eixo.id;
+
+        const indicator = document.createElement('div');
+        indicator.className = 'position-indicator';
+        indicator.style.top = '-25px';
+        indicator.style.left = '50%';
+        indicator.style.transform = 'translateX(-50%)';
+        indicator.textContent = eixo.nome;
+        axleDiv.appendChild(indicator);
+
+        if (eixo.id === 'estepe') {
+          const tireSlot = document.createElement('div');
+          tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
+          tireSlot.dataset.posicao = eixo.id;
+          tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'E';
+          axleDiv.appendChild(tireSlot);
+        } else {
+          const leftSlot = document.createElement('div');
+          leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
+          leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
+          leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
+          
+          const rightSlot = document.createElement('div');
+          rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
+          rightSlot.dataset.posicao = `${eixo.id}-direita`;
+          rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
+          
+          axleDiv.appendChild(leftSlot);
+          axleDiv.appendChild(rightSlot);
+        }
+
+        container.appendChild(axleDiv);
+      });
+    }
+
+    function renderizarPneusDisponiveis() {
+      const container = document.getElementById('availableTiresList');
+      container.innerHTML = '';
+
+      if (pneusDisponiveis.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--muted); padding: 20px;">
+            Nenhum pneu disponível
+          </div>
+        `;
+        return;
+      }
+
+      pneusDisponiveis.forEach(pneu => {
+        const div = document.createElement('div');
+        div.className = 'tire-item';
+        div.draggable = true;
+        div.dataset.fogo = pneu.numero;
+        div.innerHTML = `
+          <div class="tire-number">Fogo ${pneu.numero}</div>
+          <div class="tire-details">${pneu.medida} - ${pneu.marca}</div>
+        `;
+        
+        div.addEventListener('dragstart', (e) => {
+          arrastandoPneu = pneu.numero;
+          e.dataTransfer.setData('text/plain', pneu.numero);
+          div.style.opacity = '0.5';
+        });
+        
+        div.addEventListener('dragend', () => {
+          arrastandoPneu = null;
+          div.style.opacity = '1';
+          document.querySelectorAll('.drop-zone').forEach(zone => {
+            zone.classList.remove('drop-zone');
+          });
+        });
+
+        container.appendChild(div);
+      });
+    }
+
+    function configurarDragAndDrop() {
+      const container = document.getElementById('truckDiagram');
+      
+      container.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        const slot = e.target.closest('.tire-slot');
+        if (slot) {
+          slot.classList.add('drop-zone');
+        }
+      });
+      
+      container.addEventListener('dragleave', (e) => {
+        const slot = e.target.closest('.tire-slot');
+        if (slot) {
+          slot.classList.remove('drop-zone');
+        }
+      });
+      
+      container.addEventListener('drop', (e) => {
+        e.preventDefault();
+        const slot = e.target.closest('.tire-slot');
+        if (slot && arrastandoPneu) {
+          colocarPneuNoEixo(slot.dataset.posicao, arrastandoPneu);
+          slot.classList.remove('drop-zone');
+        }
+      });
+    }
+
+    function colocarPneuNoEixo(posicao, numeroFogo) {
+      if (!veiculoSelecionado) return;
+
+      // Remover pneu de qualquer posição anterior
+      Object.keys(veiculoSelecionado.eixos).forEach(eixo => {
+        if (veiculoSelecionado.eixos[eixo] && typeof veiculoSelecionado.eixos[eixo] === 'object') {
+          // Eixo duplo
+          if (veiculoSelecionado.eixos[eixo].esquerda === numeroFogo) {
+            veiculoSelecionado.eixos[eixo].esquerda = null;
+          }
+          if (veiculoSelecionado.eixos[eixo].direita === numeroFogo) {
+            veiculoSelecionado.eixos[eixo].direita = null;
+          }
+        } else if (veiculoSelecionado.eixos[eixo] === numeroFogo) {
+          // Estepe
+          veiculoSelecionado.eixos[eixo] = null;
+        }
+      });
+
+      // Colocar pneu na nova posição
+      const [eixo, lado] = posicao.split('-');
+      
+      if (lado) {
+        // Eixo com lados (esquerda/direita)
+        veiculoSelecionado.eixos[eixo][lado] = numeroFogo;
+      } else {
+        // Estepe
+        veiculoSelecionado.eixos[eixo] = numeroFogo;
+      }
+
+      // Atualizar no array de fogos
+      const fogo = reportData.fogos.find(f => f.numero === numeroFogo);
+      if (fogo) {
+        fogo.veiculo = veiculoSelecionado.placa;
+        fogo.posicao = posicao;
+      }
+
+      // Atualizar visualização
+      renderizarDiagramaVeiculo();
+      renderizarListaVeiculos();
+      carregarPneusDisponiveis(); // Atualizar lista de disponíveis
+      
+      showNotification(`Pneu ${numeroFogo} colocado na posição ${posicao}`, 'success');
+    }
+
+    function saveTirePositions() {
+      if (!veiculoSelecionado) {
+        showNotification('Selecione um veículo primeiro!', 'error');
+        return;
+      }
+
+      // Salvar posições dos veículos
+      localStorage.setItem('tc_veiculos_posicoes', JSON.stringify(veiculos));
+      
+      // Salvar dados dos fogos
+      saveData();
+      
+      showNotification('Posições dos pneus salvas com sucesso!', 'success');
+    }
+
+    function resetTirePositions() {
+      if (!veiculoSelecionado || !confirm('Tem certeza que deseja resetar todas as posições deste veículo?')) {
+        return;
+      }
+
+      // Resetar posições do veículo selecionado
+      Object.keys(veiculoSelecionado.eixos).forEach(eixo => {
+        if (veiculoSelecionado.eixos[eixo] && typeof veiculoSelecionado.eixos[eixo] === 'object') {
+          // Eixo duplo
+          veiculoSelecionado.eixos[eixo].esquerda = null;
+          veiculoSelecionado.eixos[eixo].direita = null;
+        } else {
+          // Estepe
+          veiculoSelecionado.eixos[eixo] = null;
+        }
+      });
+
+      // Remover veículo dos fogos
+      reportData.fogos.forEach(fogo => {
+        if (fogo.veiculo === veiculoSelecionado.placa) {
+          fogo.veiculo = '';
+          fogo.posicao = '';
+        }
+      });
+
+      // Atualizar visualização
+      renderizarDiagramaVeiculo();
+      renderizarListaVeiculos();
+      carregarPneusDisponiveis();
+      
+      showNotification('Posições resetadas com sucesso!', 'success');
+    }
+
+    // =============================================
+    // CÓDIGO ORIGINAL - MANTIDO INTACTO
+    // =============================================
+
     // Dados de exemplo para demonstração
     let reportData = {
       items: [],
@@ -2817,7 +3524,7 @@
     function setupEventListeners() {
       console.log('Configurando event listeners...');
       
-      // Tabs principais
+      // Tabs principais (ATUALIZADO com nova aba)
       document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', function() {
           document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -2837,7 +3544,10 @@
               renderDashboard();
               break;
             case 'estoque':
-              generateStockReport(); // ← AGORA USA O NOVO SISTEMA
+              generateStockReport();
+              break;
+            case 'movimento-pneus': // NOVO CASO
+              inicializarSistemaMovimentacao();
               break;
             case 'performance':
               generatePerformanceReport();
