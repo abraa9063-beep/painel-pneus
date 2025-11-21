@@ -1071,55 +1071,6 @@
         justify-content: center;
       }
     }
-    /* Animações suaves nas abas */
-.tab-content {
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.4s ease, transform 0.4s ease;
-}
-.tab-content.active {
-  opacity: 1;
-  transform: translateY(0);
-  animation: fadeInUp 0.5s ease;
-}
-
-/* Keyframe fade-in-up */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Feedback de clique */
-button:active {
-  transform: scale(0.96);
-  transition: transform 0.1s ease;
-}
-
-/* Vibração ao arrastar pneu */
-.tire-item:active {
-  animation: shake 0.3s;
-}
-@keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-3px); }
-  50% { transform: translateX(3px); }
-  75% { transform: translateX(-3px); }
-  100% { transform: translateX(0); }
-}
-
-/* Destaque no menu inferior */
-.nav-btn.active {
-  color: var(--accent);
-  transform: scale(1.08);
-  transition: all 0.3s ease;
-}
-
   </style>
 </head>
 <body>
@@ -4636,14 +4587,7 @@ button:active {
               borderWidth: 0
             }]
           },
-          options: {
-  ...chartOptions,
-  animation: {
-    duration: 1500,
-    easing: 'easeOutQuart'
-  }
-}
-
+          options: chartOptions
         });
 
         // Gráfico de Containers
@@ -5287,4 +5231,3 @@ button:active {
   </script>
 </body>
 </html>
-
