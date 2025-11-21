@@ -121,7 +121,7 @@
     
     .report-header {
       display: flex;
-      justify-content: between;
+      justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
       flex-wrap: wrap;
@@ -3208,7 +3208,7 @@
         showNotification('✅ Alerta marcado como resolvido!', 'success');
         
         // Atualizar dashboard
-        renderDashboardMetrics();
+        renderDashboard();
       }
     }
 
@@ -3228,7 +3228,7 @@
         
         salvarAlertas();
         renderizarAlertas();
-        renderDashboardMetrics();
+        renderDashboard();
         showNotification('🎉 Todos os alertas foram marcados como resolvidos!', 'success');
       }
     }
@@ -3252,7 +3252,7 @@
       sistemaAlertas.push(novoAlerta);
       salvarAlertas();
       renderizarAlertas();
-      renderDashboardMetrics();
+      renderDashboard();
       
       // Mostrar notificação do novo alerta
       showNotification(`🚨 Novo alerta: ${tipo} - ${descricao}`, 'warning');
@@ -4356,4 +4356,529 @@
     }
 
     function updateCharts() {
-      // Atualizar dados dos gráficos com informações real
+      // Atualizar dados dos gráficos com informações reais
+      if (statusChart) {
+        const statusData = calcularEstoquePorStatus();
+        statusChart.data.datasets[0].data = [
+          statusData.Novo?.quantidade || 0,
+          statusData.Usado?.quantidade || 0,
+          statusData.Reformado?.quantidade || 0
+        ];
+        statusChart.update();
+      }
+
+      if (containerChart) {
+        const containerData = calcularEstoquePorContainer();
+        containerChart.data.datasets[0].data = [
+          containerData.container1?.quantidade || 0,
+          containerData.container2?.quantidade || 0,
+          containerData.container3?.quantidade || 0
+        ];
+        containerChart.update();
+      }
+    }
+
+    // =============================================
+    // FUNÇÕES BÁSICAS DO SISTEMA
+    // =============================================
+
+    function saveData() {
+      localStorage.setItem('tc_pneus', JSON.stringify(reportData.items));
+      localStorage.setItem('tc_fogos', JSON.stringify(reportData.fogos));
+      localStorage.setItem('tc_ultimo_fogo', reportData.ultimoFogo.toString());
+    }
+
+    function showNotification(message, type = 'success') {
+      const notification = document.createElement('div');
+      notification.className = `notification ${type}`;
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 4000);
+    }
+
+    // =============================================
+    // FUNÇÕES BÁSICAS PARA MODAIS
+    // =============================================
+
+    function openAddPneuModal() {
+      document.getElementById('addPneuModal').style.display = 'flex';
+    }
+
+    function closeAddPneuModal() {
+      document.getElementById('addPneuModal').style.display = 'none';
+    }
+
+    function confirmAddPneu() {
+      const medida = document.getElementById('pneuMedida').value;
+      const marca = document.getElementById('pneuMarca').value;
+      const modelo = document.getElementById('pneuModelo').value;
+      const status = document.getElementById('pneuStatus').value;
+      const qty = parseInt(document.getElementById('pneuQuantidade').value);
+      const preco = parseFloat(document.getElementById('pneuPreco').value);
+      const container = document.getElementById('pneuContainer').value;
+      const observacoes = document.getElementById('pneuObservacoes').value;
+
+      if (!medida || !marca || !modelo || !status || !qty || !preco) {
+        showNotification('Preencha todos os campos obrigatórios!', 'error');
+        return;
+      }
+
+      const novoPneu = {
+        id: `PNEU-${Date.now()}`,
+        medida: medida,
+        marca: marca,
+        modelo: modelo,
+        dataEntrada: new Date().toISOString().split('T')[0],
+        status: status,
+        qty: qty,
+        preco: preco,
+        container: container,
+        observacoes: observacoes
+      };
+
+      reportData.items.push(novoPneu);
+      saveData();
+      closeAddPneuModal();
+      showNotification('Pneu adicionado com sucesso!', 'success');
+      
+      // Atualizar o container específico
+      updateContainerData(container);
+      
+      // Atualizar dashboard
+      renderDashboard();
+    }
+
+    // =============================================
+    // FUNÇÕES PARA CONTROLE DE FOGOS
+    // =============================================
+
+    function openAddFogoModal() {
+      // Preencher select com pneus disponíveis
+      const select = document.getElementById('fogoPneuSelect');
+      select.innerHTML = '<option value="">Selecione um pneu...</option>';
+      
+      reportData.items.forEach(pneu => {
+        if (pneu.qty > 0) {
+          const option = document.createElement('option');
+          option.value = pneu.id;
+          option.textContent = `${pneu.medida} - ${pneu.marca} ${pneu.modelo} (${pneu.qty} disponíveis)`;
+          select.appendChild(option);
+        }
+      });
+      
+      document.getElementById('addFogoModal').style.display = 'flex';
+    }
+
+    function closeAddFogoModal() {
+      document.getElementById('addFogoModal').style.display = 'none';
+    }
+
+    function updateFogoPreview() {
+      const quantidade = parseInt(document.getElementById('fogoQuantidade').value) || 0;
+      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value) || 1;
+      
+      const previewList = document.getElementById('fogoPreviewList');
+      
+      if (quantidade <= 0) {
+        previewList.innerHTML = 'Nenhum fogo gerado ainda';
+        return;
+      }
+      
+      let previewHTML = '';
+      for (let i = 0; i < quantidade; i++) {
+        previewHTML += `<div>Fogo ${numeroInicial + i}</div>`;
+      }
+      
+      previewList.innerHTML = previewHTML;
+    }
+
+    function confirmAddFogo() {
+      const pneuId = document.getElementById('fogoPneuSelect').value;
+      const quantidade = parseInt(document.getElementById('fogoQuantidade').value);
+      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value);
+      const veiculo = document.getElementById('fogoVeiculo').value;
+      const posicao = document.getElementById('fogoPosicao').value;
+      const observacoes = document.getElementById('fogoObservacoes').value;
+
+      if (!pneuId || !quantidade || quantidade <= 0) {
+        showNotification('Selecione um pneu e informe a quantidade!', 'error');
+        return;
+      }
+
+      const pneu = reportData.items.find(p => p.id === pneuId);
+      if (!pneu) {
+        showNotification('Pneu não encontrado!', 'error');
+        return;
+      }
+
+      if (quantidade > pneu.qty) {
+        showNotification(`Quantidade indisponível! Disponível: ${pneu.qty}`, 'error');
+        return;
+      }
+
+      // Atualizar quantidade do pneu
+      pneu.qty -= quantidade;
+
+      // Criar fogos
+      for (let i = 0; i < quantidade; i++) {
+        const numeroFogo = numeroInicial + i;
+        
+        const novoFogo = {
+          id: `FOGO-${Date.now()}-${i}`,
+          numero: numeroFogo,
+          pneuId: pneuId,
+          medida: pneu.medida,
+          marca: pneu.marca,
+          modelo: pneu.modelo,
+          veiculo: veiculo,
+          posicao: posicao,
+          dataCriacao: new Date().toISOString(),
+          status: 'Ativo',
+          observacoes: observacoes
+        };
+        
+        reportData.fogos.push(novoFogo);
+      }
+
+      // Atualizar último fogo
+      reportData.ultimoFogo = numeroInicial + quantidade - 1;
+
+      saveData();
+      closeAddFogoModal();
+      showNotification(`${quantidade} fogos criados com sucesso!`, 'success');
+      
+      // Atualizar relatórios
+      generateStockReport();
+      renderFogosList();
+      renderDashboard();
+    }
+
+    function renderFogosList() {
+      const container = document.getElementById('fogosList');
+      const countElement = document.getElementById('fogosCount');
+      
+      const fogosAtivos = reportData.fogos.filter(fogo => fogo.status === 'Ativo');
+      
+      countElement.textContent = fogosAtivos.length;
+      
+      if (fogosAtivos.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--muted);">
+            Nenhum fogo ativo no momento
+          </div>
+        `;
+        return;
+      }
+      
+      container.innerHTML = fogosAtivos.map(fogo => {
+        const pneu = reportData.items.find(p => p.id === fogo.pneuId);
+        
+        return `
+          <div class="fogo-item">
+            <div class="fogo-info">
+              <div class="fogo-number">Fogo ${fogo.numero}</div>
+              <div class="fogo-details">
+                ${fogo.medida} - ${fogo.marca} ${fogo.modelo}
+                ${fogo.veiculo ? ` • ${fogo.veiculo}` : ''}
+                ${fogo.posicao ? ` • ${fogo.posicao}` : ''}
+              </div>
+              <div style="font-size: 0.8rem; color: var(--muted); margin-top: 5px;">
+                Criado em: ${new Date(fogo.dataCriacao).toLocaleDateString('pt-BR')}
+              </div>
+            </div>
+            <div class="fogo-actions">
+              <button class="btn-xs" onclick="openEditFogoModal('${fogo.id}')">Editar</button>
+              <button class="btn-xs btn-warning" onclick="retirarDoFogo('${fogo.id}')">Retirar</button>
+              <button class="btn-xs btn-danger" onclick="excluirFogo('${fogo.id}')">Excluir</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openEditFogoModal(fogoId) {
+      const fogo = reportData.fogos.find(f => f.id === fogoId);
+      if (!fogo) return;
+
+      fogoEditando = fogo;
+      
+      document.getElementById('editFogoNumero').value = fogo.numero;
+      document.getElementById('editFogoVeiculo').value = fogo.veiculo || '';
+      document.getElementById('editFogoPosicao').value = fogo.posicao || '';
+      document.getElementById('editFogoObservacoes').value = fogo.observacoes || '';
+      
+      document.getElementById('editFogoModal').style.display = 'flex';
+    }
+
+    function closeEditFogoModal() {
+      document.getElementById('editFogoModal').style.display = 'none';
+      fogoEditando = null;
+    }
+
+    function confirmEditFogo() {
+      if (!fogoEditando) return;
+
+      const veiculo = document.getElementById('editFogoVeiculo').value;
+      const posicao = document.getElementById('editFogoPosicao').value;
+      const observacoes = document.getElementById('editFogoObservacoes').value;
+
+      fogoEditando.veiculo = veiculo;
+      fogoEditando.posicao = posicao;
+      fogoEditando.observacoes = observacoes;
+
+      saveData();
+      closeEditFogoModal();
+      showNotification('Fogo atualizado com sucesso!', 'success');
+      renderFogosList();
+    }
+
+    function retirarDoFogo(fogoId) {
+      const fogo = reportData.fogos.find(f => f.id === fogoId);
+      if (!fogo) return;
+
+      if (confirm(`Deseja retirar o Fogo ${fogo.numero} do veículo?`)) {
+        // Encontrar o pneu correspondente
+        const pneu = reportData.items.find(p => p.id === fogo.pneuId);
+        if (pneu) {
+          pneu.qty += 1;
+        }
+        
+        // Marcar fogo como inativo
+        fogo.status = 'Inativo';
+        fogo.dataRemocao = new Date().toISOString();
+        
+        saveData();
+        showNotification(`Fogo ${fogo.numero} retirado com sucesso!`, 'success');
+        renderFogosList();
+        generateStockReport();
+        renderDashboard();
+      }
+    }
+
+    function excluirFogo(fogoId) {
+      const fogo = reportData.fogos.find(f => f.id === fogoId);
+      if (!fogo) return;
+
+      if (confirm(`Deseja excluir permanentemente o Fogo ${fogo.numero}?`)) {
+        // Encontrar o pneu correspondente
+        const pneu = reportData.items.find(p => p.id === fogo.pneuId);
+        if (pneu && fogo.status === 'Ativo') {
+          pneu.qty += 1;
+        }
+        
+        // Remover fogo
+        const index = reportData.fogos.findIndex(f => f.id === fogoId);
+        if (index !== -1) {
+          reportData.fogos.splice(index, 1);
+        }
+        
+        saveData();
+        showNotification(`Fogo ${fogo.numero} excluído com sucesso!`, 'success');
+        renderFogosList();
+        generateStockReport();
+        renderDashboard();
+      }
+    }
+
+    function openRemoveFogoModal() {
+      showNotification('Selecione um fogo da lista para retirar', 'warning');
+    }
+
+    function openDeleteFogoModal() {
+      showNotification('Selecione um fogo da lista para excluir', 'warning');
+    }
+
+    // =============================================
+    // FUNÇÕES PARA PERFORMANCE
+    // =============================================
+
+    function generatePerformanceReport() {
+      const veiculoFilter = document.getElementById('veiculoFilter').value;
+      const periodoFilter = parseInt(document.getElementById('periodoFilter').value);
+      
+      // Filtrar dados
+      let dadosFiltrados = reportData.performance.filter(p => !p.tipo);
+      
+      if (veiculoFilter) {
+        dadosFiltrados = dadosFiltrados.filter(p => p.veiculo === veiculoFilter);
+      }
+      
+      // Atualizar métricas
+      const metricsContainer = document.getElementById('performanceMetrics');
+      if (metricsContainer) {
+        const totalVeiculos = dadosFiltrados.length;
+        const custoMedio = dadosFiltrados.reduce((sum, p) => sum + p.custoKm, 0) / totalVeiculos;
+        const durabilidadeMedia = dadosFiltrados.reduce((sum, p) => sum + p.durabilidadeMedia, 0) / totalVeiculos;
+        const eficienciaMedia = dadosFiltrados.reduce((sum, p) => sum + p.eficiencia, 0) / totalVeiculos;
+        
+        metricsContainer.innerHTML = `
+          <div class="metric-card">
+            <div class="metric-value">${totalVeiculos}</div>
+            <div class="metric-label">Veículos Analisados</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-value">R$ ${custoMedio.toFixed(4)}</div>
+            <div class="metric-label">Custo Médio por KM</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-value">${Math.round(durabilidadeMedia).toLocaleString('pt-BR')} km</div>
+            <div class="metric-label">Durabilidade Média</div>
+          </div>
+          
+          <div class="metric-card">
+            <div class="metric-value">${(eficienciaMedia * 100).toFixed(1)}%</div>
+            <div class="metric-label">Eficiência Média</div>
+          </div>
+        `;
+      }
+      
+      // Atualizar tabela de performance
+      const performanceTable = document.getElementById('performanceTable');
+      if (performanceTable) {
+        performanceTable.innerHTML = dadosFiltrados.map(item => `
+          <tr>
+            <td>${item.veiculo}</td>
+            <td>${item.kmRodados.toLocaleString('pt-BR')}</td>
+            <td>${item.pneusUsados}</td>
+            <td>R$ ${item.custoTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td>R$ ${item.custoKm.toFixed(4)}</td>
+            <td>${item.durabilidadeMedia.toLocaleString('pt-BR')} km</td>
+            <td>${(item.eficiencia * 100).toFixed(1)}%</td>
+            <td>
+              <span class="status-badge ${item.status === 'Ótimo' ? 'status-baixa' : item.status === 'Bom' ? 'status-media' : 'status-alta'}">
+                ${item.status}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
+      
+      // Atualizar tabela de histórico
+      const historicoTable = document.getElementById('historicoPneusTable');
+      if (historicoTable) {
+        const historicoFiltrado = reportData.performance.filter(p => p.tipo === 'historico');
+        
+        historicoTable.innerHTML = historicoFiltrado.map(item => `
+          <tr>
+            <td>${item.veiculo}</td>
+            <td>${item.pneu}</td>
+            <td>${item.marca} ${item.modelo}</td>
+            <td>${new Date(item.dataInstalacao).toLocaleDateString('pt-BR')}</td>
+            <td>${item.dataRemocao ? new Date(item.dataRemocao).toLocaleDateString('pt-BR') : '-'}</td>
+            <td>${item.kmRodados.toLocaleString('pt-BR')}</td>
+            <td>R$ ${item.custo.toLocaleString('pt-BR', {minimumFractionDigits: 2})}</td>
+            <td>R$ ${(item.custo / item.kmRodados).toFixed(4)}</td>
+            <td>
+              <span class="status-badge ${item.status === 'Troca Normal' ? 'status-baixa' : item.status === 'Desgaste' ? 'status-media' : 'status-alta'}">
+                ${item.status}
+              </span>
+            </td>
+          </tr>
+        `).join('');
+      }
+      
+      showNotification('Relatório de performance gerado com sucesso!', 'success');
+    }
+
+    // =============================================
+    // FUNÇÕES AUXILIARES
+    // =============================================
+
+    function applyDateFilter() {
+      showNotification('Filtro de datas aplicado!', 'success');
+      renderDashboard();
+    }
+
+    // Inicializar gráficos de performance
+    function initializePerformanceCharts() {
+      try {
+        const custoKmCtx = document.getElementById('custoKmChart').getContext('2d');
+        const durabilidadeCtx = document.getElementById('durabilidadeChart').getContext('2d');
+
+        const chartOptions = {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: '#e2e8f0',
+                font: {
+                  size: 12
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: '#94a3b8' },
+              grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            },
+            y: {
+              ticks: { color: '#94a3b8' },
+              grid: { color: 'rgba(148, 163, 184, 0.1)' }
+            }
+          }
+        };
+
+        // Gráfico de Custo por KM
+        custoKmChart = new Chart(custoKmCtx, {
+          type: 'bar',
+          data: {
+            labels: ['VOLVO FH-540', 'SCANIA R450', 'MERCEDES AXOR', 'VOLKSWAGER 8.160'],
+            datasets: [{
+              label: 'Custo por KM (R$)',
+              data: [0.18, 0.22, 0.25, 0.15],
+              backgroundColor: '#38bdf8',
+              borderColor: '#0ea5e9',
+              borderWidth: 0
+            }]
+          },
+          options: chartOptions
+        });
+
+        // Gráfico de Durabilidade
+        durabilidadeChart = new Chart(durabilidadeCtx, {
+          type: 'line',
+          data: {
+            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+            datasets: [
+              {
+                label: 'VOLVO FH-540',
+                data: [65000, 62000, 58000, 61000, 59000, 63000],
+                borderColor: '#10b981',
+                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                tension: 0.4,
+                fill: true
+              },
+              {
+                label: 'SCANIA R450',
+                data: [58000, 56000, 54000, 52000, 55000, 57000],
+                borderColor: '#f97316',
+                backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                tension: 0.4,
+                fill: true
+              }
+            ]
+          },
+          options: chartOptions
+        });
+
+      } catch (error) {
+        console.error('Erro ao inicializar gráficos de performance:', error);
+      }
+    }
+
+    // Inicializar gráficos de performance quando a aba for carregada
+    document.querySelector('.tab-btn[data-tab="performance"]').addEventListener('click', function() {
+      setTimeout(initializePerformanceCharts, 100);
+    });
+  </script>
+</body>
+</html>
