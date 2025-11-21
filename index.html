@@ -1504,6 +1504,9 @@
         <div class="report-header">
           <h2 class="report-title">Movimentação de Pneus nos Veículos</h2>
           <div class="controls-row">
+            <button onclick="openAddVeiculoModal()" class="btn-success">
+              ➕ Adicionar Veículo
+            </button>
             <button onclick="saveTirePositions()" class="btn-success">
               💾 Salvar Posições
             </button>
@@ -1868,420 +1871,927 @@
     </div>
   </div>
 
+  <!-- Modal Adicionar Veículo -->
+  <div class="modal-backdrop" id="addVeiculoModal">
+    <div class="modal">
+      <h2>Adicionar Novo Veículo</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-row">
+          <div class="field-group">
+            <label for="veiculoPlaca">Placa *</label>
+            <input type="text" id="veiculoPlaca" class="input" placeholder="Ex: ABC-1234" required>
+          </div>
+          <div class="field-group">
+            <label for="veiculoModelo">Modelo *</label>
+            <input type="text" id="veiculoModelo" class="input" placeholder="Ex: VOLVO FH-540" required>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="veiculoTipo">Tipo de Veículo *</label>
+            <select id="veiculoTipo" class="input" required>
+              <option value="cavalo">Cavalo Mecânico</option>
+              <option value="carreta">Carreta</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="veiculoConfiguracao">Configuração *</label>
+            <select id="veiculoConfiguracao" class="input" required>
+              <option value="6x2">6x2</option>
+              <option value="6x4">6x4</option>
+              <option value="4x2">4x2</option>
+              <option value="9 eixos">9 eixos (Carreta)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeAddVeiculoModal()">Cancelar</button>
+        <button onclick="confirmAddVeiculo()" class="btn-success">Adicionar Veículo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Editar Veículo -->
+  <div class="modal-backdrop" id="editVeiculoModal">
+    <div class="modal">
+      <h2>Editar Veículo</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <div class="field-row">
+          <div class="field-group">
+            <label for="editVeiculoPlaca">Placa *</label>
+            <input type="text" id="editVeiculoPlaca" class="input" placeholder="Ex: ABC-1234" required>
+          </div>
+          <div class="field-group">
+            <label for="editVeiculoModelo">Modelo *</label>
+            <input type="text" id="editVeiculoModelo" class="input" placeholder="Ex: VOLVO FH-540" required>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-group">
+            <label for="editVeiculoTipo">Tipo de Veículo *</label>
+            <select id="editVeiculoTipo" class="input" required>
+              <option value="cavalo">Cavalo Mecânico</option>
+              <option value="carreta">Carreta</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label for="editVeiculoConfiguracao">Configuração *</label>
+            <select id="editVeiculoConfiguracao" class="input" required>
+              <option value="6x2">6x2</option>
+              <option value="6x4">6x4</option>
+              <option value="4x2">4x2</option>
+              <option value="9 eixos">9 eixos (Carreta)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-xs" onclick="closeEditVeiculoModal()">Cancelar</button>
+        <button onclick="confirmEditVeiculo()" class="btn-success">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
   <script>
     // =============================================
-    // SISTEMA DE MOVIMENTAÇÃO DE PNEUS - NOVO
+    // SISTEMA DE MOVIMENTAÇÃO DE PNEUS - CORRIGIDO
     // =============================================
 
     let veiculos = [];
     let veiculoSelecionado = null;
     let pneusDisponiveis = [];
     let arrastandoPneu = null;
+    let modoEdicao = false;
 
     // Inicializar sistema de movimentação
     function inicializarSistemaMovimentacao() {
-      console.log('Inicializando sistema de movimentação...');
-      
-      // Carregar veículos
-      carregarVeiculos();
-      
-      // Carregar pneus disponíveis
-      carregarPneusDisponiveis();
-      
-      // Configurar eventos de drag and drop
-      configurarDragAndDrop();
+        console.log('Inicializando sistema de movimentação...');
+        
+        // Carregar veículos
+        carregarVeiculos();
+        
+        // Carregar pneus disponíveis
+        carregarPneusDisponiveis();
+        
+        // Configurar eventos de drag and drop
+        configurarDragAndDrop();
     }
 
     function carregarVeiculos() {
-      veiculos = [
-        {
-          id: 'V001',
-          placa: 'ABC-1234',
-          modelo: 'VOLVO FH-540',
-          tipo: 'cavalo',
-          eixos: {
-            dianteiro: { esquerda: null, direita: null },
-            traseiro1: { esquerda: null, direita: null },
-            traseiro2: { esquerda: null, direita: null },
-            estepe: null
-          }
-        },
-        {
-          id: 'V002',
-          placa: 'DEF-5678',
-          modelo: 'SCANIA R450',
-          tipo: 'cavalo',
-          eixos: {
-            dianteiro: { esquerda: null, direita: null },
-            traseiro1: { esquerda: null, direita: null },
-            traseiro2: { esquerda: null, direita: null },
-            estepe: null
-          }
-        },
-        {
-          id: 'V003',
-          placa: 'GHI-9012',
-          modelo: 'Carreta Baú',
-          tipo: 'carreta',
-          eixos: {
-            traseiro1: { esquerda: null, direita: null },
-            traseiro2: { esquerda: null, direita: null },
-            traseiro3: { esquerda: null, direita: null },
-            estepe: null
-          }
+        // Carregar do localStorage ou criar estrutura padrão
+        const veiculosSalvos = localStorage.getItem('tc_veiculos_posicoes');
+        
+        if (veiculosSalvos) {
+            veiculos = JSON.parse(veiculosSalvos);
+        } else {
+            // Estrutura realista para cavalo mecânico
+            veiculos = [
+                {
+                    id: 'V001',
+                    placa: 'ABC-1234',
+                    modelo: 'VOLVO FH-540',
+                    tipo: 'cavalo',
+                    configuracao: '6x2', // 6x2, 6x4, 4x2, etc.
+                    eixos: {
+                        dianteiro: { 
+                            tipo: 'direcional',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        traseiro1: { 
+                            tipo: 'tracao',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        traseiro2: { 
+                            tipo: 'livre',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        estepe: null
+                    }
+                },
+                {
+                    id: 'V002', 
+                    placa: 'DEF-5678',
+                    modelo: 'SCANIA R450',
+                    tipo: 'cavalo',
+                    configuracao: '6x4',
+                    eixos: {
+                        dianteiro: { 
+                            tipo: 'direcional',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        traseiro1: { 
+                            tipo: 'tracao',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        traseiro2: { 
+                            tipo: 'tracao', 
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        estepe: null
+                    }
+                },
+                {
+                    id: 'V003',
+                    placa: 'GHI-9012', 
+                    modelo: 'Carreta Baú',
+                    tipo: 'carreta',
+                    configuracao: '9 eixos',
+                    eixos: {
+                        traseiro1: { 
+                            tipo: 'fixo',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        traseiro2: { 
+                            tipo: 'fixo',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        traseiro3: { 
+                            tipo: 'fixo',
+                            esquerda: null, 
+                            direita: null 
+                        },
+                        estepe: null
+                    }
+                }
+            ];
+            
+            salvarPosicoesVeiculos();
         }
-      ];
 
-      // Carregar do localStorage se existir
-      const veiculosSalvos = localStorage.getItem('tc_veiculos_posicoes');
-      if (veiculosSalvos) {
-        const dados = JSON.parse(veiculosSalvos);
-        veiculos = veiculos.map(veiculo => {
-          const veiculoSalvo = dados.find(v => v.id === veiculo.id);
-          return veiculoSalvo ? { ...veiculo, eixos: veiculoSalvo.eixos } : veiculo;
-        });
-      }
-
-      renderizarListaVeiculos();
+        renderizarListaVeiculos();
     }
 
     function carregarPneusDisponiveis() {
-      // Pegar todos os fogos ativos que não estão em veículos
-      pneusDisponiveis = reportData.fogos.filter(fogo => 
-        fogo.status === 'Ativo' && !fogo.veiculo
-      );
-      
-      renderizarPneusDisponiveis();
+        // Pegar todos os fogos ativos que não estão em veículos
+        pneusDisponiveis = reportData.fogos.filter(fogo => 
+            fogo.status === 'Ativo' && (!fogo.veiculo || fogo.veiculo === '')
+        );
+        
+        renderizarPneusDisponiveis();
     }
 
     function renderizarListaVeiculos() {
-      const container = document.getElementById('vehiclesList');
-      container.innerHTML = '';
+        const container = document.getElementById('vehiclesList');
+        container.innerHTML = '';
 
-      veiculos.forEach(veiculo => {
-        const div = document.createElement('div');
-        div.className = `vehicle-item ${veiculoSelecionado?.id === veiculo.id ? 'active' : ''}`;
-        div.innerHTML = `
-          <div class="vehicle-plate">${veiculo.placa}</div>
-          <div class="vehicle-model">${veiculo.modelo}</div>
-          <div style="font-size: 0.8rem; color: var(--muted); margin-top: 5px;">
-            ${Object.values(veiculo.eixos).flatMap(eixo => 
-              eixo && typeof eixo === 'object' ? Object.values(eixo) : [eixo]
-            ).filter(Boolean).length} pneus instalados
-          </div>
+        // Botão para adicionar novo veículo
+        const addBtn = document.createElement('div');
+        addBtn.className = 'vehicle-item';
+        addBtn.style.background = 'rgba(56, 189, 248, 0.1)';
+        addBtn.style.border = '2px dashed var(--accent)';
+        addBtn.style.cursor = 'pointer';
+        addBtn.style.textAlign = 'center';
+        addBtn.innerHTML = `
+            <div style="font-size: 1.5rem; margin-bottom: 5px;">+</div>
+            <div>Adicionar Veículo</div>
         `;
-        div.addEventListener('click', () => selecionarVeiculo(veiculo));
-        container.appendChild(div);
-      });
+        addBtn.addEventListener('click', openAddVeiculoModal);
+        container.appendChild(addBtn);
+
+        // Lista de veículos
+        veiculos.forEach(veiculo => {
+            const div = document.createElement('div');
+            div.className = `vehicle-item ${veiculoSelecionado?.id === veiculo.id ? 'active' : ''}`;
+            div.innerHTML = `
+                <div class="vehicle-plate">${veiculo.placa}</div>
+                <div class="vehicle-model">${veiculo.modelo}</div>
+                <div style="font-size: 0.8rem; color: var(--muted); margin-top: 5px;">
+                    ${veiculo.tipo === 'cavalo' ? 'Cavalo Mecânico' : 'Carreta'} • ${veiculo.configuracao}
+                </div>
+                <div style="font-size: 0.7rem; color: var(--accent); margin-top: 3px;">
+                    ${calcularPneusInstalados(veiculo)} pneus instalados
+                </div>
+            `;
+            div.addEventListener('click', () => selecionarVeiculo(veiculo));
+            
+            // Botão de editar
+            const editBtn = document.createElement('button');
+            editBtn.className = 'btn-xs';
+            editBtn.textContent = 'Editar';
+            editBtn.style.marginTop = '8px';
+            editBtn.style.width = '100%';
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditVeiculoModal(veiculo);
+            });
+            div.appendChild(editBtn);
+            
+            container.appendChild(div);
+        });
+    }
+
+    function calcularPneusInstalados(veiculo) {
+        let count = 0;
+        Object.values(veiculo.eixos).forEach(eixo => {
+            if (eixo && typeof eixo === 'object') {
+                if (eixo.esquerda) count++;
+                if (eixo.direita) count++;
+            } else if (eixo) {
+                count++;
+            }
+        });
+        return count;
     }
 
     function selecionarVeiculo(veiculo) {
-      veiculoSelecionado = veiculo;
-      renderizarListaVeiculos();
-      renderizarDiagramaVeiculo();
-      
-      // Atualizar informações do veículo
-      document.getElementById('currentVehicle').textContent = `${veiculo.placa} - ${veiculo.modelo}`;
-      document.getElementById('vehicleDetails').textContent = `Tipo: ${veiculo.tipo === 'cavalo' ? 'Cavalo Mecânico' : 'Carreta'}`;
+        veiculoSelecionado = veiculo;
+        renderizarListaVeiculos();
+        renderizarDiagramaVeiculo();
+        
+        // Atualizar informações do veículo
+        document.getElementById('currentVehicle').textContent = `${veiculo.placa} - ${veiculo.modelo}`;
+        document.getElementById('vehicleDetails').textContent = 
+            `${veiculo.tipo === 'cavalo' ? 'Cavalo Mecânico' : 'Carreta'} • ${veiculo.configuracao}`;
     }
 
     function renderizarDiagramaVeiculo() {
-      const container = document.getElementById('truckDiagram');
-      container.innerHTML = '';
+        const container = document.getElementById('truckDiagram');
+        container.innerHTML = '';
 
-      if (!veiculoSelecionado) {
-        container.innerHTML = `
-          <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted);">
-            Selecione um veículo para visualizar
-          </div>
-        `;
-        return;
-      }
+        if (!veiculoSelecionado) {
+            container.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: var(--muted);">
+                    Selecione um veículo para visualizar
+                </div>
+            `;
+            return;
+        }
 
-      // Criar desenho baseado no tipo de veículo
-      if (veiculoSelecionado.tipo === 'cavalo') {
-        criarDiagramaCavalo(container);
-      } else {
-        criarDiagramaCarreta(container);
-      }
+        // Criar desenho baseado no tipo de veículo
+        if (veiculoSelecionado.tipo === 'cavalo') {
+            criarDiagramaCavalo(container);
+        } else {
+            criarDiagramaCarreta(container);
+        }
     }
 
     function criarDiagramaCavalo(container) {
-      // Cabine
-      const cabin = document.createElement('div');
-      cabin.className = 'truck-cabin';
-      container.appendChild(cabin);
+        // Container principal do caminhão
+        const truckContainer = document.createElement('div');
+        truckContainer.style.position = 'relative';
+        truckContainer.style.width = '100%';
+        truckContainer.style.height = '100%';
+        truckContainer.style.background = 'rgba(30, 41, 59, 0.3)';
+        truckContainer.style.borderRadius = 'var(--radius)';
 
-      // Chassis
-      const chassis = document.createElement('div');
-      chassis.className = 'truck-chassis';
-      container.appendChild(chassis);
+        // Cabine
+        const cabin = document.createElement('div');
+        cabin.style.position = 'absolute';
+        cabin.style.left = '5%';
+        cabin.style.top = '20%';
+        cabin.style.width = '20%';
+        cabin.style.height = '30%';
+        cabin.style.background = '#4a5568';
+        cabin.style.borderRadius = '10px 0 0 10px';
+        cabin.style.border = '2px solid #2d3748';
+        truckContainer.appendChild(cabin);
 
-      // Eixos para cavalo
-      const eixos = [
-        { id: 'dianteiro', nome: 'Dianteiro', left: '40%', top: '35%' },
-        { id: 'traseiro1', nome: 'Traseiro 1', left: '60%', top: '35%' },
-        { id: 'traseiro2', nome: 'Traseiro 2', left: '75%', top: '35%' },
-        { id: 'estepe', nome: 'Estepe', left: '15%', top: '70%' }
-      ];
+        // Para-choque dianteiro
+        const bumper = document.createElement('div');
+        bumper.style.position = 'absolute';
+        bumper.style.left = '5%';
+        bumper.style.top = '48%';
+        bumper.style.width = '2%';
+        bumper.style.height = '8%';
+        bumper.style.background = '#2d3748';
+        truckContainer.appendChild(bumper);
 
-      eixos.forEach(eixo => {
-        const axleDiv = document.createElement('div');
-        axleDiv.className = `axle axle-${eixo.id}`;
-        axleDiv.style.left = eixo.left;
-        axleDiv.style.top = eixo.top;
-        axleDiv.dataset.eixo = eixo.id;
+        // Chassis
+        const chassis = document.createElement('div');
+        chassis.style.position = 'absolute';
+        chassis.style.left = '25%';
+        chassis.style.top = '35%';
+        chassis.style.width = '70%';
+        chassis.style.height = '15%';
+        chassis.style.background = '#2d3748';
+        chassis.style.borderRadius = '5px';
+        chassis.style.border = '2px solid #1a202c';
+        truckContainer.appendChild(chassis);
 
-        // Adicionar indicador de posição
-        const indicator = document.createElement('div');
-        indicator.className = 'position-indicator';
-        indicator.style.top = '-25px';
-        indicator.style.left = '50%';
-        indicator.style.transform = 'translateX(-50%)';
-        indicator.textContent = eixo.nome;
-        axleDiv.appendChild(indicator);
+        // Eixos para cavalo
+        const eixosConfig = [
+            { 
+                id: 'dianteiro', 
+                nome: 'DIANTEIRO', 
+                tipo: 'direcional',
+                left: '28%', 
+                top: '48%',
+                tracao: false
+            },
+            { 
+                id: 'traseiro1', 
+                nome: 'TRASEIRO 1', 
+                tipo: veiculoSelecionado.eixos.traseiro1?.tipo || 'tracao',
+                left: '55%', 
+                top: '48%',
+                tracao: veiculoSelecionado.eixos.traseiro1?.tipo === 'tracao'
+            },
+            { 
+                id: 'traseiro2', 
+                nome: 'TRASEIRO 2', 
+                tipo: veiculoSelecionado.eixos.traseiro2?.tipo || 'livre',
+                left: '75%', 
+                top: '48%',
+                tracao: veiculoSelecionado.eixos.traseiro2?.tipo === 'tracao'
+            },
+            { 
+                id: 'estepe', 
+                nome: 'ESTEPE', 
+                tipo: 'estepe',
+                left: '12%', 
+                top: '70%',
+                tracao: false
+            }
+        ];
 
-        if (eixo.id === 'estepe') {
-          // Estepe (único)
-          const tireSlot = document.createElement('div');
-          tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
-          tireSlot.dataset.posicao = eixo.id;
-          tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'E';
-          axleDiv.appendChild(tireSlot);
-        } else {
-          // Eixos duplos (esquerda/direita)
-          const leftSlot = document.createElement('div');
-          leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
-          leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
-          leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
-          
-          const rightSlot = document.createElement('div');
-          rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
-          rightSlot.dataset.posicao = `${eixo.id}-direita`;
-          rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
-          
-          axleDiv.appendChild(leftSlot);
-          axleDiv.appendChild(rightSlot);
-        }
+        eixosConfig.forEach(eixo => {
+            const axleDiv = document.createElement('div');
+            axleDiv.className = `axle axle-${eixo.id}`;
+            axleDiv.style.position = 'absolute';
+            axleDiv.style.left = eixo.left;
+            axleDiv.style.top = eixo.top;
+            axleDiv.dataset.eixo = eixo.id;
+            
+            // Estilo baseado no tipo de eixo
+            let bgColor = 'rgba(74, 85, 104, 0.7)';
+            if (eixo.tracao) {
+                bgColor = 'rgba(34, 197, 94, 0.7)'; // Verde para tração
+            } else if (eixo.tipo === 'direcional') {
+                bgColor = 'rgba(59, 130, 246, 0.7)'; // Azul para direcional
+            }
 
-        container.appendChild(axleDiv);
-      });
+            axleDiv.style.background = bgColor;
+            axleDiv.style.border = `2px solid ${eixo.tracao ? '#16a34a' : eixo.tipo === 'direcional' ? '#1d4ed8' : '#4b5563'}`;
+            axleDiv.style.borderRadius = '8px';
+            axleDiv.style.padding = '8px';
+            axleDiv.style.display = 'flex';
+            axleDiv.style.gap = '15px';
+            axleDiv.style.alignItems = 'center';
+            axleDiv.style.justifyContent = 'center';
+            axleDiv.style.cursor = 'pointer';
+            axleDiv.style.transition = 'all 0.3s ease';
+
+            // Adicionar indicador de posição
+            const indicator = document.createElement('div');
+            indicator.className = 'position-indicator';
+            indicator.style.position = 'absolute';
+            indicator.style.top = '-30px';
+            indicator.style.left = '50%';
+            indicator.style.transform = 'translateX(-50%)';
+            indicator.style.background = eixo.tracao ? '#16a34a' : eixo.tipo === 'direcional' ? '#1d4ed8' : '#6b7280';
+            indicator.style.color = 'white';
+            indicator.style.padding = '4px 8px';
+            indicator.style.borderRadius = '4px';
+            indicator.style.fontSize = '0.7rem';
+            indicator.style.fontWeight = 'bold';
+            indicator.style.whiteSpace = 'nowrap';
+            indicator.textContent = `${eixo.nome}${eixo.tracao ? ' (TRACAO)' : ''}`;
+            axleDiv.appendChild(indicator);
+
+            if (eixo.id === 'estepe') {
+                // Estepe (único)
+                axleDiv.style.width = '60px';
+                axleDiv.style.height = '60px';
+                axleDiv.style.borderRadius = '50%';
+                axleDiv.style.flexDirection = 'column';
+                axleDiv.style.justifyContent = 'center';
+                axleDiv.style.alignItems = 'center';
+
+                const tireSlot = document.createElement('div');
+                tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
+                tireSlot.dataset.posicao = eixo.id;
+                tireSlot.style.width = '40px';
+                tireSlot.style.height = '40px';
+                tireSlot.style.borderRadius = '50%';
+                tireSlot.style.display = 'flex';
+                tireSlot.style.alignItems = 'center';
+                tireSlot.style.justifyContent = 'center';
+                tireSlot.style.fontSize = '0.7rem';
+                tireSlot.style.fontWeight = 'bold';
+                tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'ESTEPE';
+                axleDiv.appendChild(tireSlot);
+            } else {
+                // Eixos duplos (esquerda/direita)
+                axleDiv.style.width = '120px';
+                axleDiv.style.height = '50px';
+
+                const leftSlot = document.createElement('div');
+                leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
+                leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
+                leftSlot.style.width = '40px';
+                leftSlot.style.height = '40px';
+                leftSlot.style.borderRadius = '50%';
+                leftSlot.style.display = 'flex';
+                leftSlot.style.alignItems = 'center';
+                leftSlot.style.justifyContent = 'center';
+                leftSlot.style.fontSize = '0.7rem';
+                leftSlot.style.fontWeight = 'bold';
+                leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
+                
+                const rightSlot = document.createElement('div');
+                rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
+                rightSlot.dataset.posicao = `${eixo.id}-direita`;
+                rightSlot.style.width = '40px';
+                rightSlot.style.height = '40px';
+                rightSlot.style.borderRadius = '50%';
+                rightSlot.style.display = 'flex';
+                rightSlot.style.alignItems = 'center';
+                rightSlot.style.justifyContent = 'center';
+                rightSlot.style.fontSize = '0.7rem';
+                rightSlot.style.fontWeight = 'bold';
+                rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
+                
+                axleDiv.appendChild(leftSlot);
+                axleDiv.appendChild(rightSlot);
+            }
+
+            // Tooltip com informações do eixo
+            axleDiv.title = `Eixo ${eixo.nome}\nTipo: ${eixo.tipo.toUpperCase()}\n${eixo.tracao ? 'Eixo de Tração' : 'Eixo Livre'}`;
+
+            truckContainer.appendChild(axleDiv);
+        });
+
+        container.appendChild(truckContainer);
     }
 
     function criarDiagramaCarreta(container) {
-      const chassis = document.createElement('div');
-      chassis.className = 'truck-chassis';
-      chassis.style.left = '10%';
-      chassis.style.width = '80%';
-      container.appendChild(chassis);
+        const truckContainer = document.createElement('div');
+        truckContainer.style.position = 'relative';
+        truckContainer.style.width = '100%';
+        truckContainer.style.height = '100%';
+        truckContainer.style.background = 'rgba(30, 41, 59, 0.3)';
+        truckContainer.style.borderRadius = 'var(--radius)';
 
-      const eixos = [
-        { id: 'traseiro1', nome: 'Traseiro 1', left: '30%', top: '35%' },
-        { id: 'traseiro2', nome: 'Traseiro 2', left: '50%', top: '35%' },
-        { id: 'traseiro3', nome: 'Traseiro 3', left: '70%', top: '35%' },
-        { id: 'estepe', nome: 'Estepe', left: '15%', top: '70%' }
-      ];
+        // Chassis da carreta
+        const chassis = document.createElement('div');
+        chassis.style.position = 'absolute';
+        chassis.style.left = '5%';
+        chassis.style.top = '30%';
+        chassis.style.width = '90%';
+        chassis.style.height = '25%';
+        chassis.style.background = '#374151';
+        chassis.style.borderRadius = '8px';
+        chassis.style.border = '2px solid #1f2937';
+        truckContainer.appendChild(chassis);
 
-      eixos.forEach(eixo => {
-        const axleDiv = document.createElement('div');
-        axleDiv.className = `axle axle-${eixo.id}`;
-        axleDiv.style.left = eixo.left;
-        axleDiv.style.top = eixo.top;
-        axleDiv.dataset.eixo = eixo.id;
+        // Eixos para carreta (3 eixos traseiros)
+        const eixosConfig = [
+            { 
+                id: 'traseiro1', 
+                nome: 'EIXO 1', 
+                tipo: 'fixo',
+                left: '25%', 
+                top: '55%',
+                tracao: false
+            },
+            { 
+                id: 'traseiro2', 
+                nome: 'EIXO 2', 
+                tipo: 'fixo',
+                left: '50%', 
+                top: '55%',
+                tracao: false
+            },
+            { 
+                id: 'traseiro3', 
+                nome: 'EIXO 3', 
+                tipo: 'fixo',
+                left: '75%', 
+                top: '55%',
+                tracao: false
+            },
+            { 
+                id: 'estepe', 
+                nome: 'ESTEPE', 
+                tipo: 'estepe',
+                left: '10%', 
+                top: '70%',
+                tracao: false
+            }
+        ];
 
-        const indicator = document.createElement('div');
-        indicator.className = 'position-indicator';
-        indicator.style.top = '-25px';
-        indicator.style.left = '50%';
-        indicator.style.transform = 'translateX(-50%)';
-        indicator.textContent = eixo.nome;
-        axleDiv.appendChild(indicator);
+        eixosConfig.forEach(eixo => {
+            const axleDiv = document.createElement('div');
+            axleDiv.className = `axle axle-${eixo.id}`;
+            axleDiv.style.position = 'absolute';
+            axleDiv.style.left = eixo.left;
+            axleDiv.style.top = eixo.top;
+            axleDiv.dataset.eixo = eixo.id;
+            axleDiv.style.background = 'rgba(74, 85, 104, 0.7)';
+            axleDiv.style.border = '2px solid #4b5563';
+            axleDiv.style.borderRadius = '8px';
+            axleDiv.style.padding = '8px';
+            axleDiv.style.display = 'flex';
+            axleDiv.style.gap = '15px';
+            axleDiv.style.alignItems = 'center';
+            axleDiv.style.justifyContent = 'center';
+            axleDiv.style.cursor = 'pointer';
 
-        if (eixo.id === 'estepe') {
-          const tireSlot = document.createElement('div');
-          tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
-          tireSlot.dataset.posicao = eixo.id;
-          tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'E';
-          axleDiv.appendChild(tireSlot);
-        } else {
-          const leftSlot = document.createElement('div');
-          leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
-          leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
-          leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
-          
-          const rightSlot = document.createElement('div');
-          rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
-          rightSlot.dataset.posicao = `${eixo.id}-direita`;
-          rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
-          
-          axleDiv.appendChild(leftSlot);
-          axleDiv.appendChild(rightSlot);
-        }
+            // Indicador de posição
+            const indicator = document.createElement('div');
+            indicator.className = 'position-indicator';
+            indicator.style.position = 'absolute';
+            indicator.style.top = '-30px';
+            indicator.style.left = '50%';
+            indicator.style.transform = 'translateX(-50%)';
+            indicator.style.background = '#6b7280';
+            indicator.style.color = 'white';
+            indicator.style.padding = '4px 8px';
+            indicator.style.borderRadius = '4px';
+            indicator.style.fontSize = '0.7rem';
+            indicator.style.fontWeight = 'bold';
+            indicator.textContent = eixo.nome;
+            axleDiv.appendChild(indicator);
 
-        container.appendChild(axleDiv);
-      });
+            if (eixo.id === 'estepe') {
+                axleDiv.style.width = '60px';
+                axleDiv.style.height = '60px';
+                axleDiv.style.borderRadius = '50%';
+                axleDiv.style.flexDirection = 'column';
+
+                const tireSlot = document.createElement('div');
+                tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
+                tireSlot.dataset.posicao = eixo.id;
+                tireSlot.style.width = '40px';
+                tireSlot.style.height = '40px';
+                tireSlot.style.borderRadius = '50%';
+                tireSlot.style.display = 'flex';
+                tireSlot.style.alignItems = 'center';
+                tireSlot.style.justifyContent = 'center';
+                tireSlot.style.fontSize = '0.7rem';
+                tireSlot.style.fontWeight = 'bold';
+                tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'ESTEPE';
+                axleDiv.appendChild(tireSlot);
+            } else {
+                axleDiv.style.width = '120px';
+                axleDiv.style.height = '50px';
+
+                const leftSlot = document.createElement('div');
+                leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
+                leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
+                leftSlot.style.width = '40px';
+                leftSlot.style.height = '40px';
+                leftSlot.style.borderRadius = '50%';
+                leftSlot.style.display = 'flex';
+                leftSlot.style.alignItems = 'center';
+                leftSlot.style.justifyContent = 'center';
+                leftSlot.style.fontSize = '0.7rem';
+                leftSlot.style.fontWeight = 'bold';
+                leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
+                
+                const rightSlot = document.createElement('div');
+                rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
+                rightSlot.dataset.posicao = `${eixo.id}-direita`;
+                rightSlot.style.width = '40px';
+                rightSlot.style.height = '40px';
+                rightSlot.style.borderRadius = '50%';
+                rightSlot.style.display = 'flex';
+                rightSlot.style.alignItems = 'center';
+                rightSlot.style.justifyContent = 'center';
+                rightSlot.style.fontSize = '0.7rem';
+                rightSlot.style.fontWeight = 'bold';
+                rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
+                
+                axleDiv.appendChild(leftSlot);
+                axleDiv.appendChild(rightSlot);
+            }
+
+            truckContainer.appendChild(axleDiv);
+        });
+
+        container.appendChild(truckContainer);
     }
 
     function renderizarPneusDisponiveis() {
-      const container = document.getElementById('availableTiresList');
-      container.innerHTML = '';
+        const container = document.getElementById('availableTiresList');
+        container.innerHTML = '';
 
-      if (pneusDisponiveis.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; color: var(--muted); padding: 20px;">
-            Nenhum pneu disponível
-          </div>
-        `;
-        return;
-      }
+        if (pneusDisponiveis.length === 0) {
+            container.innerHTML = `
+                <div style="text-align: center; color: var(--muted); padding: 20px;">
+                    Nenhum pneu disponível<br>
+                    <small style="font-size: 0.8rem;">Cadastre fogos primeiro na aba "Fogos"</small>
+                </div>
+            `;
+            return;
+        }
 
-      pneusDisponiveis.forEach(pneu => {
-        const div = document.createElement('div');
-        div.className = 'tire-item';
-        div.draggable = true;
-        div.dataset.fogo = pneu.numero;
-        div.innerHTML = `
-          <div class="tire-number">Fogo ${pneu.numero}</div>
-          <div class="tire-details">${pneu.medida} - ${pneu.marca}</div>
-        `;
-        
-        div.addEventListener('dragstart', (e) => {
-          arrastandoPneu = pneu.numero;
-          e.dataTransfer.setData('text/plain', pneu.numero);
-          div.style.opacity = '0.5';
+        pneusDisponiveis.forEach(pneu => {
+            const div = document.createElement('div');
+            div.className = 'tire-item';
+            div.draggable = true;
+            div.dataset.fogo = pneu.numero;
+            div.innerHTML = `
+                <div class="tire-number">Fogo ${pneu.numero}</div>
+                <div class="tire-details">${pneu.medida} - ${pneu.marca}</div>
+                <div style="font-size: 0.7rem; color: var(--muted); margin-top: 2px;">
+                    ${pneu.modelo}
+                </div>
+            `;
+            
+            div.addEventListener('dragstart', (e) => {
+                arrastandoPneu = pneu.numero;
+                e.dataTransfer.setData('text/plain', pneu.numero);
+                div.style.opacity = '0.5';
+            });
+            
+            div.addEventListener('dragend', () => {
+                arrastandoPneu = null;
+                div.style.opacity = '1';
+                document.querySelectorAll('.drop-zone').forEach(zone => {
+                    zone.classList.remove('drop-zone');
+                });
+            });
+
+            container.appendChild(div);
         });
-        
-        div.addEventListener('dragend', () => {
-          arrastandoPneu = null;
-          div.style.opacity = '1';
-          document.querySelectorAll('.drop-zone').forEach(zone => {
-            zone.classList.remove('drop-zone');
-          });
-        });
-
-        container.appendChild(div);
-      });
     }
 
     function configurarDragAndDrop() {
-      const container = document.getElementById('truckDiagram');
-      
-      container.addEventListener('dragover', (e) => {
-        e.preventDefault();
-        const slot = e.target.closest('.tire-slot');
-        if (slot) {
-          slot.classList.add('drop-zone');
-        }
-      });
-      
-      container.addEventListener('dragleave', (e) => {
-        const slot = e.target.closest('.tire-slot');
-        if (slot) {
-          slot.classList.remove('drop-zone');
-        }
-      });
-      
-      container.addEventListener('drop', (e) => {
-        e.preventDefault();
-        const slot = e.target.closest('.tire-slot');
-        if (slot && arrastandoPneu) {
-          colocarPneuNoEixo(slot.dataset.posicao, arrastandoPneu);
-          slot.classList.remove('drop-zone');
-        }
-      });
+        const container = document.getElementById('truckDiagram');
+        
+        container.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            const slot = e.target.closest('.tire-slot');
+            if (slot) {
+                slot.classList.add('drop-zone');
+            }
+        });
+        
+        container.addEventListener('dragleave', (e) => {
+            const slot = e.target.closest('.tire-slot');
+            if (slot) {
+                slot.classList.remove('drop-zone');
+            }
+        });
+        
+        container.addEventListener('drop', (e) => {
+            e.preventDefault();
+            const slot = e.target.closest('.tire-slot');
+            if (slot && arrastandoPneu) {
+                colocarPneuNoEixo(slot.dataset.posicao, arrastandoPneu);
+                slot.classList.remove('drop-zone');
+            }
+        });
     }
 
     function colocarPneuNoEixo(posicao, numeroFogo) {
-      if (!veiculoSelecionado) return;
+        if (!veiculoSelecionado) return;
 
-      // Remover pneu de qualquer posição anterior
-      Object.keys(veiculoSelecionado.eixos).forEach(eixo => {
-        if (veiculoSelecionado.eixos[eixo] && typeof veiculoSelecionado.eixos[eixo] === 'object') {
-          // Eixo duplo
-          if (veiculoSelecionado.eixos[eixo].esquerda === numeroFogo) {
-            veiculoSelecionado.eixos[eixo].esquerda = null;
-          }
-          if (veiculoSelecionado.eixos[eixo].direita === numeroFogo) {
-            veiculoSelecionado.eixos[eixo].direita = null;
-          }
-        } else if (veiculoSelecionado.eixos[eixo] === numeroFogo) {
-          // Estepe
-          veiculoSelecionado.eixos[eixo] = null;
+        // Remover pneu de qualquer posição anterior
+        Object.keys(veiculoSelecionado.eixos).forEach(eixo => {
+            if (veiculoSelecionado.eixos[eixo] && typeof veiculoSelecionado.eixos[eixo] === 'object') {
+                // Eixo duplo
+                if (veiculoSelecionado.eixos[eixo].esquerda === numeroFogo) {
+                    veiculoSelecionado.eixos[eixo].esquerda = null;
+                }
+                if (veiculoSelecionado.eixos[eixo].direita === numeroFogo) {
+                    veiculoSelecionado.eixos[eixo].direita = null;
+                }
+            } else if (veiculoSelecionado.eixos[eixo] === numeroFogo) {
+                // Estepe
+                veiculoSelecionado.eixos[eixo] = null;
+            }
+        });
+
+        // Colocar pneu na nova posição
+        const [eixo, lado] = posicao.split('-');
+        
+        if (lado) {
+            // Eixo com lados (esquerda/direita)
+            veiculoSelecionado.eixos[eixo][lado] = numeroFogo;
+        } else {
+            // Estepe
+            veiculoSelecionado.eixos[eixo] = numeroFogo;
         }
-      });
 
-      // Colocar pneu na nova posição
-      const [eixo, lado] = posicao.split('-');
-      
-      if (lado) {
-        // Eixo com lados (esquerda/direita)
-        veiculoSelecionado.eixos[eixo][lado] = numeroFogo;
-      } else {
-        // Estepe
-        veiculoSelecionado.eixos[eixo] = numeroFogo;
-      }
+        // Atualizar no array de fogos
+        const fogo = reportData.fogos.find(f => f.numero === numeroFogo);
+        if (fogo) {
+            fogo.veiculo = veiculoSelecionado.placa;
+            fogo.posicao = posicao;
+        }
 
-      // Atualizar no array de fogos
-      const fogo = reportData.fogos.find(f => f.numero === numeroFogo);
-      if (fogo) {
-        fogo.veiculo = veiculoSelecionado.placa;
-        fogo.posicao = posicao;
-      }
-
-      // Atualizar visualização
-      renderizarDiagramaVeiculo();
-      renderizarListaVeiculos();
-      carregarPneusDisponiveis(); // Atualizar lista de disponíveis
-      
-      showNotification(`Pneu ${numeroFogo} colocado na posição ${posicao}`, 'success');
+        // Atualizar visualização
+        renderizarDiagramaVeiculo();
+        renderizarListaVeiculos();
+        carregarPneusDisponiveis(); // Atualizar lista de disponíveis
+        
+        showNotification(`Pneu Fogo ${numeroFogo} colocado na posição ${posicao}`, 'success');
     }
 
-    function saveTirePositions() {
-      if (!veiculoSelecionado) {
-        showNotification('Selecione um veículo primeiro!', 'error');
-        return;
-      }
+    // =============================================
+    // MODAIS PARA GERENCIAR VEÍCULOS
+    // =============================================
 
-      // Salvar posições dos veículos
-      localStorage.setItem('tc_veiculos_posicoes', JSON.stringify(veiculos));
-      
-      // Salvar dados dos fogos
-      saveData();
-      
-      showNotification('Posições dos pneus salvas com sucesso!', 'success');
+    function openAddVeiculoModal() {
+        document.getElementById('addVeiculoModal').style.display = 'flex';
+    }
+
+    function closeAddVeiculoModal() {
+        document.getElementById('addVeiculoModal').style.display = 'none';
+    }
+
+    function confirmAddVeiculo() {
+        const placa = document.getElementById('veiculoPlaca').value;
+        const modelo = document.getElementById('veiculoModelo').value;
+        const tipo = document.getElementById('veiculoTipo').value;
+        const configuracao = document.getElementById('veiculoConfiguracao').value;
+
+        if (!placa || !modelo || !tipo) {
+            showNotification('Preencha todos os campos obrigatórios!', 'error');
+            return;
+        }
+
+        // Verificar se placa já existe
+        if (veiculos.some(v => v.placa === placa)) {
+            showNotification('Já existe um veículo com esta placa!', 'error');
+            return;
+        }
+
+        const novoVeiculo = {
+            id: 'V' + Date.now(),
+            placa: placa.toUpperCase(),
+            modelo: modelo,
+            tipo: tipo,
+            configuracao: configuracao,
+            eixos: criarEstruturaEixos(tipo, configuracao)
+        };
+
+        veiculos.push(novoVeiculo);
+        salvarPosicoesVeiculos();
+        closeAddVeiculoModal();
+        renderizarListaVeiculos();
+        showNotification('Veículo adicionado com sucesso!', 'success');
+    }
+
+    function criarEstruturaEixos(tipo, configuracao) {
+        if (tipo === 'cavalo') {
+            return {
+                dianteiro: { tipo: 'direcional', esquerda: null, direita: null },
+                traseiro1: { tipo: configuracao.includes('4') ? 'tracao' : 'livre', esquerda: null, direita: null },
+                traseiro2: { tipo: configuracao === '6x4' ? 'tracao' : 'livre', esquerda: null, direita: null },
+                estepe: null
+            };
+        } else {
+            // Carreta
+            return {
+                traseiro1: { tipo: 'fixo', esquerda: null, direita: null },
+                traseiro2: { tipo: 'fixo', esquerda: null, direita: null },
+                traseiro3: { tipo: 'fixo', esquerda: null, direita: null },
+                estepe: null
+            };
+        }
+    }
+
+    function openEditVeiculoModal(veiculo) {
+        veiculoSelecionado = veiculo;
+        
+        document.getElementById('editVeiculoPlaca').value = veiculo.placa;
+        document.getElementById('editVeiculoModelo').value = veiculo.modelo;
+        document.getElementById('editVeiculoTipo').value = veiculo.tipo;
+        document.getElementById('editVeiculoConfiguracao').value = veiculo.configuracao;
+        
+        document.getElementById('editVeiculoModal').style.display = 'flex';
+    }
+
+    function closeEditVeiculoModal() {
+        document.getElementById('editVeiculoModal').style.display = 'none';
+    }
+
+    function confirmEditVeiculo() {
+        if (!veiculoSelecionado) return;
+
+        const placa = document.getElementById('editVeiculoPlaca').value;
+        const modelo = document.getElementById('editVeiculoModelo').value;
+        const tipo = document.getElementById('editVeiculoTipo').value;
+        const configuracao = document.getElementById('editVeiculoConfiguracao').value;
+
+        if (!placa || !modelo || !tipo) {
+            showNotification('Preencha todos os campos obrigatórios!', 'error');
+            return;
+        }
+
+        // Atualizar veículo
+        veiculoSelecionado.placa = placa.toUpperCase();
+        veiculoSelecionado.modelo = modelo;
+        veiculoSelecionado.tipo = tipo;
+        veiculoSelecionado.configuracao = configuracao;
+
+        salvarPosicoesVeiculos();
+        closeEditVeiculoModal();
+        renderizarListaVeiculos();
+        renderizarDiagramaVeiculo();
+        showNotification('Veículo atualizado com sucesso!', 'success');
+    }
+
+    // =============================================
+    // FUNÇÕES DE SALVAR E RESETAR
+    // =============================================
+
+    function saveTirePositions() {
+        if (!veiculoSelecionado) {
+            showNotification('Selecione um veículo primeiro!', 'error');
+            return;
+        }
+
+        salvarPosicoesVeiculos();
+        saveData(); // Salvar dados dos fogos
+        
+        showNotification('Posições dos pneus salvas com sucesso!', 'success');
+    }
+
+    function salvarPosicoesVeiculos() {
+        localStorage.setItem('tc_veiculos_posicoes', JSON.stringify(veiculos));
     }
 
     function resetTirePositions() {
-      if (!veiculoSelecionado || !confirm('Tem certeza que deseja resetar todas as posições deste veículo?')) {
-        return;
-      }
-
-      // Resetar posições do veículo selecionado
-      Object.keys(veiculoSelecionado.eixos).forEach(eixo => {
-        if (veiculoSelecionado.eixos[eixo] && typeof veiculoSelecionado.eixos[eixo] === 'object') {
-          // Eixo duplo
-          veiculoSelecionado.eixos[eixo].esquerda = null;
-          veiculoSelecionado.eixos[eixo].direita = null;
-        } else {
-          // Estepe
-          veiculoSelecionado.eixos[eixo] = null;
+        if (!veiculoSelecionado || !confirm('Tem certeza que deseja resetar todas as posições deste veículo?')) {
+            return;
         }
-      });
 
-      // Remover veículo dos fogos
-      reportData.fogos.forEach(fogo => {
-        if (fogo.veiculo === veiculoSelecionado.placa) {
-          fogo.veiculo = '';
-          fogo.posicao = '';
-        }
-      });
+        // Resetar posições do veículo selecionado
+        Object.keys(veiculoSelecionado.eixos).forEach(eixo => {
+            if (veiculoSelecionado.eixos[eixo] && typeof veiculoSelecionado.eixos[eixo] === 'object') {
+                // Eixo duplo
+                veiculoSelecionado.eixos[eixo].esquerda = null;
+                veiculoSelecionado.eixos[eixo].direita = null;
+            } else {
+                // Estepe
+                veiculoSelecionado.eixos[eixo] = null;
+            }
+        });
 
-      // Atualizar visualização
-      renderizarDiagramaVeiculo();
-      renderizarListaVeiculos();
-      carregarPneusDisponiveis();
-      
-      showNotification('Posições resetadas com sucesso!', 'success');
+        // Remover veículo dos fogos
+        reportData.fogos.forEach(fogo => {
+            if (fogo.veiculo === veiculoSelecionado.placa) {
+                fogo.veiculo = '';
+                fogo.posicao = '';
+            }
+        });
+
+        // Atualizar visualização
+        salvarPosicoesVeiculos();
+        renderizarDiagramaVeiculo();
+        renderizarListaVeiculos();
+        carregarPneusDisponiveis();
+        
+        showNotification('Posições resetadas com sucesso!', 'success');
     }
 
     // =============================================
@@ -3846,343 +4356,4 @@
     }
 
     function updateCharts() {
-      // Atualizar dados dos gráficos com informações reais
-      const statusData = {
-        'Novo': 0,
-        'Usado': 0,
-        'Reformado': 0
-      };
-
-      reportData.items.forEach(item => {
-        statusData[item.status] += item.qty;
-      });
-
-      if (statusChart) {
-        statusChart.data.datasets[0].data = [
-          statusData.Novo,
-          statusData.Usado,
-          statusData.Reformado
-        ];
-        statusChart.update();
-      }
-    }
-
-    // =============================================
-    // FUNÇÕES DE MODAIS E CRUD
-    // =============================================
-
-    function openAddPneuModal() {
-      document.getElementById('addPneuModal').style.display = 'flex';
-    }
-
-    function closeAddPneuModal() {
-      document.getElementById('addPneuModal').style.display = 'none';
-    }
-
-    function confirmAddPneu() {
-      const medida = document.getElementById('pneuMedida').value;
-      const marca = document.getElementById('pneuMarca').value;
-      const modelo = document.getElementById('pneuModelo').value;
-      const status = document.getElementById('pneuStatus').value;
-      const qty = parseInt(document.getElementById('pneuQuantidade').value);
-      const preco = parseFloat(document.getElementById('pneuPreco').value);
-      const container = document.getElementById('pneuContainer').value;
-      const observacoes = document.getElementById('pneuObservacoes').value;
-
-      if (!medida || !marca || !modelo || !status || !qty || !preco) {
-        showNotification('Preencha todos os campos obrigatórios!', 'error');
-        return;
-      }
-
-      const novoPneu = {
-        id: `PNEU-${Date.now()}`,
-        medida: medida,
-        marca: marca,
-        modelo: modelo,
-        status: status,
-        qty: qty,
-        preco: preco,
-        container: container,
-        dataEntrada: new Date().toISOString().split('T')[0],
-        observacoes: observacoes
-      };
-
-      reportData.items.push(novoPneu);
-      saveData();
-      closeAddPneuModal();
-      showNotification('Pneu adicionado com sucesso!', 'success');
-      
-      // Verificar alertas automáticos após adicionar pneu
-      verificarAlertasAutomaticos();
-      
-      // Atualizar o container específico
-      updateContainerData(container);
-      
-      // Atualizar dashboard
-      renderDashboard();
-    }
-
-    function openAddFogoModal() {
-      // Popular select com pneus disponíveis
-      const select = document.getElementById('fogoPneuSelect');
-      select.innerHTML = '<option value="">Selecione um pneu...</option>';
-      
-      reportData.items.forEach(item => {
-        if (item.qty > 0) {
-          const option = document.createElement('option');
-          option.value = item.id;
-          option.textContent = `${item.medida} - ${item.marca} ${item.modelo} (${item.qty} disponíveis)`;
-          select.appendChild(option);
-        }
-      });
-
-      document.getElementById('addFogoModal').style.display = 'flex';
-      updateFogoPreview();
-    }
-
-    function closeAddFogoModal() {
-      document.getElementById('addFogoModal').style.display = 'none';
-    }
-
-    function updateFogoPreview() {
-      const quantidade = parseInt(document.getElementById('fogoQuantidade').value) || 1;
-      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value) || 1;
-      
-      const previewList = document.getElementById('fogoPreviewList');
-      previewList.innerHTML = '';
-      
-      for (let i = 0; i < quantidade; i++) {
-        const div = document.createElement('div');
-        div.textContent = `Fogo ${numeroInicial + i}`;
-        previewList.appendChild(div);
-      }
-    }
-
-    function confirmAddFogo() {
-      const pneuId = document.getElementById('fogoPneuSelect').value;
-      const quantidade = parseInt(document.getElementById('fogoQuantidade').value);
-      const numeroInicial = parseInt(document.getElementById('fogoNumeroInicial').value);
-      const veiculo = document.getElementById('fogoVeiculo').value;
-      const posicao = document.getElementById('fogoPosicao').value;
-      const observacoes = document.getElementById('fogoObservacoes').value;
-
-      if (!pneuId || !quantidade || !numeroInicial) {
-        showNotification('Preencha todos os campos obrigatórios!', 'error');
-        return;
-      }
-
-      const pneu = reportData.items.find(p => p.id === pneuId);
-      if (!pneu) {
-        showNotification('Pneu não encontrado!', 'error');
-        return;
-      }
-
-      if (pneu.qty < quantidade) {
-        showNotification(`Quantidade insuficiente! Disponível: ${pneu.qty}`, 'error');
-        return;
-      }
-
-      // Criar fogos
-      for (let i = 0; i < quantidade; i++) {
-        const numeroFogo = numeroInicial + i;
-        
-        const novoFogo = {
-          id: `FOGO-${Date.now()}-${i}`,
-          numero: numeroFogo,
-          pneuId: pneuId,
-          medida: pneu.medida,
-          marca: pneu.marca,
-          modelo: pneu.modelo,
-          veiculo: veiculo,
-          posicao: posicao,
-          dataInstalacao: new Date().toISOString().split('T')[0],
-          observacoes: observacoes,
-          status: 'Ativo'
-        };
-
-        reportData.fogos.push(novoFogo);
-      }
-
-      // Atualizar estoque
-      pneu.qty -= quantidade;
-      reportData.ultimoFogo = Math.max(reportData.ultimoFogo, numeroInicial + quantidade - 1);
-
-      saveData();
-      closeAddFogoModal();
-      showNotification(`${quantidade} fogos adicionados com sucesso!`, 'success');
-      
-      // Verificar alertas automáticos após adicionar fogos
-      verificarAlertasAutomaticos();
-      
-      // Atualizar views
-      renderFogosList();
-      renderDashboard();
-    }
-
-    function openEditFogoModal(fogoNumero) {
-      const fogo = reportData.fogos.find(f => f.numero === fogoNumero);
-      if (!fogo) return;
-
-      fogoEditando = fogo;
-      
-      document.getElementById('editFogoNumero').value = fogo.numero;
-      document.getElementById('editFogoVeiculo').value = fogo.veiculo || '';
-      document.getElementById('editFogoPosicao').value = fogo.posicao || '';
-      document.getElementById('editFogoObservacoes').value = fogo.observacoes || '';
-      
-      document.getElementById('editFogoModal').style.display = 'flex';
-    }
-
-    function closeEditFogoModal() {
-      document.getElementById('editFogoModal').style.display = 'none';
-      fogoEditando = null;
-    }
-
-    function confirmEditFogo() {
-      if (!fogoEditando) return;
-
-      fogoEditando.veiculo = document.getElementById('editFogoVeiculo').value;
-      fogoEditando.posicao = document.getElementById('editFogoPosicao').value;
-      fogoEditando.observacoes = document.getElementById('editFogoObservacoes').value;
-
-      saveData();
-      closeEditFogoModal();
-      showNotification('Fogo atualizado com sucesso!', 'success');
-      renderFogosList();
-    }
-
-    function deleteFogo(fogoNumero) {
-      if (!confirm(`Tem certeza que deseja excluir o fogo ${fogoNumero}?`)) return;
-
-      const index = reportData.fogos.findIndex(f => f.numero === fogoNumero);
-      if (index !== -1) {
-        // Devolver pneu ao estoque
-        const fogo = reportData.fogos[index];
-        const pneu = reportData.items.find(p => p.id === fogo.pneuId);
-        if (pneu) {
-          pneu.qty += 1;
-        }
-
-        reportData.fogos.splice(index, 1);
-        saveData();
-        showNotification('Fogo excluído com sucesso!', 'success');
-        renderFogosList();
-        renderDashboard();
-      }
-    }
-
-    function generatePerformanceReport() {
-      showNotification('🚛 Gerando relatório de performance...', 'success');
-      
-      // Atualizar métricas de performance
-      const performanceMetrics = document.getElementById('performanceMetrics');
-      if (performanceMetrics) {
-        performanceMetrics.innerHTML = `
-          <div class="metric-card">
-            <div class="metric-value">4</div>
-            <div class="metric-label">Veículos Ativos</div>
-            <div class="metric-change positive">↑ 100% operacionais</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">R$ 0.18</div>
-            <div class="metric-label">Custo Médio/KM</div>
-            <div class="metric-change negative">↑ 5% vs mês anterior</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">42.5k</div>
-            <div class="metric-label">KM Médio por Pneu</div>
-            <div class="metric-change positive">↑ 8% vs mês anterior</div>
-          </div>
-          
-          <div class="metric-card">
-            <div class="metric-value">84%</div>
-            <div class="metric-label">Eficiência Geral</div>
-            <div class="metric-change positive">↑ 3% vs mês anterior</div>
-          </div>
-        `;
-      }
-    }
-
-    function renderFogosList() {
-      const fogosList = document.getElementById('fogosList');
-      const fogosCount = document.getElementById('fogosCount');
-
-      if (fogosList && fogosCount) {
-        if (reportData.fogos.length === 0) {
-          fogosList.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">🔥</div>
-              <p>Nenhum fogo cadastrado</p>
-              <p style="font-size: 0.8rem; margin-top: 10px;">Use o botão "Adicionar Fogo" para começar</p>
-            </div>
-          `;
-        } else {
-          fogosList.innerHTML = reportData.fogos.map(fogo => `
-            <div class="fogo-item">
-              <div class="fogo-info">
-                <div class="fogo-number">Fogo ${fogo.numero}</div>
-                <div class="fogo-details">
-                  ${fogo.medida} - ${fogo.marca} ${fogo.modelo}
-                  ${fogo.veiculo ? ` • ${fogo.veiculo}` : ''}
-                  ${fogo.posicao ? ` • ${fogo.posicao}` : ''}
-                </div>
-              </div>
-              <div class="fogo-actions">
-                <button class="btn-xs" onclick="openEditFogoModal(${fogo.numero})">Editar</button>
-                <button class="btn-xs btn-danger" onclick="deleteFogo(${fogo.numero})">Excluir</button>
-              </div>
-            </div>
-          `).join('');
-        }
-
-        fogosCount.textContent = reportData.fogos.length;
-      }
-    }
-
-    // =============================================
-    // FUNÇÕES UTILITÁRIAS
-    // =============================================
-
-    function showNotification(message, type = 'success') {
-      const existingNotifications = document.querySelectorAll('.notification');
-      existingNotifications.forEach(notif => notif.remove());
-      
-      const notification = document.createElement('div');
-      notification.className = `notification ${type}`;
-      notification.textContent = message;
-      
-      document.body.appendChild(notification);
-      
-      setTimeout(() => {
-        if (notification.parentNode) {
-          notification.remove();
-        }
-      }, 3000);
-    }
-
-    function saveData() {
-      localStorage.setItem('tc_pneus', JSON.stringify(reportData.items));
-      localStorage.setItem('tc_fogos', JSON.stringify(reportData.fogos));
-      localStorage.setItem('tc_ultimo_fogo', reportData.ultimoFogo.toString());
-      salvarAlertas();
-    }
-
-    // Funções dos modais que ainda não foram implementados
-    function openRemoveFogoModal() {
-      showNotification('🔄 Modal Retirar do Fogo - Em desenvolvimento', 'warning');
-    }
-
-    function openDeleteFogoModal() {
-      showNotification('🗑️ Modal Excluir Fogo - Em desenvolvimento', 'warning');
-    }
-
-    function applyDateFilter() {
-      showNotification('📅 Filtro de datas aplicado!', 'success');
-    }
-
-    console.log('Aplicação carregada com sucesso!');
-  </script>
-</body>
-</html>
+      // Atualizar dados dos gráficos com informações real
