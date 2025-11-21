@@ -1010,6 +1010,47 @@
       z-index: 10;
     }
 
+    /* Modo de montagem */
+    .montagem-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .montagem-info {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+
+    .montagem-status {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .status-item {
+      text-align: center;
+      padding: 10px;
+      background: rgba(15, 23, 42, 0.6);
+      border-radius: 8px;
+      min-width: 100px;
+    }
+
+    .status-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: var(--accent);
+    }
+
+    .status-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
     @media (max-width: 768px) {
       .movement-container {
         grid-template-columns: 1fr;
@@ -1023,6 +1064,10 @@
       
       .truck-diagram {
         height: 250px;
+      }
+
+      .montagem-status {
+        justify-content: center;
       }
     }
   </style>
@@ -1507,12 +1552,40 @@
             <button onclick="openAddVeiculoModal()" class="btn-success">
               ➕ Adicionar Veículo
             </button>
+            <button onclick="iniciarMontagem()" class="btn-success" id="btnIniciarMontagem">
+              🔧 Iniciar Montagem
+            </button>
+            <button onclick="finalizarMontagem()" class="btn-success" id="btnFinalizarMontagem" style="display: none;">
+              ✅ Finalizar Montagem
+            </button>
             <button onclick="saveTirePositions()" class="btn-success">
               💾 Salvar Posições
             </button>
             <button onclick="resetTirePositions()" class="btn-warning">
               🔄 Resetar
             </button>
+          </div>
+        </div>
+
+        <!-- Informações de Montagem -->
+        <div class="montagem-info" id="montagemInfo" style="display: none;">
+          <h3 style="color: var(--accent); margin-bottom: 10px;">🔧 Modo Montagem Ativo</h3>
+          <p style="margin-bottom: 10px;">Arraste os pneus disponíveis para as posições desejadas no caminhão. 
+          Clique em "Finalizar Montagem" quando terminar.</p>
+          
+          <div class="montagem-status">
+            <div class="status-item">
+              <div class="status-value" id="statusPneusMontados">0</div>
+              <div class="status-label">Pneus Montados</div>
+            </div>
+            <div class="status-item">
+              <div class="status-value" id="statusPosicoesVazias">0</div>
+              <div class="status-label">Posições Vazias</div>
+            </div>
+            <div class="status-item">
+              <div class="status-value" id="statusPneusDisponiveis">0</div>
+              <div class="status-label">Pneus Disponíveis</div>
+            </div>
           </div>
         </div>
 
@@ -1961,14 +2034,15 @@
 
   <script>
     // =============================================
-    // SISTEMA DE MOVIMENTAÇÃO DE PNEUS - CORRIGIDO
+    // SISTEMA DE MOVIMENTAÇÃO DE PNEUS - MELHORADO
     // =============================================
 
     let veiculos = [];
     let veiculoSelecionado = null;
     let pneusDisponiveis = [];
     let arrastandoPneu = null;
-    let modoEdicao = false;
+    let modoMontagem = false;
+    let montagemTemporaria = {};
 
     // Inicializar sistema de movimentação
     function inicializarSistemaMovimentacao() {
@@ -1982,6 +2056,17 @@
         
         // Configurar eventos de drag and drop
         configurarDragAndDrop();
+        
+        // Inicializar montagem temporária
+        inicializarMontagemTemporaria();
+    }
+
+    function inicializarMontagemTemporaria() {
+        montagemTemporaria = {
+            pneusMontados: [],
+            posicoesOcupadas: {},
+            dataInicio: null
+        };
     }
 
     function carregarVeiculos() {
@@ -2083,6 +2168,7 @@
         );
         
         renderizarPneusDisponiveis();
+        atualizarStatusMontagem();
     }
 
     function renderizarListaVeiculos() {
@@ -2157,6 +2243,9 @@
         document.getElementById('currentVehicle').textContent = `${veiculo.placa} - ${veiculo.modelo}`;
         document.getElementById('vehicleDetails').textContent = 
             `${veiculo.tipo === 'cavalo' ? 'Cavalo Mecânico' : 'Carreta'} • ${veiculo.configuracao}`;
+        
+        // Atualizar status da montagem
+        atualizarStatusMontagem();
     }
 
     function renderizarDiagramaVeiculo() {
@@ -2313,7 +2402,11 @@
                 axleDiv.style.alignItems = 'center';
 
                 const tireSlot = document.createElement('div');
-                tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
+                const pneuAtual = modoMontagem ? 
+                    (montagemTemporaria.posicoesOcupadas[eixo.id] || veiculoSelecionado.eixos[eixo.id]) : 
+                    veiculoSelecionado.eixos[eixo.id];
+                
+                tireSlot.className = `tire-slot ${pneuAtual ? 'filled' : ''}`;
                 tireSlot.dataset.posicao = eixo.id;
                 tireSlot.style.width = '40px';
                 tireSlot.style.height = '40px';
@@ -2323,7 +2416,7 @@
                 tireSlot.style.justifyContent = 'center';
                 tireSlot.style.fontSize = '0.7rem';
                 tireSlot.style.fontWeight = 'bold';
-                tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'ESTEPE';
+                tireSlot.textContent = pneuAtual || 'ESTEPE';
                 axleDiv.appendChild(tireSlot);
             } else {
                 // Eixos duplos (esquerda/direita)
@@ -2331,7 +2424,11 @@
                 axleDiv.style.height = '50px';
 
                 const leftSlot = document.createElement('div');
-                leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
+                const pneuEsquerda = modoMontagem ? 
+                    (montagemTemporaria.posicoesOcupadas[`${eixo.id}-esquerda`] || veiculoSelecionado.eixos[eixo.id]?.esquerda) : 
+                    veiculoSelecionado.eixos[eixo.id]?.esquerda;
+                
+                leftSlot.className = `tire-slot ${pneuEsquerda ? 'filled' : ''}`;
                 leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
                 leftSlot.style.width = '40px';
                 leftSlot.style.height = '40px';
@@ -2341,10 +2438,14 @@
                 leftSlot.style.justifyContent = 'center';
                 leftSlot.style.fontSize = '0.7rem';
                 leftSlot.style.fontWeight = 'bold';
-                leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
+                leftSlot.textContent = pneuEsquerda || 'E';
                 
                 const rightSlot = document.createElement('div');
-                rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
+                const pneuDireita = modoMontagem ? 
+                    (montagemTemporaria.posicoesOcupadas[`${eixo.id}-direita`] || veiculoSelecionado.eixos[eixo.id]?.direita) : 
+                    veiculoSelecionado.eixos[eixo.id]?.direita;
+                
+                rightSlot.className = `tire-slot ${pneuDireita ? 'filled' : ''}`;
                 rightSlot.dataset.posicao = `${eixo.id}-direita`;
                 rightSlot.style.width = '40px';
                 rightSlot.style.height = '40px';
@@ -2354,7 +2455,7 @@
                 rightSlot.style.justifyContent = 'center';
                 rightSlot.style.fontSize = '0.7rem';
                 rightSlot.style.fontWeight = 'bold';
-                rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
+                rightSlot.textContent = pneuDireita || 'D';
                 
                 axleDiv.appendChild(leftSlot);
                 axleDiv.appendChild(rightSlot);
@@ -2465,7 +2566,11 @@
                 axleDiv.style.flexDirection = 'column';
 
                 const tireSlot = document.createElement('div');
-                tireSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id] ? 'filled' : ''}`;
+                const pneuAtual = modoMontagem ? 
+                    (montagemTemporaria.posicoesOcupadas[eixo.id] || veiculoSelecionado.eixos[eixo.id]) : 
+                    veiculoSelecionado.eixos[eixo.id];
+                
+                tireSlot.className = `tire-slot ${pneuAtual ? 'filled' : ''}`;
                 tireSlot.dataset.posicao = eixo.id;
                 tireSlot.style.width = '40px';
                 tireSlot.style.height = '40px';
@@ -2475,14 +2580,18 @@
                 tireSlot.style.justifyContent = 'center';
                 tireSlot.style.fontSize = '0.7rem';
                 tireSlot.style.fontWeight = 'bold';
-                tireSlot.textContent = veiculoSelecionado.eixos[eixo.id] || 'ESTEPE';
+                tireSlot.textContent = pneuAtual || 'ESTEPE';
                 axleDiv.appendChild(tireSlot);
             } else {
                 axleDiv.style.width = '120px';
                 axleDiv.style.height = '50px';
 
                 const leftSlot = document.createElement('div');
-                leftSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.esquerda ? 'filled' : ''}`;
+                const pneuEsquerda = modoMontagem ? 
+                    (montagemTemporaria.posicoesOcupadas[`${eixo.id}-esquerda`] || veiculoSelecionado.eixos[eixo.id]?.esquerda) : 
+                    veiculoSelecionado.eixos[eixo.id]?.esquerda;
+                
+                leftSlot.className = `tire-slot ${pneuEsquerda ? 'filled' : ''}`;
                 leftSlot.dataset.posicao = `${eixo.id}-esquerda`;
                 leftSlot.style.width = '40px';
                 leftSlot.style.height = '40px';
@@ -2492,10 +2601,14 @@
                 leftSlot.style.justifyContent = 'center';
                 leftSlot.style.fontSize = '0.7rem';
                 leftSlot.style.fontWeight = 'bold';
-                leftSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.esquerda || 'E';
+                leftSlot.textContent = pneuEsquerda || 'E';
                 
                 const rightSlot = document.createElement('div');
-                rightSlot.className = `tire-slot ${veiculoSelecionado.eixos[eixo.id]?.direita ? 'filled' : ''}`;
+                const pneuDireita = modoMontagem ? 
+                    (montagemTemporaria.posicoesOcupadas[`${eixo.id}-direita`] || veiculoSelecionado.eixos[eixo.id]?.direita) : 
+                    veiculoSelecionado.eixos[eixo.id]?.direita;
+                
+                rightSlot.className = `tire-slot ${pneuDireita ? 'filled' : ''}`;
                 rightSlot.dataset.posicao = `${eixo.id}-direita`;
                 rightSlot.style.width = '40px';
                 rightSlot.style.height = '40px';
@@ -2505,7 +2618,7 @@
                 rightSlot.style.justifyContent = 'center';
                 rightSlot.style.fontSize = '0.7rem';
                 rightSlot.style.fontWeight = 'bold';
-                rightSlot.textContent = veiculoSelecionado.eixos[eixo.id]?.direita || 'D';
+                rightSlot.textContent = pneuDireita || 'D';
                 
                 axleDiv.appendChild(leftSlot);
                 axleDiv.appendChild(rightSlot);
@@ -2532,31 +2645,43 @@
         }
 
         pneusDisponiveis.forEach(pneu => {
+            // Verificar se o pneu já está sendo usado na montagem atual
+            const estaEmUso = montagemTemporaria.pneusMontados.includes(pneu.numero);
+            
             const div = document.createElement('div');
-            div.className = 'tire-item';
-            div.draggable = true;
+            div.className = `tire-item ${estaEmUso ? 'em-uso' : ''}`;
+            div.draggable = !estaEmUso && modoMontagem; // Só pode arrastar se não estiver em uso e estiver em modo montagem
             div.dataset.fogo = pneu.numero;
+            
+            if (estaEmUso) {
+                div.style.opacity = '0.6';
+                div.style.cursor = 'not-allowed';
+            }
+            
             div.innerHTML = `
-                <div class="tire-number">Fogo ${pneu.numero}</div>
+                <div class="tire-number">Fogo ${pneu.numero} ${estaEmUso ? '🔒' : ''}</div>
                 <div class="tire-details">${pneu.medida} - ${pneu.marca}</div>
                 <div style="font-size: 0.7rem; color: var(--muted); margin-top: 2px;">
                     ${pneu.modelo}
                 </div>
+                ${estaEmUso ? '<div style="font-size: 0.6rem; color: var(--accent); margin-top: 2px;">Em uso na montagem</div>' : ''}
             `;
             
-            div.addEventListener('dragstart', (e) => {
-                arrastandoPneu = pneu.numero;
-                e.dataTransfer.setData('text/plain', pneu.numero);
-                div.style.opacity = '0.5';
-            });
-            
-            div.addEventListener('dragend', () => {
-                arrastandoPneu = null;
-                div.style.opacity = '1';
-                document.querySelectorAll('.drop-zone').forEach(zone => {
-                    zone.classList.remove('drop-zone');
+            if (!estaEmUso && modoMontagem) {
+                div.addEventListener('dragstart', (e) => {
+                    arrastandoPneu = pneu.numero;
+                    e.dataTransfer.setData('text/plain', pneu.numero);
+                    div.style.opacity = '0.5';
                 });
-            });
+                
+                div.addEventListener('dragend', () => {
+                    arrastandoPneu = null;
+                    div.style.opacity = '1';
+                    document.querySelectorAll('.drop-zone').forEach(zone => {
+                        zone.classList.remove('drop-zone');
+                    });
+                });
+            }
 
             container.appendChild(div);
         });
@@ -2566,6 +2691,7 @@
         const container = document.getElementById('truckDiagram');
         
         container.addEventListener('dragover', (e) => {
+            if (!modoMontagem) return;
             e.preventDefault();
             const slot = e.target.closest('.tire-slot');
             if (slot) {
@@ -2574,6 +2700,7 @@
         });
         
         container.addEventListener('dragleave', (e) => {
+            if (!modoMontagem) return;
             const slot = e.target.closest('.tire-slot');
             if (slot) {
                 slot.classList.remove('drop-zone');
@@ -2581,18 +2708,214 @@
         });
         
         container.addEventListener('drop', (e) => {
+            if (!modoMontagem) return;
             e.preventDefault();
             const slot = e.target.closest('.tire-slot');
             if (slot && arrastandoPneu) {
-                colocarPneuNoEixo(slot.dataset.posicao, arrastandoPneu);
+                colocarPneuNaMontagem(slot.dataset.posicao, arrastandoPneu);
                 slot.classList.remove('drop-zone');
             }
         });
     }
 
+    function colocarPneuNaMontagem(posicao, numeroFogo) {
+        if (!veiculoSelecionado || !modoMontagem) return;
+
+        // Verificar se a posição já está ocupada na montagem atual
+        if (montagemTemporaria.posicoesOcupadas[posicao]) {
+            showNotification(`Posição ${posicao} já está ocupada!`, 'error');
+            return;
+        }
+
+        // Verificar se o pneu já está sendo usado em outra posição
+        if (montagemTemporaria.pneusMontados.includes(numeroFogo)) {
+            showNotification(`Pneu Fogo ${numeroFogo} já está em uso na montagem!`, 'error');
+            return;
+        }
+
+        // Adicionar à montagem temporária
+        montagemTemporaria.posicoesOcupadas[posicao] = numeroFogo;
+        montagemTemporaria.pneusMontados.push(numeroFogo);
+
+        // Atualizar visualização
+        renderizarDiagramaVeiculo();
+        renderizarPneusDisponiveis();
+        atualizarStatusMontagem();
+        
+        showNotification(`Pneu Fogo ${numeroFogo} colocado na posição ${posicao}`, 'success');
+    }
+
+    function removerPneuDaMontagem(posicao) {
+        if (!modoMontagem) return;
+
+        const numeroFogo = montagemTemporaria.posicoesOcupadas[posicao];
+        if (numeroFogo) {
+            // Remover da montagem temporária
+            delete montagemTemporaria.posicoesOcupadas[posicao];
+            const index = montagemTemporaria.pneusMontados.indexOf(numeroFogo);
+            if (index > -1) {
+                montagemTemporaria.pneusMontados.splice(index, 1);
+            }
+
+            // Atualizar visualização
+            renderizarDiagramaVeiculo();
+            renderizarPneusDisponiveis();
+            atualizarStatusMontagem();
+            
+            showNotification(`Pneu Fogo ${numeroFogo} removido da posição ${posicao}`, 'warning');
+        }
+    }
+
+    // =============================================
+    // SISTEMA DE MONTAGEM - NOVAS FUNÇÕES
+    // =============================================
+
+    function iniciarMontagem() {
+        if (!veiculoSelecionado) {
+            showNotification('Selecione um veículo primeiro!', 'error');
+            return;
+        }
+
+        modoMontagem = true;
+        montagemTemporaria.dataInicio = new Date();
+        
+        // Atualizar interface
+        document.getElementById('btnIniciarMontagem').style.display = 'none';
+        document.getElementById('btnFinalizarMontagem').style.display = 'inline-block';
+        document.getElementById('montagemInfo').style.display = 'block';
+        
+        // Adicionar eventos de clique para remover pneus
+        adicionarEventosRemocao();
+        
+        showNotification('Modo montagem ativado! Arraste os pneus para as posições desejadas.', 'success');
+        
+        // Atualizar status
+        atualizarStatusMontagem();
+    }
+
+    function finalizarMontagem() {
+        if (!modoMontagem) return;
+
+        // Confirmar finalização
+        if (!confirm('Deseja finalizar a montagem e aplicar as alterações?')) {
+            return;
+        }
+
+        // Aplicar mudanças permanentes
+        aplicarMontagemPermanente();
+        
+        // Sair do modo montagem
+        modoMontagem = false;
+        inicializarMontagemTemporaria();
+        
+        // Atualizar interface
+        document.getElementById('btnIniciarMontagem').style.display = 'inline-block';
+        document.getElementById('btnFinalizarMontagem').style.display = 'none';
+        document.getElementById('montagemInfo').style.display = 'none';
+        
+        // Remover eventos de remoção
+        removerEventosRemocao();
+        
+        showNotification('Montagem finalizada com sucesso!', 'success');
+        
+        // Atualizar visualização
+        renderizarDiagramaVeiculo();
+        renderizarPneusDisponiveis();
+        renderizarListaVeiculos();
+    }
+
+    function aplicarMontagemPermanente() {
+        if (!veiculoSelecionado) return;
+
+        // Aplicar todas as posições da montagem temporária ao veículo
+        Object.keys(montagemTemporaria.posicoesOcupadas).forEach(posicao => {
+            const [eixo, lado] = posicao.split('-');
+            const numeroFogo = montagemTemporaria.posicoesOcupadas[posicao];
+            
+            if (lado) {
+                // Eixo com lados (esquerda/direita)
+                veiculoSelecionado.eixos[eixo][lado] = numeroFogo;
+            } else {
+                // Estepe
+                veiculoSelecionado.eixos[eixo] = numeroFogo;
+            }
+
+            // Atualizar no array de fogos
+            const fogo = reportData.fogos.find(f => f.numero === numeroFogo);
+            if (fogo) {
+                fogo.veiculo = veiculoSelecionado.placa;
+                fogo.posicao = posicao;
+            }
+        });
+
+        // Salvar alterações
+        salvarPosicoesVeiculos();
+        saveData();
+    }
+
+    function adicionarEventosRemocao() {
+        const slots = document.querySelectorAll('.tire-slot.filled');
+        slots.forEach(slot => {
+            // Só adicionar evento se for um pneu da montagem temporária
+            const posicao = slot.dataset.posicao;
+            if (montagemTemporaria.posicoesOcupadas[posicao]) {
+                slot.style.cursor = 'pointer';
+                slot.title = 'Clique para remover o pneu';
+                slot.addEventListener('click', () => removerPneuDaMontagem(posicao));
+            }
+        });
+    }
+
+    function removerEventosRemocao() {
+        const slots = document.querySelectorAll('.tire-slot');
+        slots.forEach(slot => {
+            slot.style.cursor = '';
+            slot.title = '';
+            slot.replaceWith(slot.cloneNode(true)); // Remove event listeners
+        });
+    }
+
+    function atualizarStatusMontagem() {
+        if (!veiculoSelecionado) return;
+
+        // Calcular totais
+        const totalPosicoes = calcularTotalPosicoes(veiculoSelecionado);
+        const pneusMontados = montagemTemporaria.pneusMontados.length;
+        const posicoesVazias = totalPosicoes - pneusMontados;
+        const pneusDisponiveisCount = pneusDisponiveis.length - pneusMontados;
+
+        // Atualizar elementos
+        document.getElementById('statusPneusMontados').textContent = pneusMontados;
+        document.getElementById('statusPosicoesVazias').textContent = posicoesVazias;
+        document.getElementById('statusPneusDisponiveis').textContent = pneusDisponiveisCount;
+    }
+
+    function calcularTotalPosicoes(veiculo) {
+        let total = 0;
+        Object.values(veiculo.eixos).forEach(eixo => {
+            if (eixo && typeof eixo === 'object') {
+                total += 2; // Eixos duplos (esquerda + direita)
+            } else {
+                total += 1; // Estepe
+            }
+        });
+        return total;
+    }
+
+    // =============================================
+    // FUNÇÕES EXISTENTES (mantidas para compatibilidade)
+    // =============================================
+
     function colocarPneuNoEixo(posicao, numeroFogo) {
         if (!veiculoSelecionado) return;
 
+        // Se estiver em modo montagem, usar o sistema de montagem
+        if (modoMontagem) {
+            colocarPneuNaMontagem(posicao, numeroFogo);
+            return;
+        }
+
+        // Código original para quando não está em modo montagem
         // Remover pneu de qualquer posição anterior
         Object.keys(veiculoSelecionado.eixos).forEach(eixo => {
             if (veiculoSelecionado.eixos[eixo] && typeof veiculoSelecionado.eixos[eixo] === 'object') {
@@ -2630,7 +2953,7 @@
         // Atualizar visualização
         renderizarDiagramaVeiculo();
         renderizarListaVeiculos();
-        carregarPneusDisponiveis(); // Atualizar lista de disponíveis
+        carregarPneusDisponiveis();
         
         showNotification(`Pneu Fogo ${numeroFogo} colocado na posição ${posicao}`, 'success');
     }
@@ -2750,6 +3073,12 @@
             return;
         }
 
+        // Se estiver em modo montagem, finalizar primeiro
+        if (modoMontagem) {
+            showNotification('Finalize a montagem antes de salvar!', 'warning');
+            return;
+        }
+
         salvarPosicoesVeiculos();
         saveData(); // Salvar dados dos fogos
         
@@ -2763,6 +3092,11 @@
     function resetTirePositions() {
         if (!veiculoSelecionado || !confirm('Tem certeza que deseja resetar todas as posições deste veículo?')) {
             return;
+        }
+
+        // Se estiver em modo montagem, cancelar montagem
+        if (modoMontagem) {
+            cancelarMontagem();
         }
 
         // Resetar posições do veículo selecionado
@@ -2794,8 +3128,23 @@
         showNotification('Posições resetadas com sucesso!', 'success');
     }
 
+    function cancelarMontagem() {
+        modoMontagem = false;
+        inicializarMontagemTemporaria();
+        
+        // Atualizar interface
+        document.getElementById('btnIniciarMontagem').style.display = 'inline-block';
+        document.getElementById('btnFinalizarMontagem').style.display = 'none';
+        document.getElementById('montagemInfo').style.display = 'none';
+        
+        // Remover eventos de remoção
+        removerEventosRemocao();
+        
+        showNotification('Montagem cancelada!', 'warning');
+    }
+
     // =============================================
-    // CÓDIGO ORIGINAL - MANTIDO INTACTO
+    // CÓDIGO ORIGINAL - MANTIDO PARA COMPATIBILIDADE
     // =============================================
 
     // Dados de exemplo para demonstração
